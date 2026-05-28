@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ordre de Mission – Lycée Léopold Elfort</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gr:#1a6b4a; --gr-lt:#e8f5ef; --gr-md:#2e9069;
+  --go:#c8960a; --go-lt:#fef9e7;
+  --bg:#f2f4f3; --card:#fff;
+  --tx:#1c2b22; --mu:#5a7068; --bd:#d0dbd5;
+  --sh:0 2px 12px rgba(26,107,74,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.6;}
+
+/* ── TOPBAR ── */
+#bar{position:sticky;top:0;z-index:200;background:var(--gr);display:flex;align-items:center;gap:7px;padding:8px 18px;box-shadow:0 3px 14px rgba(0,0,0,.28);flex-wrap:wrap;}
+#bar .nm{color:#fff;font-weight:700;font-size:13px;flex:1;min-width:140px;}
+#bar .nm small{display:block;font-weight:300;font-size:10px;opacity:.8;}
+.tb{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border:none;border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tb svg{width:14px;height:14px;flex-shrink:0;}
+.tb-w{background:#fff;color:var(--gr);} .tb-w:hover{background:var(--gr-lt);}
+.tb-g{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);} .tb-g:hover{background:rgba(255,255,255,.26);}
+.tb-o{background:var(--go);color:#fff;} .tb-o:hover{background:#a97c08;}
+#badge{font-size:10px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px;}
+#badge .dot{width:7px;height:7px;border-radius:50%;background:#6fcf97;}
+#fl{display:none;}
+
+/* ── WRAP ── */
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 60px;}
+
+/* ── PAGE HEADER ── */
+.ph{background:var(--card);border-radius:12px;padding:20px 24px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;gap:18px;border-top:5px solid var(--gr);}
+.ph-logo{width:58px;height:58px;border-radius:10px;background:var(--gr);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ph-logo svg{width:36px;height:36px;fill:#fff;}
+.ph-txt h1{font-size:1.4rem;font-weight:800;color:var(--gr);letter-spacing:-.5px;}
+.ph-txt p{color:var(--mu);font-size:12px;margin-top:1px;}
+
+/* ── INFOBOX ── */
+.ib{background:var(--go-lt);border-left:4px solid var(--go);border-radius:0 8px 8px 0;padding:11px 14px;margin-bottom:16px;font-size:12.5px;color:#6b5300;}
+.ib b{display:block;margin-bottom:2px;font-size:13px;}
+
+/* ── SECTION ── */
+.sec{background:var(--card);border-radius:10px;box-shadow:var(--sh);margin-bottom:14px;overflow:hidden;}
+.sh{background:var(--gr);color:#fff;padding:9px 16px;font-weight:700;font-size:11.5px;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.sh svg{width:13px;height:13px;fill:#fff;opacity:.85;}
+.sb{padding:15px 18px;}
+
+/* ── AIDE ── */
+.sec-aide .sh{background:#2c5f8a;cursor:pointer;user-select:none;justify-content:space-between;}
+.sec-aide .sh:hover{background:#245078;}
+.ai{font-size:14px;}
+.aide-bd{display:none;padding:14px 18px;background:#f0f6fb;border-top:2px solid #cce0f0;}
+.aide-bd.show{display:block;}
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:10px;margin-top:8px;}
+.ac{background:#fff;border-radius:8px;padding:11px 13px;border-left:3px solid var(--gr);box-shadow:0 1px 5px rgba(0,0,0,.07);}
+.ac h4{font-size:11px;font-weight:700;color:var(--gr);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+.ac p{font-size:11.5px;color:var(--mu);line-height:1.5;}
+
+/* ── GRID ── */
+.row{display:flex;gap:12px;margin-bottom:11px;}
+.row:last-child{margin-bottom:0;}
+.col{flex:1;} .col2{flex:2;} .col3{flex:3;}
+
+/* ── FIELDS ── */
+.lb{display:block;margin-bottom:3px;font-weight:600;font-size:10.5px;color:var(--gr);letter-spacing:.3px;text-transform:uppercase;}
+input[type=text],input[type=email],input[type=date],input[type=time],input[type=number],select,textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;
+  font-family:'Outfit',sans-serif;font-size:13px;color:var(--tx);background:#fafcfb;
+  transition:border .2s,box-shadow .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gr-md);outline:none;box-shadow:0 0 0 3px rgba(46,144,105,.13);background:#fff;}
+textarea{resize:vertical;min-height:80px;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]{-moz-appearance:textfield;}
+
+/* ── CHECKS ── */
+.cg{display:flex;flex-wrap:wrap;gap:7px 15px;padding:10px;background:#f7faf9;border:1px solid var(--bd);border-radius:6px;margin-top:4px;}
+.cg label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap;}
+.cg input[type=checkbox]{width:15px;height:15px;accent-color:var(--gr);cursor:pointer;flex-shrink:0;}
+
+/* ── RADIO SORTIE ── */
+.radio-big{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px;}
+.radio-big label{flex:1;min-width:160px;display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid var(--bd);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s;}
+.radio-big label:hover{border-color:var(--gr-md);background:var(--gr-lt);}
+.radio-big input[type=radio]{width:16px;height:16px;accent-color:var(--gr);}
+.radio-big label.sel{border-color:var(--gr);background:var(--gr-lt);color:var(--gr);}
+
+/* ── TRANSPORT BUS ── */
+#bus-box{background:#fff8e1;border:1px solid #f1c40f;border-radius:8px;padding:13px 15px;margin-top:8px;display:none;}
+#bus-box.show{display:block;}
+.bus-title{font-size:12px;font-weight:700;color:#b7860a;margin-bottom:8px;}
+
+/* ── TABLES ── */
+.gtbl{width:100%;border-collapse:collapse;}
+.gtbl thead th{background:var(--gr);color:#fff;padding:8px 11px;font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;text-align:left;}
+.gtbl tbody tr{border-bottom:1px solid var(--bd);}
+.gtbl tbody tr:nth-child(even){background:#f7faf9;}
+.gtbl tbody tr:hover{background:var(--gr-lt);}
+.gtbl td{padding:6px 10px;vertical-align:middle;}
+.gtbl td input,.gtbl td select{width:100%;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;padding:2px 0;}
+.gtbl td input:focus,.gtbl td select:focus{outline:none;border-bottom:2px solid var(--gr-md);box-shadow:none;}
+.gtbl .nd{text-align:center;width:38px;font-size:11px;color:var(--mu);font-weight:700;}
+.gtbl .dd{text-align:center;width:38px;}
+
+/* ── PASTE ── */
+details.paste-det{border:2px dashed var(--gr-md);border-radius:8px;overflow:hidden;margin-bottom:4px;}
+details.paste-det summary{background:var(--gr-lt);padding:11px 15px;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:13px;font-weight:600;color:var(--gr);user-select:none;}
+details.paste-det summary::-webkit-details-marker{display:none;}
+details.paste-det summary::marker{display:none;}
+details.paste-det summary:hover{background:#d4ede3;}
+.paste-arr{font-size:12px;}
+details.paste-det[open] .paste-arr{transform:rotate(90deg);}
+.paste-in{padding:13px 15px;background:#f9fdfb;border-top:1px solid #b8ddc8;}
+.paste-in code{background:#e8f5ef;padding:1px 5px;border-radius:3px;font-size:11px;}
+
+/* ── AVIS ── */
+.avis-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px;}
+.avis-box{background:#f7faf9;border:1px solid var(--bd);border-radius:8px;padding:13px 15px;}
+.avis-box label{display:block;font-weight:700;font-size:12px;color:var(--gr);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;}
+.sign-block{text-align:right;font-size:12px;color:var(--mu);}
+.sign-line{height:55px;border-bottom:1px solid #aaa;margin-top:5px;}
+
+/* ── RAPPEL ── */
+.rappel{background:#fff8dc;border:1px solid #f1c40f;border-radius:8px;padding:12px 15px;}
+.rappel h4{font-size:12px;font-weight:700;color:#856404;margin-bottom:6px;text-transform:uppercase;}
+.rappel ul{padding-left:18px;}
+.rappel li{font-size:12.5px;color:#6b5300;margin-bottom:3px;}
+
+/* ── MISC ── */
+.sep{border-top:1px dashed var(--bd);margin:12px 0;}
+.st{font-weight:700;color:var(--gr);font-size:12.5px;margin-bottom:7px;}
+.sn{font-weight:400;color:var(--mu);font-size:10.5px;}
+.ab{display:inline-flex;align-items:center;gap:5px;background:none;border:1px dashed var(--gr-md);color:var(--gr);border-radius:5px;padding:5px 12px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;margin-top:5px;transition:background .2s;}
+.ab:hover{background:var(--gr-lt);}
+.xb{background:none;border:none;cursor:pointer;color:#c0392b;font-size:20px;line-height:1;padding:0 3px;flex-shrink:0;}
+.badge-warn{display:inline-flex;align-items:center;gap:5px;background:#e8f4fd;color:#1a5276;border:1px solid #aed6f1;border-radius:5px;padding:4px 10px;font-size:11.5px;font-weight:600;margin-top:4px;}
+
+/* ── MODAL ── */
+#mod{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;}
+#mod.on{display:flex;}
+.mb{background:#fff;border-radius:14px;padding:26px;max-width:500px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.mb h2{font-size:1.05rem;color:var(--gr);margin-bottom:8px;}
+.mb p{font-size:13px;color:var(--mu);margin-bottom:14px;line-height:1.7;}
+.mbs{display:flex;gap:9px;flex-wrap:wrap;}
+.mbt{flex:1;padding:10px;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.mbt:hover{opacity:.87;}
+.mbt-g{background:var(--gr);color:#fff;} .mbt-l{background:var(--gr-lt);color:var(--gr);} .mbt-c{background:#eee;color:#555;}
+
+@media(max-width:600px){.row{flex-direction:column;}.ph{flex-direction:column;gap:12px;}.radio-big{flex-direction:column;}.avis-grid{grid-template-columns:1fr;}}
+
+/* ═══════════════════════════════════════
+   IMPRESSION A4 — Recto : ordre de mission
+                   Verso : liste des élèves
+═══════════════════════════════════════ */
+@media print{
+  @page{size:A4;margin:12mm 11mm;}
+
+  /* Masquer UI */
+  #bar,#mod,.ib,.ab,.sec-aide,.xb,details.paste-det,#elv-count,
+  .badge-warn,.radio-big{display:none!important;}
+
+  body{background:#fff;font-size:8.5pt;color:#000;font-family:'Outfit',sans-serif;}
+  .wrap{padding:0;max-width:none;}
+
+  /* Toutes les sections par défaut */
+  .sec{box-shadow:none;border:1px solid #ccc;border-radius:3px;margin-bottom:5px;break-inside:avoid;}
+  .sec.np{display:none!important;}
+  .sh{background:#1a6b4a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:5px 10px;font-size:7.5pt;}
+  .sb{padding:6px 10px;}
+  .ph{box-shadow:none;border:1px solid #ccc;padding:9px 12px;margin-bottom:5px;border-radius:3px;}
+  .ph-txt h1{font-size:13pt;} .ph-txt p{font-size:8pt;}
+  .ph-logo{width:46px;height:46px;}
+  .row{margin-bottom:4px;}
+
+  /* Inputs → texte brut */
+  input[type=text],input[type=email],input[type=date],input[type=time],input[type=number],textarea{
+    border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;
+  }
+  textarea{min-height:unset;overflow:hidden;}
+  select{display:none!important;}
+  .sp{display:inline!important;}
+
+  /* Cases non cochées → masquées */
+  .cg label.np{display:none!important;}
+  .cg{padding:3px 5px;gap:3px 12px;font-size:8pt;}
+
+  /* Radio → texte */
+  .rp{display:block!important;font-weight:700;font-size:8.5pt;}
+
+  /* Transport bus */
+  #bus-box{background:transparent;border:1px dotted #ccc;padding:4px 8px;margin-top:3px;}
+  #bus-box.show{display:block;}
+
+  /* Tables */
+  .gtbl thead th{background:#1a6b4a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:4px 8px;font-size:7.5pt;}
+  .gtbl td{padding:3px 8px;font-size:8.5pt;}
+  .gtbl tbody tr.np{display:none!important;}
+  .gtbl tbody tr:nth-child(even){background:transparent;}
+  .gtbl .dd{display:none!important;}
+
+  /* Avis */
+  .avis-grid{grid-template-columns:1fr 1fr;}
+  .avis-box{padding:6px 8px;font-size:8pt;}
+  .sign-line{height:35px;}
+
+  /* Rappel */
+  .rappel{padding:6px 10px;}
+  .rappel h4{font-size:8pt;} .rappel li{font-size:8pt;}
+
+  .sep{margin:4px 0;}
+  .st{font-size:8pt;margin-bottom:2px;}
+
+  /* ─── RECTO : tout sauf liste des élèves ─── */
+  #s-eleves{display:none!important;}
+
+  /* ─── VERSO : saut de page puis liste des élèves ─── */
+  #verso-eleves{
+    display:block!important;
+    page-break-before:always;
+    break-before:page;
+  }
+}
+/* Cacher le verso sur écran */
+#verso-eleves{display:none;}
+/* Cacher rp (radio print) sur écran */
+.rp{display:none;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="bar">
+  <div class="nm">Lycée Polyvalent Léopold Elfort <small>Ordre de Mission</small></div>
+  <span id="badge"><span class="dot"></span> Sauvegarde auto</span>
+  <button class="tb tb-w" onclick="doSave()">
+    <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
+    Sauvegarder
+  </button>
+  <button class="tb tb-g" onclick="doExport()">
+    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    Exporter
+  </button>
+  <button class="tb tb-g" onclick="document.getElementById('fl').click()">
+    <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+    Charger
+  </button>
+  <input type="file" id="fl" accept=".json" onchange="doImport(event)">
+  <button class="tb tb-g" onclick="doPrint()">
+    <svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 00-3 3v6h4v4h12v-4h4v-6a3 3 0 00-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-7H6V2h12v3z"/></svg>
+    Imprimer / PDF
+  </button>
+  <button class="tb tb-o" onclick="openMod()">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    Envoyer
+  </button>
+</div>
+
+<div class="wrap">
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-logo"><svg viewBox="0 0 64 64"><path d="M32 4C16.536 4 4 16.536 4 32s12.536 28 28 28 28-12.536 28-28S47.464 4 32 4zm0 4c13.255 0 24 10.745 24 24S45.255 56 32 56 8 45.255 8 32 18.745 8 32 8zm-2 8v14H18l14 16 14-16H34V16h-4z"/></svg></div>
+  <div class="ph-txt">
+    <h1>ORDRE DE MISSION</h1>
+    <p>465 Avenue Paule Berthelot — Lycée Polyvalent Léopold Elfort — Mana, Guyane</p>
+    <p style="font-size:10.5px;color:#bbb;margin-top:1px;">À remettre au Chef d'Établissement <strong>15 jours avant</strong> la date de la sortie ou du voyage</p>
+  </div>
+</div>
+
+<!-- INFOBOX -->
+<div class="ib">
+  <b>📋 Mode d'emploi</b>
+  <strong>Sauvegarder</strong> conserve la saisie dans ce navigateur. <strong>Exporter</strong> télécharge un fichier .json. <strong>Charger</strong> pour reprendre sur un autre ordinateur. <strong>Imprimer/PDF</strong> : recto = ordre de mission, verso = liste des élèves. Titre et responsable obligatoires pour imprimer.
+</div>
+
+<!-- AIDE -->
+<div class="sec sec-aide">
+  <div class="sh" onclick="toggleAide(this)" style="cursor:pointer;user-select:none;">
+    <span style="display:flex;align-items:center;gap:7px;"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>Aide — Guide de saisie</span>
+    <span class="ai">▶</span>
+  </div>
+  <div class="aide-bd" id="ai-bd">
+    <div class="ag">
+      <div class="ac"><h4>📋 Destinataires</h4><p>Cochez les personnes à qui transmettre l'ordre de mission : Proviseur, Gestionnaire, Infirmerie, Proviseur Adjoint, CPE, Demandeur.</p></div>
+      <div class="ac"><h4>📌 Titre</h4><p>Donnez un titre descriptif à votre sortie (ex : « Visite musée départemental »). Ce titre apparaît en en-tête du document imprimé.</p></div>
+      <div class="ac"><h4>🏫 Type de sortie</h4><p><strong>Obligatoire</strong> : inscrite dans le programme officiel pendant les horaires habituels. <strong>Facultative</strong> : en partie ou totalement pendant le temps scolaire, incluant les voyages avec nuitées.</p></div>
+      <div class="ac"><h4>👥 Classes et élèves</h4><p>Toutes les classes concernées et le nombre exact d'élèves. La liste nominative complète doit être jointe (PRONOTE si possible).</p></div>
+      <div class="ac"><h4>🚌 Transport</h4><p>Si vous sélectionnez « Bus », saisissez le montant estimé et pensez à joindre un devis à l'ordre de mission.</p></div>
+      <div class="ac"><h4>🍱 Repas froids</h4><p>Indiquez si des repas froids sont nécessaires pour les élèves. Si oui, précisez le nombre.</p></div>
+      <div class="ac"><h4>👤 Responsable et accompagnateurs</h4><p>Le responsable informe les collègues des absences. Minimum 1 accompagnateur pour 15 élèves.</p></div>
+      <div class="ac"><h4>✅ Décision chef d'établissement</h4><p>Cette rubrique sera complétée par la direction. Elle apparaît sur le recto du document imprimé, avant la liste des élèves (verso).</p></div>
+      <div class="ac"><h4>📝 Liste des élèves (verso)</h4><p>Saisissez la liste ou collez-la depuis PRONOTE. Elle s'imprime automatiquement au verso de la feuille A4.</p></div>
+      <div class="ac"><h4>💾 Sauvegarde</h4><p>« Sauvegarder » enregistre dans ce navigateur. « Exporter » crée un fichier .json. Sur un autre PC, « Charger » pour reprendre.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 1. DESTINATAIRES -->
+<div class="sec" id="s-dest">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>Destinataires</div>
+  <div class="sb">
+    <label class="lb">Cocher les destinataires de cet ordre de mission</label>
+    <div class="cg">
+      <label><input type="checkbox" class="cdest" value="Proviseur"> Proviseur</label>
+      <label><input type="checkbox" class="cdest" value="Gestionnaire"> Gestionnaire</label>
+      <label><input type="checkbox" class="cdest" value="Infirmerie"> Infirmerie</label>
+      <label><input type="checkbox" class="cdest" value="Proviseur Adjoint"> Proviseur Adjoint</label>
+      <label><input type="checkbox" class="cdest" value="CPE"> CPE</label>
+      <label><input type="checkbox" class="cdest" value="Demandeur"> Demandeur</label>
+    </div>
+  </div>
+</div>
+
+<!-- 2. TITRE -->
+<div class="sec" id="s-titre">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>Titre de l'ordre de mission</div>
+  <div class="sb">
+    <div class="row">
+      <div class="col3">
+        <label class="lb">Titre de la sortie / du voyage *</label>
+        <input type="text" id="titre" placeholder="Ex : Sortie visite musée départemental, Voyage pédagogique…">
+      </div>
+      <div class="col">
+        <label class="lb">Date du document</label>
+        <input type="date" id="doc-date">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. TYPE DE SORTIE -->
+<div class="sec" id="s-type">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Type de sortie pédagogique</div>
+  <div class="sb">
+    <div class="radio-big">
+      <label id="lbl-oblig"><input type="radio" name="type-sortie" value="Obligatoire" onchange="updType()"> ✅ Sortie obligatoire</label>
+      <label id="lbl-facul"><input type="radio" name="type-sortie" value="Facultative" onchange="updType()"> 🗓️ Sortie facultative <span style="font-size:11px;font-weight:400;color:var(--mu);">(inclut les voyages avec nuitées)</span></label>
+    </div>
+    <!-- affiché seulement à l'impression -->
+    <div class="rp" id="type-rp"></div>
+  </div>
+</div>
+
+<!-- 4. CLASSES ET EFFECTIFS -->
+<div class="sec" id="s-classes">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Classes et effectifs</div>
+  <div class="sb">
+    <div class="row">
+      <div class="col2"><label class="lb">Classe(s) concernée(s) *</label><input type="text" id="classes" placeholder="Ex : 2A, 2B, 1ère Pro…"></div>
+      <div class="col"><label class="lb">Précision si besoin</label><input type="text" id="classes-precis" placeholder="Ex : uniquement filière…"></div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label class="lb">Nombre d'élèves *</label>
+        <input type="number" id="nb-eleves" placeholder="0" min="0">
+        <span class="badge-warn">⚠️ Fournir impérativement la liste nominative des élèves</span>
+      </div>
+      <div class="col"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. LIEU ET DATES -->
+<div class="sec" id="s-lieu">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5 14.5 7.62 14.5 9 13.38 11.5 12 11.5z"/></svg>Lieu et dates</div>
+  <div class="sb">
+    <div class="row">
+      <div class="col3"><label class="lb">Lieu de la sortie / destination</label><input type="text" id="lieu" placeholder="Ex : Musée des cultures guyanaises, Cayenne…"></div>
+    </div>
+    <div class="row">
+      <div class="col"><label class="lb">Date (sortie ponctuelle)</label><input type="date" id="date-unique"></div>
+      <div class="col"><label class="lb">Date de début (voyage)</label><input type="date" id="date-debut"></div>
+      <div class="col"><label class="lb">Date de fin (voyage)</label><input type="date" id="date-fin"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. OBJECTIFS -->
+<div class="sec" id="s-obj">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Objectifs pédagogiques</div>
+  <div class="sb">
+    <label class="lb">Descriptif des objectifs pédagogiques</label>
+    <textarea id="objectifs" style="min-height:90px;" placeholder="Décrivez les objectifs pédagogiques, compétences visées, lien avec les programmes…"></textarea>
+  </div>
+</div>
+
+<!-- 7. TRANSPORT -->
+<div class="sec" id="s-transport">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>Transport et logistique</div>
+  <div class="sb">
+    <div class="row">
+      <div class="col">
+        <label class="lb">Moyen de transport</label>
+        <select id="transport" onchange="onTransport()">
+          <option value="">Choisir…</option>
+          <option>Bus</option>
+          <option>Car scolaire</option>
+          <option>Véhicule personnel</option>
+          <option>Marche à pied</option>
+          <option>Bateau</option>
+          <option>Avion</option>
+          <option>Autre</option>
+        </select>
+        <span class="sp" id="transport-p" style="display:none;"></span>
+      </div>
+      <div class="col">
+        <label class="lb">Précision transport</label>
+        <input type="text" id="transport-detail" placeholder="Compagnie, numéro de ligne…">
+      </div>
+    </div>
+    <!-- BUS -->
+    <div id="bus-box">
+      <div class="bus-title">🚌 Transport en bus — montant estimé</div>
+      <div class="row">
+        <div class="col2">
+          <label class="lb">Montant estimé (€)</label>
+          <input type="number" id="bus-montant" placeholder="0,00" min="0" step="0.01">
+        </div>
+        <div class="col" style="display:flex;align-items:flex-end;padding-bottom:2px;">
+          <span style="font-size:12px;color:#856404;font-weight:600;">⚠️ Joindre un devis à cet ordre de mission</span>
+        </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:11px;">
+      <div class="col"><label class="lb">Lieu de départ</label><input type="text" id="lieu-depart" placeholder="Ex : Lycée Léopold Elfort, Mana…"></div>
+      <div class="col"><label class="lb">Heure de départ</label><input type="time" id="heure-depart"></div>
+      <div class="col"><label class="lb">Heure de retour</label><input type="time" id="heure-retour"></div>
+    </div>
+    <div class="sep"></div>
+    <p class="st">Repas froids pour les élèves</p>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:600;"><input type="radio" name="repas" value="oui" onchange="onRepas()"> OUI</label>
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;font-weight:600;"><input type="radio" name="repas" value="non" onchange="onRepas()"> NON</label>
+      <div id="repas-nb-box" style="display:none;flex:1;max-width:220px;margin-top:6px;">
+        <label class="lb">Nombre de repas</label>
+        <input type="number" id="repas-nb" placeholder="0" min="0">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. RESPONSABLE ET ACCOMPAGNATEURS -->
+<div class="sec" id="s-acc">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Personne responsable et accompagnateurs</div>
+  <div class="sb">
+    <p class="st">Personne responsable <span class="sn">(qui informera les collègues de l'absence des élèves)</span></p>
+    <div class="row">
+      <div class="col"><label class="lb">Nom *</label><input type="text" id="resp-nom" placeholder="NOM"></div>
+      <div class="col"><label class="lb">Prénom</label><input type="text" id="resp-prenom" placeholder="Prénom"></div>
+      <div class="col">
+        <label class="lb">Qualité</label>
+        <select id="resp-qualite">
+          <option value="">Choisir…</option>
+          <option>Enseignant</option><option>CPE</option><option>AED</option><option>Autre</option>
+        </select>
+        <span class="sp" id="resp-qualite-p" style="display:none;"></span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <p class="st">Accompagnateurs <span class="sn">(minimum 1 pour 15 élèves)</span></p>
+    <table class="gtbl">
+      <thead><tr><th>Nom</th><th>Prénom</th><th style="width:170px;">Qualité</th><th class="dd"></th></tr></thead>
+      <tbody id="acc-body"></tbody>
+    </table>
+    <button class="ab" onclick="addAcc()">+ Ajouter un accompagnateur</button>
+  </div>
+</div>
+
+<!-- 9. DÉCISION CHEF D'ÉTABLISSEMENT -->
+<div class="sec" id="s-avis">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Décision du chef d'établissement</div>
+  <div class="sb">
+    <div class="avis-grid">
+      <div class="avis-box">
+        <label>Accord (valant ordre de mission)</label>
+        <textarea id="avis-accord" style="min-height:50px;" placeholder="Mentions complémentaires éventuelles…"></textarea>
+      </div>
+      <div class="avis-box">
+        <label>Refus — Motif</label>
+        <textarea id="avis-motif" style="min-height:50px;" placeholder="Motif du refus…"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:12px;" class="sign-block">
+      Le Proviseur — <strong>Christophe BIGNON</strong>
+      <div class="sign-line"></div>
+    </div>
+    <p style="font-size:11px;color:var(--mu);margin-top:8px;text-align:center;">MANA, le <input type="date" id="date-signature" style="width:auto;display:inline-block;border:none;border-bottom:1px solid var(--bd);padding:0 4px;background:transparent;font-size:11px;"></p>
+  </div>
+</div>
+
+<!-- 10. RAPPEL -->
+<div class="sec" id="s-rappel">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>Rappel matériel obligatoire</div>
+  <div class="sb">
+    <div class="rappel">
+      <h4>⚠️ N'oubliez pas de vous munir, même pour une sortie de proximité :</h4>
+      <ul>
+        <li>D'une <strong>trousse de secours</strong></li>
+        <li>Des <strong>trousses individuelles</strong> avec ordonnance et médicaments des enfants bénéficiaires d'un <strong>P.A.I.</strong></li>
+        <li style="font-style:italic;">Ces trousses sont à votre disposition à l'infirmerie.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- 11. LISTE DES ÉLÈVES (écran) -->
+<div class="sec" id="s-eleves">
+  <div class="sh"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>Liste des élèves</div>
+  <div class="sb">
+    <p style="font-size:12px;color:var(--mu);margin-bottom:12px;">Saisissez les élèves ligne par ligne <strong>ou collez une liste depuis PRONOTE</strong>.</p>
+    <!-- ZONE COLLER (details natif, aucun JS pour l'ouverture) -->
+    <details class="paste-det">
+      <summary>📋 Coller une liste depuis PRONOTE ou un autre logiciel <span class="paste-arr">▶</span></summary>
+      <div class="paste-in">
+        <p style="font-size:12px;color:var(--mu);margin-bottom:8px;">
+          Copiez votre liste, collez-la ci-dessous et cliquez <strong>« Importer »</strong>.<br>
+          Formats acceptés : <code>NOM Prénom</code>, <code>Prénom NOM</code>, <code>NOM, Prénom</code>, <code>1 - NOM Prénom</code>
+        </p>
+        <textarea id="paste-input" style="min-height:130px;font-family:monospace;font-size:12px;background:#fff;border-color:#b8ddc8;" placeholder="1 - DUPONT Jean&#10;2 - MARTIN Marie&#10;LEROY Paul&#10;SIMON, Claire"></textarea>
+        <div style="display:flex;gap:10px;margin-top:9px;flex-wrap:wrap;align-items:center;">
+          <button class="ab" style="border-style:solid;background:var(--gr);color:#fff;margin-top:0;" onclick="importPaste()">✅ Importer la liste</button>
+          <button class="ab" style="margin-top:0;" onclick="document.getElementById('paste-input').value='';document.getElementById('paste-fb').textContent='';">🗑️ Effacer</button>
+          <span id="paste-fb" style="font-size:12px;color:var(--gr);font-weight:600;"></span>
+        </div>
+      </div>
+    </details>
+    <div style="margin-top:12px;">
+      <table class="gtbl">
+        <thead><tr><th class="nd">N°</th><th>Nom</th><th>Prénom</th><th class="dd"></th></tr></thead>
+        <tbody id="elv-body"></tbody>
+      </table>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;align-items:center;">
+        <button class="ab" onclick="addElv()">+ Ajouter un élève</button>
+        <button class="ab" style="border-color:#c0392b;color:#c0392b;" onclick="clearElv()">🗑️ Vider la liste</button>
+        <span id="elv-count" style="font-size:11.5px;color:var(--mu);"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ═══ VERSO IMPRESSION (liste élèves) ═══ -->
+<div id="verso-eleves">
+  <div style="text-align:center;border-bottom:2px solid #1a6b4a;padding-bottom:8px;margin-bottom:12px;">
+    <h2 style="font-size:14pt;color:#1a6b4a;margin-bottom:2px;">LISTE DES ÉLÈVES</h2>
+    <p id="verso-titre" style="font-size:9pt;color:#555;"></p>
+  </div>
+  <table class="gtbl" id="verso-tbl">
+    <thead><tr><th class="nd" style="width:40px;">N°</th><th>Nom</th><th>Prénom</th></tr></thead>
+    <tbody id="verso-body"></tbody>
+  </table>
+  <p style="font-size:7.5pt;color:#555;margin-top:8px;font-style:italic;">Vous pouvez également joindre une liste éditée depuis PRONOTE.</p>
+</div>
+
+<!-- MODAL -->
+<div id="mod">
+  <div class="mb">
+    <h2>📤 Envoyer l'ordre de mission</h2>
+    <p>
+      <strong>Étape 1 :</strong> Téléchargez le fichier JSON.<br>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie pré-remplie et joignez le fichier + la liste des élèves.<br><br>
+      📧 <strong>Chef d'établissement :</strong> <a href="mailto:christophe.bignon@ac-guyane.fr">christophe.bignon@ac-guyane.fr</a><br>
+      📧 <strong>Secrétariat :</strong> <a href="mailto:tatiana.agesilas@ac-guyane.fr">tatiana.agesilas@ac-guyane.fr</a>
+    </p>
+    <div class="mbs">
+      <button class="mbt mbt-l" onclick="doExport()">💾 Télécharger le fichier</button>
+      <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
+      <button class="mbt mbt-c" onclick="closeMod()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ── TRANSPORT ── */
+function onTransport(){
+  var val = document.getElementById('transport').value;
+  document.getElementById('bus-box').className = (val === 'Bus') ? 'show' : '';
+  var p = document.getElementById('transport-p');
+  if(p) p.textContent = val;
+}
+
+/* ── REPAS ── */
+function onRepas(){
+  var r = document.querySelector('input[name="repas"]:checked');
+  document.getElementById('repas-nb-box').style.display = (r && r.value === 'oui') ? 'block' : 'none';
+}
+
+/* ── TYPE SORTIE ── */
+function updType(){
+  var r = document.querySelector('input[name="type-sortie"]:checked');
+  document.querySelectorAll('.radio-big label').forEach(function(l){ l.classList.remove('sel'); });
+  if(r){
+    var lbl = r.closest('label');
+    if(lbl) lbl.classList.add('sel');
+    var rp = document.getElementById('type-rp');
+    if(rp) rp.textContent = 'Type de sortie : ' + r.value;
+  }
+}
+
+/* ── AIDE ── */
+function toggleAide(hd){
+  var bd = document.getElementById('ai-bd');
+  var ico = hd.querySelector('.ai');
+  var open = bd.classList.toggle('show');
+  if(ico) ico.textContent = open ? '▼' : '▶';
+}
+
+/* ── ACCOMPAGNATEURS ── */
+var accList = [];
+var ACC_Q = ['Enseignant','AED','CPE','AESH','Parent d\'élève','Autre'];
+function renderAcc(){
+  var h = '';
+  for(var i = 0; i < accList.length; i++){
+    var a = accList[i];
+    var opts = '<option value="">Qualité…</option>';
+    for(var j = 0; j < ACC_Q.length; j++){
+      opts += '<option value="' + ACC_Q[j] + '"' + (a.q === ACC_Q[j] ? ' selected' : '') + '>' + ACC_Q[j] + '</option>';
+    }
+    h += '<tr>'
+      + '<td><input type="text" value="' + e(a.n) + '" oninput="accList[' + i + '].n=this.value" placeholder="NOM"></td>'
+      + '<td><input type="text" value="' + e(a.p) + '" oninput="accList[' + i + '].p=this.value" placeholder="Prénom"></td>'
+      + '<td><select onchange="accList[' + i + '].q=this.value">' + opts + '</select>'
+      +    '<span class="sp" style="display:none;">' + e(a.q) + '</span></td>'
+      + '<td class="dd"><button class="xb" onclick="remAcc(' + i + ')">×</button></td>'
+      + '</tr>';
+  }
+  document.getElementById('acc-body').innerHTML = h;
+}
+function addAcc(){ accList.push({n:'',p:'',q:''}); renderAcc(); }
+function remAcc(i){ accList.splice(i,1); renderAcc(); }
+
+/* ── ÉLÈVES ── */
+var elvList = [];
+function renderElv(){
+  var h = '';
+  for(var i = 0; i < elvList.length; i++){
+    var v = elvList[i];
+    h += '<tr>'
+      + '<td class="nd">' + (i+1) + '</td>'
+      + '<td><input type="text" value="' + e(v.n) + '" oninput="elvList[' + i + '].n=this.value;cntElv()" placeholder="NOM"></td>'
+      + '<td><input type="text" value="' + e(v.p) + '" oninput="elvList[' + i + '].p=this.value;cntElv()" placeholder="Prénom"></td>'
+      + '<td class="dd"><button class="xb" onclick="remElv(' + i + ')">×</button></td>'
+      + '</tr>';
+  }
+  document.getElementById('elv-body').innerHTML = h;
+  cntElv();
+}
+function addElv(){ elvList.push({n:'',p:''}); renderElv(); }
+function remElv(i){ elvList.splice(i,1); renderElv(); }
+function clearElv(){
+  if(elvList.length === 0) return;
+  if(confirm('Vider toute la liste des élèves ?')){ elvList = []; renderElv(); }
+}
+function cntElv(){
+  var n = elvList.filter(function(v){ return v.n || v.p; }).length;
+  var el = document.getElementById('elv-count');
+  if(el) el.textContent = n > 0 ? n + ' élève(s) dans la liste.' : '';
+}
+
+/* ── IMPORT COLLAGE ── */
+function importPaste(){
+  var raw = document.getElementById('paste-input').value;
+  if(!raw.trim()){ alert('La zone de collage est vide.'); return; }
+  var lines = raw.split(/\r?\n/);
+  var added = 0;
+  lines.forEach(function(line){
+    var clean = line.replace(/^\s*\d+[\s\.\-\)]+/, '').trim();
+    if(!clean) return;
+    var nom = '', prenom = '';
+    if(clean.indexOf(',') > -1){
+      var parts = clean.split(',');
+      nom = parts[0].trim().toUpperCase();
+      prenom = (parts[1] || '').trim();
+    } else if(clean === clean.toUpperCase() && /\s/.test(clean)){
+      var sp = clean.indexOf(' ');
+      nom = clean.substring(0, sp).trim();
+      prenom = clean.substring(sp+1).trim();
+      prenom = prenom.charAt(0).toUpperCase() + prenom.slice(1).toLowerCase();
+    } else if(/\s/.test(clean)){
+      var w = clean.split(/\s+/);
+      if(w[0] === w[0].toUpperCase() && w[0].length > 1){
+        nom = w[0]; prenom = w.slice(1).join(' ');
+      } else {
+        var last = w[w.length-1];
+        if(last === last.toUpperCase() && last.length > 1){ prenom = w.slice(0,-1).join(' '); nom = last; }
+        else { nom = clean; }
+      }
+    } else { nom = clean.toUpperCase(); }
+    if(nom || prenom){ elvList.push({n:nom, p:prenom}); added++; }
+  });
+  renderElv();
+  var fb = document.getElementById('paste-fb');
+  if(fb) fb.textContent = added > 0
+    ? '✅ ' + added + ' élève(s) importé(s).'
+    : '⚠️ Aucun élève détecté. Vérifiez le format.';
+}
+
+/* ── UTILITAIRES ── */
+function e(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gv(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function sv(id, v){ var el = document.getElementById(id); if(el && v != null) el.value = v; }
+function gchk(sel){ return Array.from(document.querySelectorAll(sel + ':checked')).map(function(c){ return c.value; }); }
+function schk(sel, vals){ document.querySelectorAll(sel).forEach(function(c){ c.checked = (vals||[]).indexOf(c.value) > -1; }); }
+function grad(nm){ var r = document.querySelector('input[name="' + nm + '"]:checked'); return r ? r.value : ''; }
+function srad(nm, val){ var r = document.querySelector('input[name="' + nm + '"][value="' + val + '"]'); if(r) r.checked = true; }
+function todayStr(){ return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+function safeName(s){ return (s||'OrdresMission').replace(/[^a-zA-Z0-9\u00C0-\u024F]/g,'_').replace(/_+/g,'_').substring(0,40); }
+
+/* ── COLLECTE ── */
+function getData(){
+  return {
+    titre: gv('titre'), docDate: gv('doc-date'),
+    destinataires: gchk('.cdest'),
+    typeSortie: grad('type-sortie'),
+    classes: gv('classes'), classesPrecis: gv('classes-precis'),
+    nbEleves: gv('nb-eleves'),
+    lieu: gv('lieu'), dateUnique: gv('date-unique'),
+    dateDebut: gv('date-debut'), dateFin: gv('date-fin'),
+    objectifs: gv('objectifs'),
+    transport: gv('transport'), transportDetail: gv('transport-detail'),
+    busMontant: gv('bus-montant'),
+    lieuDepart: gv('lieu-depart'),
+    heureDepart: gv('heure-depart'), heureRetour: gv('heure-retour'),
+    repas: grad('repas'), repasNb: gv('repas-nb'),
+    respNom: gv('resp-nom'), respPrenom: gv('resp-prenom'), respQualite: gv('resp-qualite'),
+    accompagnateurs: JSON.parse(JSON.stringify(accList)),
+    avisAccord: gv('avis-accord'), avisMotif: gv('avis-motif'),
+    dateSignature: gv('date-signature'),
+    eleves: JSON.parse(JSON.stringify(elvList)),
+  };
+}
+
+/* ── RESTAURATION ── */
+function setData(d){
+  if(!d) return;
+  sv('titre', d.titre); sv('doc-date', d.docDate);
+  schk('.cdest', d.destinataires || []);
+  if(d.typeSortie){ srad('type-sortie', d.typeSortie); updType(); }
+  sv('classes', d.classes); sv('classes-precis', d.classesPrecis);
+  sv('nb-eleves', d.nbEleves);
+  sv('lieu', d.lieu); sv('date-unique', d.dateUnique);
+  sv('date-debut', d.dateDebut); sv('date-fin', d.dateFin);
+  sv('objectifs', d.objectifs);
+  sv('transport', d.transport); sv('transport-detail', d.transportDetail);
+  var tp = document.getElementById('transport-p'); if(tp) tp.textContent = d.transport || '';
+  onTransport();
+  sv('bus-montant', d.busMontant);
+  sv('lieu-depart', d.lieuDepart);
+  sv('heure-depart', d.heureDepart); sv('heure-retour', d.heureRetour);
+  if(d.repas){ srad('repas', d.repas); onRepas(); }
+  sv('repas-nb', d.repasNb);
+  sv('resp-nom', d.respNom); sv('resp-prenom', d.respPrenom);
+  sv('resp-qualite', d.respQualite);
+  var rqp = document.getElementById('resp-qualite-p'); if(rqp) rqp.textContent = d.respQualite || '';
+  sv('avis-accord', d.avisAccord); sv('avis-motif', d.avisMotif);
+  sv('date-signature', d.dateSignature);
+  accList = (d.accompagnateurs || []).map(function(a){ return {n:a.n||'', p:a.p||'', q:a.q||''}; });
+  renderAcc();
+  elvList = (d.eleves || []).map(function(v){ return {n:v.n||'', p:v.p||''}; });
+  renderElv();
+}
+
+/* ── SAUVEGARDE ── */
+var KEY = 'om_v2';
+function doSave(){
+  localStorage.setItem(KEY, JSON.stringify(getData()));
+  flash('✅ Sauvegardé !');
+}
+function flash(msg){
+  var el = document.getElementById('badge');
+  el.innerHTML = '<span class="dot"></span> ' + msg;
+  setTimeout(function(){ el.innerHTML = '<span class="dot"></span> Sauvegarde auto'; }, 2500);
+}
+setInterval(function(){ localStorage.setItem(KEY, JSON.stringify(getData())); }, 30000);
+
+/* ── EXPORT ── */
+function doExport(){
+  var data = getData();
+  var fname = 'OM_' + safeName(data.titre || 'Ordre_Mission') + '_' + todayStr() + '.json';
+  var json = JSON.stringify(data, null, 2);
+  var blob = new Blob([json], {type: 'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  flash('💾 Fichier exporté : ' + fname);
+}
+
+/* ── IMPORT ── */
+function doImport(evt){
+  var file = evt.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var d = JSON.parse(e.target.result);
+      setData(d);
+      localStorage.setItem(KEY, JSON.stringify(d));
+      flash('📂 Fiche chargée !');
+    } catch(err){
+      alert('❌ Fichier invalide. Choisissez un fichier .json exporté depuis cette application.');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+/* ── IMPRESSION ── */
+function doPrint(){
+  var titre = gv('titre'), resp = gv('resp-nom');
+  if(!titre || !resp){
+    var msg = '⚠️ Champs obligatoires manquants :\n';
+    if(!titre) msg += '\n• Titre de l\'ordre de mission';
+    if(!resp)  msg += '\n• Nom de la personne responsable';
+    alert(msg); return;
+  }
+  localStorage.setItem(KEY, JSON.stringify(getData()));
+
+  /* Préparer le verso : copie de la liste dans #verso-body */
+  var vb = document.getElementById('verso-body');
+  var vt = document.getElementById('verso-titre');
+  if(vt) vt.textContent = gv('titre') + (gv('classes') ? ' — ' + gv('classes') : '');
+  if(vb){
+    var h = '';
+    var filled = elvList.filter(function(v){ return v.n || v.p; });
+    if(filled.length === 0){
+      h = '<tr><td colspan="3" style="text-align:center;font-style:italic;color:#888;padding:10px;">Aucun élève saisi — joindre la liste PRONOTE</td></tr>';
+    } else {
+      for(var i = 0; i < filled.length; i++){
+        h += '<tr><td class="nd">' + (i+1) + '</td><td>' + e(filled[i].n) + '</td><td>' + e(filled[i].p) + '</td></tr>';
+      }
+    }
+    vb.innerHTML = h;
+  }
+
+  /* Cases non cochées → masquées */
+  document.querySelectorAll('.cg label').forEach(function(lbl){
+    lbl.classList.toggle('np', !lbl.querySelector('input').checked);
+  });
+
+  /* Spans print pour les selects */
+  var tp = document.getElementById('transport-p'); if(tp) tp.textContent = gv('transport');
+  var rqp = document.getElementById('resp-qualite-p'); if(rqp) rqp.textContent = gv('resp-qualite');
+
+  /* Accompagnateurs vides masqués */
+  document.querySelectorAll('#acc-body tr').forEach(function(r){
+    var ok = Array.from(r.querySelectorAll('input[type=text]')).some(function(i){ return i.value.trim(); });
+    r.classList.toggle('np', !ok);
+  });
+
+  /* Sections vides → masquées (sauf s-dest, s-titre, s-avis, s-rappel toujours imprimés) */
+  var secs = [
+    {id:'s-type',      ok:function(){ return grad('type-sortie'); }},
+    {id:'s-classes',   ok:function(){ return gv('classes') || gv('nb-eleves'); }},
+    {id:'s-lieu',      ok:function(){ return gv('lieu') || gv('date-unique') || gv('date-debut'); }},
+    {id:'s-obj',       ok:function(){ return gv('objectifs'); }},
+    {id:'s-transport', ok:function(){ return gv('transport') || gv('lieu-depart') || gv('heure-depart') || grad('repas'); }},
+    {id:'s-acc',       ok:function(){ return gv('resp-nom') || accList.some(function(a){ return a.n || a.p; }); }},
+  ];
+  secs.forEach(function(s){
+    var el = document.getElementById(s.id);
+    if(el) el.classList.toggle('np', !s.ok());
+  });
+  /* Toujours imprimés */
+  ['s-dest','s-titre','s-avis','s-rappel'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.remove('np');
+  });
+
+  window.print();
+
+  setTimeout(function(){
+    document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); });
+  }, 800);
+}
+
+/* ── EMAIL ── */
+function doMail(){
+  var d = getData();
+  var titre = d.titre || 'Ordre de Mission';
+  var sub = encodeURIComponent('[Ordre de Mission] ' + titre);
+  var body = encodeURIComponent(
+    'Bonjour,\n\n'
+    + 'Veuillez trouver ci-joint l\'ordre de mission :\n'
+    + '"' + titre + '" — ' + d.docDate + '\n\n'
+    + 'Responsable : ' + d.respNom + ' ' + d.respPrenom + '\n'
+    + 'Classe(s) : ' + d.classes + '  |  Nb élèves : ' + d.nbEleves + '\n'
+    + 'Lieu : ' + d.lieu + '\n'
+    + (d.dateUnique ? 'Date : ' + d.dateUnique + '\n' : '')
+    + (d.dateDebut  ? 'Du ' + d.dateDebut + ' au ' + d.dateFin + '\n' : '')
+    + '\nCordialement,\n' + d.respNom + ' ' + d.respPrenom
+  );
+  window.location.href = 'mailto:christophe.bignon@ac-guyane.fr?cc=tatiana.agesilas@ac-guyane.fr&subject=' + sub + '&body=' + body;
+}
+
+/* ── MODAL ── */
+function openMod(){ localStorage.setItem(KEY, JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
+function closeMod(){ document.getElementById('mod').classList.remove('on'); }
+document.getElementById('mod').addEventListener('click', function(ev){ if(ev.target === this) closeMod(); });
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded', function(){
+  /* Date du document par défaut = aujourd'hui */
+  var dd = document.getElementById('doc-date');
+  if(dd && !dd.value) dd.value = new Date().toISOString().slice(0,10);
+
+  /* Restaurer depuis localStorage */
+  try {
+    var saved = localStorage.getItem('om_v2');
+    if(saved){ setData(JSON.parse(saved)); }
+  } catch(err){ /* ignore */ }
+
+  /* Initialiser les listes vides si besoin */
+  if(accList.length === 0){ addAcc(); }
+  if(elvList.length === 0){ addElv(); }
+});
+</script>
+</body>
+</html>

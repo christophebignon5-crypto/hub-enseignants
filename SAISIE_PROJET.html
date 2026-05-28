@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fiche Projet – Lycée Léopold Elfort</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gr:#1a6b4a; --gr-lt:#e8f5ef; --gr-md:#2e9069;
+  --go:#c8960a; --go-lt:#fef9e7;
+  --bg:#f2f4f3; --card:#fff;
+  --tx:#1c2b22; --mu:#5a7068; --bd:#d0dbd5;
+  --sh:0 2px 12px rgba(26,107,74,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.6;}
+
+/* ── TOPBAR ── */
+#bar{position:sticky;top:0;z-index:200;background:var(--gr);display:flex;align-items:center;gap:7px;padding:8px 18px;box-shadow:0 3px 14px rgba(0,0,0,.28);flex-wrap:wrap;}
+#bar .nm{color:#fff;font-weight:700;font-size:13px;flex:1;min-width:140px;}
+#bar .nm small{display:block;font-weight:300;font-size:10px;opacity:.8;}
+.tb{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border:none;border-radius:6px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.tb svg{width:14px;height:14px;flex-shrink:0;}
+.tb-w{background:#fff;color:var(--gr);} .tb-w:hover{background:var(--gr-lt);}
+.tb-g{background:rgba(255,255,255,.16);color:#fff;border:1px solid rgba(255,255,255,.3);} .tb-g:hover{background:rgba(255,255,255,.26);}
+.tb-o{background:var(--go);color:#fff;} .tb-o:hover{background:#a97c08;}
+#badge{font-size:10px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px;}
+#badge .dot{width:7px;height:7px;border-radius:50%;background:#6fcf97;}
+#fl{display:none;}
+
+/* ── WRAP ── */
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px 60px;}
+
+/* ── PAGE HEADER ── */
+.ph{background:var(--card);border-radius:12px;padding:20px 24px;margin-bottom:16px;box-shadow:var(--sh);display:flex;align-items:center;gap:18px;border-top:5px solid var(--gr);}
+.ph-logo{width:58px;height:58px;border-radius:10px;background:var(--gr);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ph-logo svg{width:36px;height:36px;fill:#fff;}
+.ph-txt h1{font-size:1.4rem;font-weight:800;color:var(--gr);letter-spacing:-.5px;}
+.ph-txt p{color:var(--mu);font-size:12px;margin-top:1px;}
+
+/* ── INFOBOX ── */
+.ib{background:var(--go-lt);border-left:4px solid var(--go);border-radius:0 8px 8px 0;padding:11px 14px;margin-bottom:16px;font-size:12.5px;color:#6b5300;}
+.ib b{display:block;margin-bottom:2px;font-size:13px;}
+
+/* ── SECTION ── */
+.sec{background:var(--card);border-radius:10px;box-shadow:var(--sh);margin-bottom:14px;overflow:hidden;}
+.sh{background:var(--gr);color:#fff;padding:9px 16px;font-weight:700;font-size:11.5px;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+.sh-l{display:flex;align-items:center;gap:7px;}
+.sh svg{width:13px;height:13px;fill:#fff;opacity:.85;}
+.sb{padding:15px 18px;}
+
+/* ── AIDE ── */
+.sec-aide .sh{background:#2c5f8a;cursor:pointer;user-select:none;}
+.sec-aide .sh:hover{background:#245078;}
+.ai{font-size:14px;transition:transform .25s;}
+.ai.open{transform:rotate(90deg);}
+.aide-bd{display:none;padding:14px 18px;background:#f0f6fb;border-top:2px solid #cce0f0;}
+.aide-bd.show{display:block;}
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:10px;margin-top:8px;}
+.ac{background:#fff;border-radius:8px;padding:11px 13px;border-left:3px solid var(--gr);box-shadow:0 1px 5px rgba(0,0,0,.07);}
+.ac h4{font-size:11px;font-weight:700;color:var(--gr);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px;}
+.ac p{font-size:11.5px;color:var(--mu);line-height:1.5;}
+
+/* ── GRID ── */
+.row{display:flex;gap:12px;margin-bottom:11px;}
+.row:last-child{margin-bottom:0;}
+.col{flex:1;} .col2{flex:2;} .col3{flex:3;}
+
+/* ── FIELDS ── */
+.lb{display:block;margin-bottom:3px;font-weight:600;font-size:10.5px;color:var(--gr);letter-spacing:.3px;text-transform:uppercase;}
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{
+  width:100%;padding:8px 10px;border:1px solid var(--bd);border-radius:6px;
+  font-family:'Outfit',sans-serif;font-size:13px;color:var(--tx);background:#fafcfb;
+  transition:border .2s,box-shadow .2s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--gr-md);outline:none;box-shadow:0 0 0 3px rgba(46,144,105,.13);background:#fff;}
+textarea{resize:vertical;min-height:80px;}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;}
+input[type=number]{-moz-appearance:textfield;}
+
+/* ── ENC ROWS ── */
+.er{display:flex;gap:7px;align-items:center;padding:6px 9px;background:#f7faf9;border:1px solid var(--bd);border-radius:6px;margin-bottom:5px;}
+.er input{flex:1;border:none;background:transparent;padding:3px 5px;font-size:13px;}
+.er input:focus{outline:none;border-bottom:2px solid var(--gr-md);}
+.er select{width:150px;font-size:12px;padding:4px 6px;}
+.xb{background:none;border:none;cursor:pointer;color:#c0392b;font-size:20px;line-height:1;padding:0 3px;flex-shrink:0;}
+
+/* ── ADD BTN ── */
+.ab{display:inline-flex;align-items:center;gap:5px;background:none;border:1px dashed var(--gr-md);color:var(--gr);border-radius:5px;padding:5px 12px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;margin-top:5px;transition:background .2s;}
+.ab:hover{background:var(--gr-lt);}
+.ar{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px;}
+
+/* ── DYN ROWS ── */
+.dr{display:flex;align-items:center;gap:8px;padding:6px 9px;background:#f7faf9;border:1px solid var(--bd);border-radius:6px;margin-bottom:5px;}
+.dt{font-size:10px;font-weight:700;color:var(--gr);text-transform:uppercase;background:var(--gr-lt);padding:2px 7px;border-radius:4px;min-width:60px;text-align:center;flex-shrink:0;white-space:nowrap;}
+.dr input{flex:1;border:none;background:transparent;padding:3px 5px;font-size:13px;}
+.dr input:focus{outline:none;border-bottom:2px solid var(--gr-md);}
+
+/* ── DEP TABLE ── */
+.dep-wrap{overflow-x:auto;margin-bottom:8px;}
+table.dt-tbl{width:100%;border-collapse:collapse;}
+table.dt-tbl thead th{background:var(--gr);color:#fff;padding:9px 12px;font-size:11px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;text-align:left;}
+table.dt-tbl thead th.r{text-align:right;width:130px;}
+table.dt-tbl thead th.d{width:38px;}
+table.dt-tbl tbody tr{border-bottom:1px solid var(--bd);}
+table.dt-tbl tbody tr:nth-child(even){background:#f7faf9;}
+table.dt-tbl tbody tr:hover{background:var(--gr-lt);}
+table.dt-tbl td{padding:7px 10px;vertical-align:middle;}
+table.dt-tbl td.r{text-align:right;}
+table.dt-tbl td select{width:100%;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;padding:2px 0;cursor:pointer;}
+table.dt-tbl td select:focus{outline:none;border-bottom:2px solid var(--gr-md);box-shadow:none;}
+table.dt-tbl td input{width:100%;border:none;background:transparent;font-family:'Outfit',sans-serif;font-size:13px;padding:2px 0;}
+table.dt-tbl td input:focus{outline:none;border-bottom:2px solid var(--gr-md);box-shadow:none;}
+table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
+.dep-tot{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:8px 12px;background:var(--gr-lt);border-radius:6px;border:1px solid #b8ddc8;font-weight:700;font-size:13px;color:var(--gr);margin-top:4px;}
+.dep-tot .big{font-size:17px;}
+
+/* ── CHECKS ── */
+.cg{display:flex;flex-wrap:wrap;gap:7px 15px;padding:10px;background:#f7faf9;border:1px solid var(--bd);border-radius:6px;margin-top:4px;}
+.cg label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;white-space:nowrap;}
+.cg input[type=checkbox],.cg input[type=radio]{width:15px;height:15px;accent-color:var(--gr);cursor:pointer;flex-shrink:0;}
+.pg{display:flex;flex-wrap:wrap;gap:7px 18px;padding:10px;background:#f7faf9;border:1px solid var(--bd);border-radius:6px;}
+.pg label{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;}
+.pg input[type=checkbox]{width:14px;height:14px;accent-color:var(--gr);cursor:pointer;}
+
+/* ── ODD ── */
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:5px;padding:7px;}
+.oi{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:7px;cursor:pointer;transition:background .15s;font-size:12px;border:1px solid transparent;}
+.oi:hover{background:var(--gr-lt);border-color:var(--bd);}
+.oi input[type=checkbox]{width:14px;height:14px;accent-color:var(--gr);flex-shrink:0;}
+.oi-ico{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;opacity:.5;transition:opacity .2s;}
+.oi input:checked ~ .oi-ico{opacity:1;box-shadow:0 0 0 2px rgba(0,0,0,.12);}
+.oi-lbl{line-height:1.25;}
+.oi-n{font-size:9px;font-weight:800;opacity:.55;}
+
+/* ── AVIS ── */
+.av{display:flex;gap:22px;padding:12px;background:#f0f7f3;border:1px solid #b8ddc8;border-radius:8px;align-items:center;}
+.av label{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;}
+.av input[type=radio]{width:15px;height:15px;accent-color:var(--gr);}
+.sg{flex:1;text-align:right;font-size:12px;color:var(--mu);}
+.sl{height:50px;border-bottom:1px solid #aaa;margin-top:4px;}
+
+/* ── MISC ── */
+.sep{border-top:1px dashed var(--bd);margin:12px 0;}
+.st{font-weight:700;color:var(--gr);font-size:12.5px;margin-bottom:7px;}
+.sn{font-weight:400;color:var(--mu);font-size:10.5px;}
+
+/* ── MODAL ── */
+#mod{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center;}
+#mod.on{display:flex;}
+.mb{background:#fff;border-radius:14px;padding:26px;max-width:500px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.35);}
+.mb h2{font-size:1.05rem;color:var(--gr);margin-bottom:8px;}
+.mb p{font-size:13px;color:var(--mu);margin-bottom:14px;line-height:1.7;}
+.mbs{display:flex;gap:9px;flex-wrap:wrap;}
+.mbt{flex:1;padding:10px;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.mbt:hover{opacity:.87;}
+.mbt-g{background:var(--gr);color:#fff;}
+.mbt-l{background:var(--gr-lt);color:var(--gr);}
+.mbt-c{background:#eee;color:#555;}
+
+@media(max-width:600px){.row{flex-direction:column;}.ph{flex-direction:column;gap:12px;}#bar{padding:8px 12px;}}
+
+/* ══════════════════════════════
+   IMPRESSION A4
+══════════════════════════════ */
+@media print{
+  @page{size:A4;margin:13mm 12mm;}
+  #bar,#mod,.ib,.ab,.ar,.xb,.sec-aide{display:none!important;}
+  body{background:#fff;font-size:8.5pt;color:#000;}
+  .wrap{padding:0;max-width:none;}
+
+  .sec{box-shadow:none;border:1px solid #ccc;border-radius:3px;margin-bottom:6px;break-inside:avoid;}
+  .sec.np{display:none!important;}
+  .sh{background:#1a6b4a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:5px 10px;font-size:7.5pt;}
+  .sb{padding:6px 10px;}
+  .ph{box-shadow:none;border:1px solid #ccc;padding:9px 12px;margin-bottom:6px;border-radius:3px;}
+  .ph-txt h1{font-size:13pt;} .ph-txt p{font-size:8pt;}
+  .ph-logo{width:46px;height:46px;}
+  .row{margin-bottom:5px;}
+
+  /* inputs → texte brut */
+  input[type=text],input[type=email],input[type=date],input[type=number],textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;}
+  textarea{min-height:unset;overflow:hidden;}
+  select{display:none!important;}
+  .sp{display:inline!important;} /* sel-print */
+
+  /* lignes dynamiques vides → masquées */
+  .dr.np{display:none!important;}
+  .dr{background:transparent;border:none;border-bottom:1px dotted #ccc;padding:2px 0;border-radius:0;margin-bottom:2px;}
+  .dt{background:transparent!important;font-size:7.5pt;padding:1px 4px;}
+
+  /* encadrants vides → masqués */
+  .er.np{display:none!important;}
+  .er{background:transparent;border:none;border-bottom:1px dotted #ccc;padding:2px 0;border-radius:0;}
+
+  /* ODD non cochés → masqués */
+  .oi.np{display:none!important;}
+  .og{display:flex;flex-wrap:wrap;gap:3px;padding:4px;}
+  .oi{padding:2px 5px;border:none;font-size:7.5pt;gap:4px;}
+  .oi:hover{background:transparent;}
+  .oi-ico{width:20px;height:20px;font-size:12px;opacity:1;}
+
+  /* cases non cochées → masquées */
+  .cg label.np,.pg label.np{display:none!important;}
+  .cg{padding:3px 5px;gap:3px 12px;font-size:8pt;}
+  .pg{padding:3px 5px;gap:3px 14px;font-size:8pt;}
+
+  /* tableau dépenses */
+  table.dt-tbl thead th{background:#1a6b4a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:4px 8px;font-size:7.5pt;}
+  table.dt-tbl td{padding:3px 8px;font-size:8.5pt;}
+  table.dt-tbl tbody tr.np{display:none!important;}
+  table.dt-tbl tbody tr:nth-child(even){background:transparent;}
+  table.dt-tbl td.del-td{display:none!important;}
+  .dep-tot{padding:4px 10px;font-size:8.5pt;border-radius:2px;}
+  .dep-tot .big{font-size:10pt;}
+
+  .av{padding:8px;font-size:8pt;}
+  .sl{height:35px;}
+  .sep{margin:5px 0;}
+  .st{font-size:8pt;margin-bottom:3px;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="bar">
+  <div class="nm">Lycée Polyvalent Léopold Elfort <small>Fiche Projet EDD</small></div>
+  <span id="badge"><span class="dot"></span> Sauvegarde auto</span>
+  <button class="tb tb-w" onclick="doSave()">
+    <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
+    Sauvegarder
+  </button>
+  <button class="tb tb-g" onclick="doExport()">
+    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+    Exporter
+  </button>
+  <button class="tb tb-g" onclick="document.getElementById('fl').click()">
+    <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+    Charger
+  </button>
+  <input type="file" id="fl" accept=".json" onchange="doImport(event)">
+  <button class="tb tb-g" onclick="doPrint()">
+    <svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 00-3 3v6h4v4h12v-4h4v-6a3 3 0 00-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-7H6V2h12v3z"/></svg>
+    Imprimer / PDF
+  </button>
+  <button class="tb tb-o" onclick="openMod()">
+    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    Envoyer
+  </button>
+</div>
+
+<div class="wrap">
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-logo"><svg viewBox="0 0 64 64"><path d="M32 4C16.536 4 4 16.536 4 32s12.536 28 28 28 28-12.536 28-28S47.464 4 32 4zm0 4c13.255 0 24 10.745 24 24S45.255 56 32 56 8 45.255 8 32 18.745 8 32 8zm-2 8v14H18l14 16 14-16H34V16h-4z"/></svg></div>
+  <div class="ph-txt">
+    <h1>FICHE PROJET</h1>
+    <p>Éducation au Développement Durable — Lycée Polyvalent Léopold Elfort</p>
+    <p style="font-size:10.5px;color:#bbb;margin-top:1px;">Complétez · Sauvegardez · Envoyez à la direction</p>
+  </div>
+</div>
+
+<!-- INFOBOX -->
+<div class="ib">
+  <b>📋 Mode d'emploi</b>
+  <strong>Sauvegarder</strong> conserve la saisie dans ce navigateur. <strong>Exporter</strong> télécharge un fichier .json pour reprendre sur un autre ordinateur (<strong>Charger</strong> pour le rouvrir). <strong>Imprimer/PDF</strong> génère uniquement les rubriques renseignées (titre, référent et email obligatoires). <strong>Aide</strong> ci-dessous pour le guide.
+</div>
+
+<!-- AIDE -->
+<div class="sec sec-aide">
+  <div class="sh" onclick="toggleAide()">
+    <div class="sh-l"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>Aide — Guide de saisie</div>
+    <span class="ai" id="ai-ic">▶</span>
+  </div>
+  <div class="aide-bd" id="ai-bd">
+    <div class="ag">
+      <div class="ac"><h4>📌 Identification</h4><p>Titre du projet, nom du référent et e-mail académique sont obligatoires pour imprimer ou envoyer la fiche.</p></div>
+      <div class="ac"><h4>👥 Encadrant(e)s</h4><p>Listez tous les adultes impliqués : enseignants, AED, CPE, intervenants. Cliquez « + Ajouter » pour plus de lignes.</p></div>
+      <div class="ac"><h4>🏫 Dispositifs</h4><p>Indiquez la ou les disciplines (SVT, HG…) et cochez les dispositifs institutionnels associés.</p></div>
+      <div class="ac"><h4>🤝 Partenaires</h4><p>Renseignez les structures externes (association, entreprise, collectivité) et cochez leur(s) rôle(s).</p></div>
+      <div class="ac"><h4>🎯 Objectifs</h4><p>Axe du projet d'établissement, objectif visé, action concrète, compétences du livret scolaire ciblées.</p></div>
+      <div class="ac"><h4>🌱 ODD</h4><p>Les 17 Objectifs de Développement Durable de l'ONU. Cochez ceux auxquels contribue votre projet.</p></div>
+      <div class="ac"><h4>📅 Organisation</h4><p>Ajoutez autant de dates, lieux et durées que nécessaire. Pour le matériel, un item par ligne.</p></div>
+      <div class="ac"><h4>💶 Budget</h4><p>Une ligne par dépense : choisissez le type, ajoutez un libellé, saisissez le montant. Total calculé automatiquement.</p></div>
+      <div class="ac"><h4>💾 Portabilité</h4><p>« Exporter » télécharge un .json. Sur un autre ordinateur, « Charger » pour reprendre la saisie.</p></div>
+      <div class="ac"><h4>🖨️ Impression</h4><p>Seules les rubriques renseignées s'impriment. Choisissez « Enregistrer en PDF » dans les options du navigateur.</p></div>
+      <div class="ac"><h4>📤 Envoi</h4><p>« Envoyer » ouvre la messagerie pré-remplie. Joignez le fichier exporté (.json) manuellement à l'e-mail.</p></div>
+      <div class="ac"><h4>✅ Avis direction</h4><p>La rubrique « Avis chef d'établissement » est toujours imprimée — elle sera complétée par la direction.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- 1. IDENTIFICATION -->
+<div class="sec" id="s-id">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>Identification du projet</div></div>
+  <div class="sb">
+    <div class="row">
+      <div class="col3"><label class="lb">Titre du projet *</label><input type="text" id="titre" placeholder="Ex : Jardin pédagogique – biodiversité locale"></div>
+      <div class="col"><label class="lb">Année scolaire</label><select id="annee"><option>2025-2026</option><option>2026-2027</option><option>2027-2028</option></select><span class="sp" style="display:none;" id="annee-p"></span></div>
+    </div>
+    <div class="row">
+      <div class="col"><label class="lb">Référent(e) du projet *</label><input type="text" id="referent" placeholder="Nom Prénom"></div>
+      <div class="col"><label class="lb">Email du référent *</label><input type="email" id="ref-email" placeholder="prenom.nom@ac-guyane.fr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. ENCADRANTS -->
+<div class="sec" id="s-enc">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Encadrant(e)s</div></div>
+  <div class="sb">
+    <div id="enc-list"></div>
+    <button class="ab" onclick="addEnc()">+ Ajouter un(e) encadrant(e)</button>
+  </div>
+</div>
+
+<!-- 3. DISPOSITIFS -->
+<div class="sec" id="s-disp">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>Dispositif(s) éducatif(s)</div></div>
+  <div class="sb">
+    <div class="row"><div class="col"><label class="lb">Enseignement(s) disciplinaire(s) engagé(s)</label><input type="text" id="disciplines" placeholder="Ex : SVT, Géographie, Économie…"></div></div>
+    <label class="lb" style="margin-top:8px;">Dispositifs associés</label>
+    <div class="cg">
+      <label><input type="checkbox" class="cd" value="Cardie"> Cardie</label>
+      <label><input type="checkbox" class="cd" value="NEFLE"> NEFLE</label>
+      <label><input type="checkbox" class="cd" value="Club"> Club</label>
+      <label><input type="checkbox" class="cd" value="PHare"> PHare</label>
+      <label><input type="checkbox" class="cd" value="Devoirs faits"> Devoirs faits</label>
+      <label><input type="checkbox" class="cd" value="Cordées"> Cordées</label>
+      <label><input type="checkbox" class="cd" value="Ulis"> Ulis</label>
+      <label><input type="checkbox" class="cd" value="Formation Fil"> Formation Fil</label>
+    </div>
+  </div>
+</div>
+
+<!-- 4. PARTENAIRES -->
+<div class="sec" id="s-part">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>Partenaires</div></div>
+  <div class="sb">
+    <div class="row"><div class="col"><label class="lb">Nom(s) du/des partenaire(s)</label><input type="text" id="part-nom" placeholder="Ex : Parc Amazonien, Mairie de Cayenne…"></div></div>
+    <label class="lb" style="margin-top:8px;">Rôle(s)</label>
+    <div class="cg">
+      <label><input type="checkbox" class="cr" value="Animation"> Animation</label>
+      <label><input type="checkbox" class="cr" value="Financement"> Financement</label>
+      <label><input type="checkbox" class="cr" value="Orientation"> Orientation</label>
+    </div>
+    <div style="margin-top:9px;"><label class="lb">Précisions complémentaires</label><input type="text" id="part-detail" placeholder="Détails sur le rôle du partenaire…"></div>
+  </div>
+</div>
+
+<!-- 5. PUBLIC -->
+<div class="sec" id="s-pub">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Public concerné</div></div>
+  <div class="sb">
+    <div class="row">
+      <div class="col"><label class="lb">Nb élèves total</label><input type="number" id="nb-el" placeholder="0" min="0"></div>
+      <div class="col"><label class="lb">Niveau(x)</label><input type="text" id="niveaux" placeholder="Seconde, Première…"></div>
+      <div class="col"><label class="lb">Classe(s)</label><input type="text" id="classes" placeholder="2A, 1B…"></div>
+      <div class="col"><label class="lb">Groupe(s)</label><input type="text" id="groupes" placeholder="Groupe 1…"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. OBJECTIFS -->
+<div class="sec" id="s-obj">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Objectifs du projet</div></div>
+  <div class="sb">
+    <p class="st">Objectifs généraux — projet d'établissement</p>
+    <div class="row"><div class="col"><label class="lb">Axe</label><input type="text" id="axe" placeholder="Axe stratégique du projet d'établissement…"></div></div>
+    <div class="row"><div class="col"><label class="lb">Objectif</label><input type="text" id="objectif" placeholder="Objectif visé…"></div></div>
+    <div class="row"><div class="col"><label class="lb">Action</label><input type="text" id="action" placeholder="Action concrète mise en œuvre…"></div></div>
+    <div class="sep"></div>
+    <p class="st">Objectifs de savoirs, savoir-faire, savoir-être <span class="sn">(compétences du livret scolaire ciblées)</span></p>
+    <div class="row"><div class="col"><label class="lb">Compétence 1</label><input type="text" id="c1" placeholder="…"></div></div>
+    <div class="row"><div class="col"><label class="lb">Compétence 2</label><input type="text" id="c2" placeholder="…"></div></div>
+    <div class="row"><div class="col"><label class="lb">Compétence 3</label><input type="text" id="c3" placeholder="…"></div></div>
+    <div class="sep"></div>
+    <p class="st">Parcours éducatif(s) visé(s)</p>
+    <div class="cg">
+      <label><input type="checkbox" class="cp" value="Citoyen"> 🗳️ Citoyen</label>
+      <label><input type="checkbox" class="cp" value="Culturel"> 🎨 Culturel</label>
+      <label><input type="checkbox" class="cp" value="Santé"> 🍏 Santé</label>
+      <label><input type="checkbox" class="cp" value="Avenir"> 🚀 Avenir</label>
+    </div>
+  </div>
+</div>
+
+<!-- 7. ODD -->
+<div class="sec" id="s-odd">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>Objectifs de Développement Durable (ODD) visés</div></div>
+  <div class="sb"><div class="og" id="og"></div></div>
+</div>
+
+<!-- 8. PRÉSENTATION -->
+<div class="sec" id="s-pres">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Présentation du projet</div></div>
+  <div class="sb">
+    <label class="lb">Pourquoi cette initiative ? Quelle est votre démarche ?</label>
+    <textarea id="presentation" style="min-height:110px;" placeholder="Contexte, problématique identifiée, démarche pédagogique envisagée…"></textarea>
+  </div>
+</div>
+
+<!-- 9. ORGANISATION -->
+<div class="sec" id="s-orga">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>Organisation des actions</div></div>
+  <div class="sb">
+    <p class="st">Dates des activités prévues</p>
+    <div id="l-dates"></div>
+    <div class="ar"><button class="ab" onclick="addDyn('l-dates','Date','date')">📅 + Ajouter une date</button></div>
+    <div class="sep"></div>
+    <p class="st">Lieux de déroulement</p>
+    <div id="l-lieux"></div>
+    <div class="ar"><button class="ab" onclick="addDyn('l-lieux','Lieu','text')">📍 + Ajouter un lieu</button></div>
+    <div class="sep"></div>
+    <p class="st">Durées des activités</p>
+    <div id="l-durees"></div>
+    <div class="ar"><button class="ab" onclick="addDyn('l-durees','Durée','text')">⏱️ + Ajouter une durée</button></div>
+    <div class="sep"></div>
+    <p class="st">Besoins matériels</p>
+    <div id="l-mat"></div>
+    <div class="ar"><button class="ab" onclick="addDyn('l-mat','Matériel','text')">📦 + Ajouter un besoin matériel</button></div>
+    <div class="sep"></div>
+    <p class="st">Subventions obtenues</p>
+    <textarea id="subv" style="min-height:60px;" placeholder="Montant et source des subventions déjà accordées…"></textarea>
+  </div>
+</div>
+
+<!-- 10. BUDGET -->
+<div class="sec" id="s-fin">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>Besoins financiers</div></div>
+  <div class="sb">
+    <p style="font-size:12px;color:var(--mu);margin-bottom:10px;">Saisissez chaque type de dépense et son montant estimé. <em>Joindre les devis à la fiche.</em></p>
+    <div class="dep-wrap">
+      <table class="dt-tbl">
+        <thead><tr>
+          <th style="width:195px;">Type de dépense</th>
+          <th>Précision / Libellé</th>
+          <th class="r">Montant (€)</th>
+          <th class="d"></th>
+        </tr></thead>
+        <tbody id="dep-body"></tbody>
+      </table>
+    </div>
+    <button class="ab" onclick="addDep()">💶 + Ajouter une dépense</button>
+    <div class="dep-tot">Total estimé : <span class="big" id="dep-tot-val">0,00 €</span></div>
+  </div>
+</div>
+
+<!-- 11. ÉVALUATION -->
+<div class="sec" id="s-eval">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Évaluation du projet</div></div>
+  <div class="sb">
+    <p class="st">Productions attendues</p>
+    <div class="pg">
+      <label><input type="checkbox" class="cprod" value="Podcast(s)"> 🎙️ Podcast(s)</label>
+      <label><input type="checkbox" class="cprod" value="Vidéo(s)"> 🎬 Vidéo(s)</label>
+      <label><input type="checkbox" class="cprod" value="Livre(s)"> 📗 Livre(s)</label>
+      <label><input type="checkbox" class="cprod" value="Article(s)"> 📰 Article(s)</label>
+      <label><input type="checkbox" class="cprod" value="Sculpture(s)"> 🗿 Sculpture(s)</label>
+      <label><input type="checkbox" class="cprod" value="Objet(s)"> 📦 Objet(s)</label>
+    </div>
+    <div style="margin-top:9px;"><label class="lb">Autre production</label><input type="text" id="prod-autre" placeholder="Précisez…"></div>
+    <div class="sep"></div>
+    <p class="st">Plus-value pour les élèves <span class="sn">(compétences orales, numériques, EDD…)</span></p>
+    <div class="row"><div class="col"><label class="lb">1.</label><input type="text" id="pv1" placeholder="Compétence ou apport…"></div></div>
+    <div class="row"><div class="col"><label class="lb">2.</label><input type="text" id="pv2" placeholder="Compétence ou apport…"></div></div>
+    <div class="row"><div class="col"><label class="lb">3.</label><input type="text" id="pv3" placeholder="Compétence ou apport…"></div></div>
+    <div class="sep"></div>
+    <p class="st">Plus-value pour l'établissement</p>
+    <div class="cg">
+      <label><input type="checkbox" class="cetab" value="La promotion des filières"> La promotion des filières</label>
+      <label><input type="checkbox" class="cetab" value="Le climat scolaire"> Le climat scolaire</label>
+      <label><input type="checkbox" class="cetab" value="La promotion de la santé"> La promotion de la santé</label>
+    </div>
+  </div>
+</div>
+
+<!-- 12. AVIS (toujours imprimé) -->
+<div class="sec" id="s-avis">
+  <div class="sh"><div class="sh-l"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>Avis du chef d'établissement</div></div>
+  <div class="sb">
+    <div class="av">
+      <label><input type="radio" name="avis" value="favorable"> ✅ Avis favorable</label>
+      <label><input type="radio" name="avis" value="défavorable"> ❌ Avis défavorable</label>
+      <div class="sg">Date et Signature du chef d'établissement<div class="sl"></div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- MODAL -->
+<div id="mod">
+  <div class="mb">
+    <h2>📤 Envoyer la fiche à la direction</h2>
+    <p>
+      <strong>Étape 1 :</strong> Téléchargez le fichier JSON (nommé automatiquement <em>Titre_date.json</em>).<br>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le fichier manuellement.<br><br>
+      📧 <strong>Chef d'établissement :</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a1c2c9d3c8d2d5ced1c9c48fc3c8c6cfcecfe1c0c28cc6d4d8c0cfc48fc7d3">[email&#160;protected]</a><br>
+      📧 <strong>Secrétariat :</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="b3c7d2c7dad2ddd29dd2d4d6c0dadfd2c0f3d2d09ed4c6cad2ddd69dd5c1">[email&#160;protected]</a>
+    </p>
+    <div class="mbs">
+      <button class="mbt mbt-l" onclick="doExport()">💾 Télécharger le fichier</button>
+      <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
+      <button class="mbt mbt-c" onclick="closeMod()">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+'use strict';
+
+/* ── ODD ── */
+const ODDS=[
+  {n:1,l:"Pas de pauvreté",c:"#E5243B",e:"🏠"},
+  {n:2,l:"Faim « Zéro »",c:"#DDA63A",e:"🌾"},
+  {n:3,l:"Bonne santé et bien-être",c:"#4C9F38",e:"❤️"},
+  {n:4,l:"Éducation de qualité",c:"#C5192D",e:"📚"},
+  {n:5,l:"Égalité entre les sexes",c:"#FF3A21",e:"⚖️"},
+  {n:6,l:"Eau propre et assainissement",c:"#26BDE2",e:"💧"},
+  {n:7,l:"Énergie propre et abordable",c:"#FCC30B",e:"☀️"},
+  {n:8,l:"Travail décent et croissance",c:"#A21942",e:"📈"},
+  {n:9,l:"Industrie et innovation",c:"#FD6925",e:"🏭"},
+  {n:10,l:"Inégalités réduites",c:"#DD1367",e:"🤝"},
+  {n:11,l:"Villes et communautés durables",c:"#FD9D24",e:"🏙️"},
+  {n:12,l:"Consommation et production",c:"#BF8B2E",e:"♻️"},
+  {n:13,l:"Lutte contre les changements climatiques",c:"#3F7E44",e:"🌍"},
+  {n:14,l:"Vie aquatique",c:"#0A97D9",e:"🐠"},
+  {n:15,l:"Vie terrestre",c:"#56C02B",e:"🌿"},
+  {n:16,l:"Paix, justice et institutions",c:"#00689D",e:"🕊️"},
+  {n:17,l:"Partenariats pour les objectifs",c:"#19486A",e:"🌐"},
+];
+(function(){
+  const g=document.getElementById('og');
+  ODDS.forEach(function(o){
+    const lb=document.createElement('label');
+    lb.className='oi';
+    lb.innerHTML='<input type="checkbox" class="codd" value="'+o.n+'"><span class="oi-ico" style="background:'+o.c+'">'+o.e+'</span><span class="oi-lbl"><span class="oi-n">ODD '+o.n+' — </span>'+o.l+'</span>';
+    g.appendChild(lb);
+  });
+})();
+
+/* ── ENCADRANTS ── */
+var encList=[];
+var ENC_F=['Enseignant','AED','CPE','AESH','Intervenant extérieur','Autre'];
+function renderEnc(){
+  var h='';
+  for(var i=0;i<encList.length;i++){
+    var e=encList[i];
+    var opts='<option value="">Fonction…</option>';
+    for(var j=0;j<ENC_F.length;j++){
+      opts+='<option value="'+ENC_F[j]+'"'+(e.role===ENC_F[j]?' selected':'')+'>'+ENC_F[j]+'</option>';
+    }
+    h+='<div class="er" data-i="'+i+'">'
+      +'<input type="text" value="'+esc(e.nom)+'" oninput="encList['+i+'].nom=this.value" placeholder="NOM">'
+      +'<input type="text" value="'+esc(e.prenom)+'" oninput="encList['+i+'].prenom=this.value" placeholder="Prénom">'
+      +'<select onchange="encList['+i+'].role=this.value">'+opts+'</select>'
+      +'<span class="sp" style="display:none;">'+esc(e.role)+'</span>'
+      +'<button class="xb" onclick="remEnc('+i+')">×</button>'
+      +'</div>';
+  }
+  document.getElementById('enc-list').innerHTML=h;
+}
+function addEnc(){ encList.push({nom:'',prenom:'',role:''}); renderEnc(); }
+function remEnc(i){ encList.splice(i,1); renderEnc(); }
+
+/* ── LISTES DYNAMIQUES ── */
+var DYN={'l-dates':[],'l-lieux':[],'l-durees':[],'l-mat':[]};
+function addDyn(lid,label,type){
+  DYN[lid].push({val:'',label:label,type:type});
+  renderDyn(lid);
+}
+function remDyn(lid,i){ DYN[lid].splice(i,1); renderDyn(lid); }
+function renderDyn(lid){
+  var arr=DYN[lid];
+  var h='';
+  for(var i=0;i<arr.length;i++){
+    var item=arr[i];
+    h+='<div class="dr" data-i="'+i+'">'
+      +'<span class="dt">'+item.label+'</span>'
+      +'<input type="'+item.type+'" value="'+(item.type==='date'?item.val:esc(item.val))+'" '
+      +'oninput="DYN[\''+lid+'\']['+i+'].val=this.value" '
+      +'placeholder="'+(item.type==='date'?'':item.label+' …')+'">'
+      +'<button class="xb" onclick="remDyn(\''+lid+'\','+i+')">×</button>'
+      +'</div>';
+  }
+  document.getElementById(lid).innerHTML=h;
+}
+
+/* ── DÉPENSES ── */
+var DEP_TYPES=['Hébergement','Transport','Entrée','Activités','Autres'];
+var deps=[];
+function addDep(){ deps.push({type:'',precision:'',amt:''}); renderDep(); }
+function remDep(i){ deps.splice(i,1); renderDep(); calcTotal(); }
+function renderDep(){
+  var h='';
+  for(var i=0;i<deps.length;i++){
+    var d=deps[i];
+    var opts='<option value="">Choisir…</option>';
+    for(var j=0;j<DEP_TYPES.length;j++){
+      opts+='<option value="'+DEP_TYPES[j]+'"'+(d.type===DEP_TYPES[j]?' selected':'')+'>'+DEP_TYPES[j]+'</option>';
+    }
+    h+='<tr>'
+      +'<td>'
+        +'<select onchange="deps['+i+'].type=this.value;renderDep();calcTotal()">'+opts+'</select>'
+        +'<span class="sp" style="display:none;">'+esc(d.type)+'</span>'
+      +'</td>'
+      +'<td><input type="text" value="'+esc(d.precision)+'" oninput="deps['+i+'].precision=this.value" placeholder="'+(d.type==='Autres'?'Précisez la nature de la dépense…':'Libellé complémentaire (optionnel)…')+'"></td>'
+      +'<td class="r"><input type="number" class="ra" value="'+d.amt+'" min="0" step="0.01" placeholder="0,00" oninput="deps['+i+'].amt=this.value;calcTotal()"></td>'
+      +'<td class="del-td"><button class="xb" onclick="remDep('+i+')">×</button></td>'
+      +'</tr>';
+  }
+  document.getElementById('dep-body').innerHTML=h;
+}
+function calcTotal(){
+  var t=0;
+  for(var i=0;i<deps.length;i++) t+=parseFloat(deps[i].amt)||0;
+  document.getElementById('dep-tot-val').textContent=t.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+}
+
+/* ── AIDE ── */
+function toggleAide(){
+  var b=document.getElementById('ai-bd');
+  var ic=document.getElementById('ai-ic');
+  var open=b.classList.toggle('show');
+  ic.classList.toggle('open',open);
+  ic.textContent=open?'▼':'▶';
+}
+
+/* ── UTILITAIRES ── */
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function gv(id){ var e=document.getElementById(id); return e?e.value.trim():''; }
+function sv(id,v){ var e=document.getElementById(id); if(e&&v!=null) e.value=v; }
+function gchk(sel){ return Array.from(document.querySelectorAll(sel+':checked')).map(function(c){return c.value;}); }
+function schk(sel,vals){
+  document.querySelectorAll(sel).forEach(function(c){ c.checked=(vals||[]).map(String).indexOf(c.value)>-1; });
+}
+function todayStr(){ return new Date().toISOString().slice(0,10).replace(/-/g,''); }
+function safeName(s){ return (s||'Fiche').replace(/[^a-zA-Z0-9\u00C0-\u024F]/g,'_').replace(/_+/g,'_').substring(0,40); }
+
+/* ── COLLECTE ── */
+function getData(){
+  var avisEl=document.querySelector('input[name="avis"]:checked');
+  return {
+    titre:gv('titre'), annee:gv('annee'),
+    referent:gv('referent'), email:gv('ref-email'),
+    encadrants:JSON.parse(JSON.stringify(encList)),
+    disciplines:gv('disciplines'), dispositifs:gchk('.cd'),
+    partNom:gv('part-nom'), partRoles:gchk('.cr'), partDetail:gv('part-detail'),
+    nbEl:gv('nb-el'), niveaux:gv('niveaux'), classes:gv('classes'), groupes:gv('groupes'),
+    axe:gv('axe'), objectif:gv('objectif'), action:gv('action'),
+    c1:gv('c1'), c2:gv('c2'), c3:gv('c3'),
+    parcours:gchk('.cp'), odd:gchk('.codd'),
+    presentation:gv('presentation'),
+    dates:   DYN['l-dates'].map(function(d){return d.val;}).filter(Boolean),
+    lieux:   DYN['l-lieux'].map(function(d){return d.val;}).filter(Boolean),
+    durees:  DYN['l-durees'].map(function(d){return d.val;}).filter(Boolean),
+    materiel:DYN['l-mat'].map(function(d){return d.val;}).filter(Boolean),
+    depenses:deps.filter(function(d){return d.amt;}),
+    subv:gv('subv'),
+    productions:gchk('.cprod'), prodAutre:gv('prod-autre'),
+    pv1:gv('pv1'), pv2:gv('pv2'), pv3:gv('pv3'),
+    plusEtab:gchk('.cetab'),
+    avis:avisEl?avisEl.value:'',
+  };
+}
+
+/* ── RESTAURATION ── */
+function setData(d){
+  if(!d) return;
+  sv('titre',d.titre); sv('annee',d.annee);
+  sv('referent',d.referent); sv('ref-email',d.email);
+  sv('disciplines',d.disciplines);
+  sv('part-nom',d.partNom); sv('part-detail',d.partDetail);
+  sv('nb-el',d.nbEl); sv('niveaux',d.niveaux); sv('classes',d.classes); sv('groupes',d.groupes);
+  sv('axe',d.axe); sv('objectif',d.objectif); sv('action',d.action);
+  sv('c1',d.c1); sv('c2',d.c2); sv('c3',d.c3);
+  sv('presentation',d.presentation); sv('subv',d.subv);
+  sv('prod-autre',d.prodAutre); sv('pv1',d.pv1); sv('pv2',d.pv2); sv('pv3',d.pv3);
+  schk('.cd',d.dispositifs); schk('.cr',d.partRoles);
+  schk('.cp',d.parcours); schk('.codd',(d.odd||[]).map(String));
+  schk('.cprod',d.productions); schk('.cetab',d.plusEtab);
+  if(d.avis){ var r=document.querySelector('input[name="avis"][value="'+d.avis+'"]'); if(r) r.checked=true; }
+  // annee select
+  var anneeEl=document.getElementById('annee'); if(anneeEl&&d.annee) anneeEl.value=d.annee;
+  encList=d.encadrants||[]; renderEnc();
+  function rDyn(lid,vals,label,type){ DYN[lid]=(vals||[]).map(function(val){return{val:val,label:label,type:type};}); renderDyn(lid); }
+  rDyn('l-dates',  d.dates,    'Date',    'date');
+  rDyn('l-lieux',  d.lieux,    'Lieu',    'text');
+  rDyn('l-durees', d.durees,   'Durée',   'text');
+  rDyn('l-mat',    d.materiel, 'Matériel','text');
+  deps=(d.depenses||[]).map(function(dep){return{type:dep.type||'',precision:dep.precision||'',amt:dep.amt||''};});
+  renderDep(); calcTotal();
+  // update annee print span
+  var ap=document.getElementById('annee-p'); if(ap) ap.textContent=gv('annee');
+}
+
+/* ── SAUVEGARDE ── */
+var LSKEY='fiche_edd_v5';
+function doSave(){
+  localStorage.setItem(LSKEY,JSON.stringify(getData()));
+  flash('✅ Sauvegardé !');
+}
+function flash(msg){
+  var el=document.getElementById('badge');
+  el.innerHTML='<span class="dot"></span> '+msg;
+  setTimeout(function(){ el.innerHTML='<span class="dot"></span> Sauvegarde auto'; },2500);
+}
+setInterval(function(){ localStorage.setItem(LSKEY,JSON.stringify(getData())); },30000);
+
+/* ── EXPORT ── */
+function doExport(){
+  var data=getData();
+  var fname='projet_'+safeName(data.titre)+'_'+todayStr()+'.json';
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url; a.download=fname;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  flash('💾 Fichier exporté !');
+}
+
+/* ── IMPORT ── */
+function doImport(evt){
+  var file=evt.target.files[0];
+  if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var d=JSON.parse(e.target.result);
+      setData(d);
+      localStorage.setItem(LSKEY,JSON.stringify(d));
+      flash('📂 Fiche chargée !');
+    }catch(err){
+      alert('❌ Fichier invalide. Choisissez un fichier .json exporté depuis cette application.');
+    }
+  };
+  reader.readAsText(file);
+  evt.target.value='';
+}
+
+/* ── IMPRESSION ── */
+function doPrint(){
+  // Validation obligatoire
+  var titre=gv('titre'), ref=gv('referent'), email=gv('ref-email');
+  if(!titre||!ref||!email){
+    var msg='⚠️ Impossible de générer le PDF.\nVeuillez renseigner les champs obligatoires :\n';
+    if(!titre)  msg+='\n• Titre du projet';
+    if(!ref)    msg+='\n• Référent(e) du projet';
+    if(!email)  msg+='\n• Email du référent';
+    alert(msg);
+    return;
+  }
+  localStorage.setItem(LSKEY,JSON.stringify(getData()));
+
+  // Marquer lignes dynamiques vides
+  document.querySelectorAll('.dr').forEach(function(r){
+    var inp=r.querySelector('input');
+    if(inp&&!inp.value) r.classList.add('np'); else r.classList.remove('np');
+  });
+
+  // Marquer lignes budget vides
+  document.querySelectorAll('#dep-body tr').forEach(function(r){
+    var m=r.querySelector('input.ra');
+    if(m&&!m.value) r.classList.add('np'); else r.classList.remove('np');
+  });
+
+  // Marquer encadrants vides
+  document.querySelectorAll('.er').forEach(function(r){
+    var inputs=Array.from(r.querySelectorAll('input[type=text]'));
+    var filled=inputs.some(function(i){return i.value.trim();});
+    if(filled) r.classList.remove('np'); else r.classList.add('np');
+  });
+
+  // ODD non cochés
+  document.querySelectorAll('.oi').forEach(function(item){
+    if(item.querySelector('input').checked) item.classList.remove('np');
+    else item.classList.add('np');
+  });
+
+  // Cases non cochées
+  document.querySelectorAll('.cg label,.pg label').forEach(function(lbl){
+    if(lbl.querySelector('input').checked) lbl.classList.remove('np');
+    else lbl.classList.add('np');
+  });
+
+  // Sections entièrement vides → cachées (sauf s-id et s-avis toujours imprimées)
+  var secs=[
+    {id:'s-enc',  ok:function(){return encList.some(function(e){return e.nom||e.prenom||e.role;});}},
+    {id:'s-disp', ok:function(){return gv('disciplines')||gchk('.cd').length;}},
+    {id:'s-part', ok:function(){return gv('part-nom')||gchk('.cr').length||gv('part-detail');}},
+    {id:'s-pub',  ok:function(){return gv('nb-el')||gv('niveaux')||gv('classes')||gv('groupes');}},
+    {id:'s-obj',  ok:function(){return gv('axe')||gv('objectif')||gv('action')||gv('c1')||gv('c2')||gv('c3')||gchk('.cp').length;}},
+    {id:'s-odd',  ok:function(){return gchk('.codd').length;}},
+    {id:'s-pres', ok:function(){return gv('presentation');}},
+    {id:'s-orga', ok:function(){
+      var hasD=Object.keys(DYN).some(function(k){return DYN[k].some(function(x){return x.val;});});
+      return hasD||gv('subv');
+    }},
+    {id:'s-fin',  ok:function(){return deps.some(function(d){return d.amt;});}},
+    {id:'s-eval', ok:function(){return gchk('.cprod').length||gv('prod-autre')||gv('pv1')||gv('pv2')||gv('pv3')||gchk('.cetab').length;}},
+  ];
+  secs.forEach(function(s){
+    var el=document.getElementById(s.id);
+    if(el){ if(s.ok()) el.classList.remove('np'); else el.classList.add('np'); }
+  });
+  // s-id et s-avis : toujours imprimés
+  var sid=document.getElementById('s-id'); if(sid) sid.classList.remove('np');
+  var sav=document.getElementById('s-avis'); if(sav) sav.classList.remove('np');
+
+  // Mettre à jour le span de l'année (remplace le select)
+  var ap=document.getElementById('annee-p'); if(ap) ap.textContent=gv('annee');
+
+  window.print();
+
+  // Nettoyage après impression
+  setTimeout(function(){
+    document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); });
+  },700);
+}
+
+/* ── EMAIL ── */
+function doMail(){
+  var d=getData();
+  var titre=d.titre||'Projet';
+  var total=deps.reduce(function(s,dep){return s+(parseFloat(dep.amt)||0);},0);
+  var sub=encodeURIComponent('[Fiche Projet] '+titre);
+  var body=encodeURIComponent(
+'Bonjour,\n\n'
++'Veuillez trouver ci-joint la fiche de projet intitulée :\n'
++'"'+titre+'" — Année '+d.annee+'\n\n'
++'Référent(e) : '+d.referent+' ('+d.email+')\n'
++'Niveau(x) : '+d.niveaux+'  |  Classe(s) : '+d.classes+'  |  Nb élèves : '+d.nbEl+'\n'
++'Budget total estimé : '+total.toLocaleString('fr-FR',{minimumFractionDigits:2})+' €\n\n'
++'Cordialement,\n'+d.referent);
+  window.location.href='mailto:christophe.bignon@ac-guyane.fr?cc=tatiana.agesilas@ac-guyane.fr&subject='+sub+'&body='+body;
+}
+
+/* ── MODAL ── */
+function openMod(){ localStorage.setItem(LSKEY,JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
+function closeMod(){ document.getElementById('mod').classList.remove('on'); }
+document.getElementById('mod').addEventListener('click',function(e){ if(e.target===this) closeMod(); });
+
+/* ── INIT ── */
+(function(){
+  var saved = localStorage.getItem(LSKEY);
+  if(saved){
+    try{ setData(JSON.parse(saved)); }catch(e){ console.warn('Restore error',e); }
+  } else {
+    renderEnc();
+    renderDyn('l-dates'); renderDyn('l-lieux');
+    renderDyn('l-durees'); renderDyn('l-mat');
+    renderDep(); calcTotal();
+  }
+})();
+</script>
+</body>
+</html>
