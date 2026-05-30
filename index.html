@@ -603,11 +603,8 @@ function doLogout(){ authOk = false; closeSet(); showToast('Déconnexion effectu
 function openSet(){
   document.getElementById('set-nom').value   = cfg.ecole || '';
   document.getElementById('set-ville').value = cfg.ville || '';
-  document.getElementById('new-login').value = '';
-  document.getElementById('new-pwd').value   = '';
-  document.getElementById('new-pwd2').value  = '';
-  document.getElementById('acces-msg').className = 'info-msg';
-  document.getElementById('acces-msg').textContent = '';
+  var gp = document.getElementById('gen-pwd'); if(gp) gp.value='';
+  var gr = document.getElementById('gen-result-row'); if(gr) gr.style.display='none';
   renderSetApps();
   // reset tabs
   document.querySelectorAll('.stab').forEach(function(t){ t.classList.remove('on'); });
