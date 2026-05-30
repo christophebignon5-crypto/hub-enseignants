@@ -904,10 +904,9 @@ function closeMod(){ document.getElementById('mod').classList.remove('on'); }
 document.getElementById('mod').addEventListener('click',function(e){ if(e.target===this) closeMod(); });
 
 /* ── VERROUILLAGE DIRECTION ── */
-var _remoteHash='3a0d1d9bdae44782fd698d3dd83760674498aaaee911f9846144275d86a96bd9';
+var _remotePwd='Elfort2025';
 fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignants/main/config.json')
-  .then(function(r){return r.json();}).then(function(c){if(c.passwordHash)_remoteHash=c.passwordHash;}).catch(function(){});
-function _sha256(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');});}
+  .then(function(r){return r.json();}).then(function(c){if(c.password)_remotePwd=c.password;}).catch(function(){});
 (function(){
   var sec=document.getElementById('s-avis');
   if(!sec) return;
@@ -924,17 +923,15 @@ function _sha256(s){return crypto.subtle.digest('SHA-256',new TextEncoder().enco
   };
   window.closeLock=function(){ document.getElementById('lock-modal').classList.remove('on'); };
   window.doUnlock=function(){
-    _sha256(document.getElementById('lock-pwd').value).then(function(hash){
-      if(hash===_remoteHash){
-        sec.classList.remove('admin-section-locked');
-        banner.style.display='none';
-        window.closeLock();
-      } else {
-        document.getElementById('lock-err').className='lock-err on';
-        document.getElementById('lock-pwd').value='';
-        document.getElementById('lock-pwd').focus();
-      }
-    });
+    if(document.getElementById('lock-pwd').value===_remotePwd){
+      sec.classList.remove('admin-section-locked');
+      banner.style.display='none';
+      window.closeLock();
+    } else {
+      document.getElementById('lock-err').className='lock-err on';
+      document.getElementById('lock-pwd').value='';
+      document.getElementById('lock-pwd').focus();
+    }
   };
   document.getElementById('lock-modal').addEventListener('click',function(e){ if(e.target===this) window.closeLock(); });
 })();

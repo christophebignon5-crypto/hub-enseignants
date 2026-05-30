@@ -348,18 +348,18 @@ footer{text-align:center;padding:22px;font-size:11px;color:var(--mu);border-top:
         <li>Remplacez la valeur de <code style="background:#eee;padding:1px 4px;border-radius:3px;">passwordHash</code> puis <strong>Commit changes</strong></li>
       </ol>
       <div class="sep"></div>
-      <p style="font-size:12px;font-weight:700;color:var(--gr);margin-bottom:8px;">🔧 Générateur de hash</p>
+      <p style="font-size:12px;font-weight:700;color:var(--gr);margin-bottom:8px;">🔧 Changer le mot de passe</p>
       <div class="fg">
-        <label class="lb">Nouveau mot de passe souhaité</label>
-        <input type="password" id="gen-pwd" placeholder="Saisissez le mot de passe…" autocomplete="new-password">
+        <label class="lb">Nouveau mot de passe</label>
+        <input type="password" id="gen-pwd" placeholder="Saisissez le nouveau mot de passe…" autocomplete="new-password">
       </div>
       <div class="btn-row" style="margin-bottom:12px;">
-        <button class="btn btn-gr" onclick="genHash()">⚙️ Générer le hash</button>
+        <button class="btn btn-gr" onclick="genHash()">📋 Préparer la valeur</button>
       </div>
       <div id="gen-result-row" style="display:none;">
-        <label class="lb">Hash SHA-256 à coller dans config.json</label>
-        <input type="text" id="gen-result" readonly onclick="this.select()" style="font-family:monospace;font-size:11px;cursor:copy;">
-        <p style="font-size:11px;color:var(--mu);margin-top:4px;">Cliquez sur le champ pour tout sélectionner, puis Cmd+C.</p>
+        <label class="lb">Valeur à coller dans config.json (champ "password")</label>
+        <input type="text" id="gen-result" readonly onclick="this.select()" style="font-weight:700;cursor:copy;">
+        <p style="font-size:11px;color:var(--mu);margin-top:4px;">Cliquez sur le champ pour sélectionner, puis Cmd+C.</p>
       </div>
       <div class="sep"></div>
       <div class="btn-row">
@@ -447,20 +447,13 @@ const CAT_STYLE = {
    CONFIG GITHUB
 ══════════════════════════════ */
 var CONFIG_URL = 'https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignants/main/config.json';
-var remoteHash = '3a0d1d9bdae44782fd698d3dd83760674498aaaee911f9846144275d86a96bd9'; // hash par défaut (Elfort2025)
-
-function sha256(str){
-  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
-    .then(function(buf){
-      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
-    });
-}
+var remotePassword = 'Elfort2025'; // valeur par défaut
 
 function fetchRemoteCfg(){
   fetch(CONFIG_URL)
     .then(function(r){ return r.json(); })
     .then(function(remote){
-      if(remote.passwordHash) remoteHash = remote.passwordHash;
+      if(remote.password) remotePassword = remote.password;
     })
     .catch(function(){});
 }
@@ -591,17 +584,15 @@ function closeAuth(){ document.getElementById('mod-auth').classList.remove('on')
 function doAuth(){
   var l = document.getElementById('auth-login').value.trim();
   var p = document.getElementById('auth-pwd').value;
-  sha256(p).then(function(hash){
-    if(l === cfg.login && hash === remoteHash){
-      authOk = true;
-      closeAuth();
-      openSet();
-    } else {
-      document.getElementById('auth-err').className = 'auth-err on';
-      document.getElementById('auth-pwd').value = '';
-      document.getElementById('auth-pwd').focus();
-    }
-  });
+  if(l === cfg.login && p === remotePassword){
+    authOk = true;
+    closeAuth();
+    openSet();
+  } else {
+    document.getElementById('auth-err').className = 'auth-err on';
+    document.getElementById('auth-pwd').value = '';
+    document.getElementById('auth-pwd').focus();
+  }
 }
 
 function doLogout(){ authOk = false; closeSet(); showToast('Déconnexion effectuée.'); }
@@ -644,12 +635,10 @@ function saveEcole(){
 }
 
 function genHash(){
-  var p = document.getElementById('gen-pwd').value;
+  var p = document.getElementById('gen-pwd').value.trim();
   if(!p){ showToast('Saisissez un mot de passe.','red'); return; }
-  sha256(p).then(function(hash){
-    document.getElementById('gen-result').value = hash;
-    document.getElementById('gen-result-row').style.display='block';
-  });
+  document.getElementById('gen-result').value = p;
+  document.getElementById('gen-result-row').style.display='block';
 }
 
 /* ── CUSTOM APPS ── */
