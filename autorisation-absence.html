@@ -334,6 +334,25 @@ input[type=text]{text-transform:inherit}
   border-top:1px solid var(--bo);background:var(--ca);
   margin-top:24px;
 }
+/* ── VERROUILLAGE DIRECTION ── */
+.admin-lock-overlay{position:absolute;inset:0;background:rgba(235,238,240,.92);backdrop-filter:blur(2px);z-index:10;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;border-radius:inherit;}
+.admin-lock-overlay:hover{background:rgba(218,224,228,.96);}
+.admin-lock-btn{display:flex;align-items:center;gap:9px;padding:12px 26px;background:#fff;border:2px solid #ccc;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;color:#555;box-shadow:0 2px 14px rgba(0,0,0,.12);pointer-events:none;white-space:nowrap;}
+.admin-lock-btn svg{width:18px;height:18px;fill:#888;flex-shrink:0;}
+#lock-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.52);z-index:9999;align-items:center;justify-content:center;}
+#lock-modal.on{display:flex;}
+.lock-mb{background:#fff;border-radius:14px;padding:26px;max-width:370px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.lock-mb h3{font-size:1rem;font-weight:800;color:var(--p);margin-bottom:6px;}
+.lock-mb p{font-size:12.5px;color:var(--mu);margin-bottom:16px;line-height:1.6;}
+.lock-err{background:#fdf0ef;border:1px solid #f5c6c0;border-radius:6px;padding:8px 12px;font-size:12.5px;color:var(--r);margin-bottom:12px;display:none;}
+.lock-err.on{display:block;}
+.lock-input{width:100%;padding:9px 11px;border:1.5px solid var(--bo);border-radius:7px;font-family:'Outfit',sans-serif;font-size:14px;margin-bottom:13px;color:var(--tx);background:#fff;}
+.lock-input:focus{border-color:var(--p);outline:none;box-shadow:0 0 0 3px rgba(30,58,110,.10);}
+.lock-btns{display:flex;gap:9px;}
+.lock-btns button{flex:1;padding:10px;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.lock-ok{background:var(--p);color:#fff;}.lock-ok:hover{background:var(--ps);}
+.lock-cc{background:#eee;color:#555;}
+@media print{.admin-lock-overlay,#lock-modal{display:none!important;}}
 
 /* ════ PRINT ════════════════════════════════════════════════════ */
 @media print{
@@ -823,6 +842,20 @@ input[type=text]{text-transform:inherit}
   </div>
 </div>
 
+<!-- MODAL VERROUILLAGE DIRECTION -->
+<div id="lock-modal">
+  <div class="lock-mb">
+    <h3>🔒 Accès Direction</h3>
+    <p>Zone réservée au chef d'établissement.<br>Saisissez le mot de passe pour accéder aux champs.</p>
+    <div class="lock-err" id="lock-err">Mot de passe incorrect.</div>
+    <input type="password" class="lock-input" id="lock-pwd" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doUnlock()">
+    <div class="lock-btns">
+      <button class="lock-ok" onclick="doUnlock()">🔓 Déverrouiller</button>
+      <button class="lock-cc" onclick="closeLock()">Annuler</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <!-- ═════════════════ SCRIPT ══════════════════════════════════════ -->
@@ -1137,6 +1170,35 @@ function dl(blob,name){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
 }
+
+/* ── VERROUILLAGE DIRECTION ── */
+(function(){
+  function adminPwd(){ try{var c=JSON.parse(localStorage.getItem('hub_v1')||'{}');return c.password||'Elfort2025';}catch(e){return 'Elfort2025';} }
+  var sec=document.querySelector('.admin-card');
+  if(!sec) return;
+  var ov=document.createElement('div');
+  ov.className='admin-lock-overlay';
+  ov.innerHTML='<div class="admin-lock-btn"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>Réservé à la Direction — Cliquer pour déverrouiller</div>';
+  ov.onclick=function(){ window.openLock(); };
+  sec.appendChild(ov);
+  window.openLock=function(){
+    document.getElementById('lock-pwd').value='';
+    document.getElementById('lock-err').className='lock-err';
+    document.getElementById('lock-modal').classList.add('on');
+    setTimeout(function(){ document.getElementById('lock-pwd').focus(); },100);
+  };
+  window.closeLock=function(){ document.getElementById('lock-modal').classList.remove('on'); };
+  window.doUnlock=function(){
+    if(document.getElementById('lock-pwd').value===adminPwd()){
+      ov.style.display='none'; window.closeLock();
+    } else {
+      document.getElementById('lock-err').className='lock-err on';
+      document.getElementById('lock-pwd').value='';
+      document.getElementById('lock-pwd').focus();
+    }
+  };
+  document.getElementById('lock-modal').addEventListener('click',function(e){ if(e.target===this) window.closeLock(); });
+})();
 </script>
 </body>
 </html>
