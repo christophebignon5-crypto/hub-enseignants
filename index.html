@@ -337,22 +337,32 @@ footer{text-align:center;padding:22px;font-size:11px;color:var(--mu);border-top:
 
     <!-- ─ TAB ACCÈS ─ -->
     <div class="spane" id="tab-acces">
-      <p style="font-size:12.5px;color:var(--mu);margin-bottom:16px;">Modifiez vos identifiants de connexion. Les données sont enregistrées localement dans ce navigateur.</p>
-      <div class="fg">
-        <label class="lb">Nouvel identifiant</label>
-        <input type="text" id="new-login" placeholder="Identifiant…" autocomplete="new-password">
+      <div style="background:#e8f5ef;border:1px solid #b8ddc8;border-radius:8px;padding:14px 16px;margin-bottom:16px;">
+        <p style="font-size:13px;font-weight:700;color:var(--gr);margin-bottom:6px;">🔐 Mot de passe stocké sur GitHub</p>
+        <p style="font-size:12.5px;color:var(--tx);line-height:1.7;">Le mot de passe est dans <code style="background:#d4ede3;padding:1px 5px;border-radius:3px;">config.json</code> sur GitHub — il fonctionne sur <strong>tous les postes</strong> automatiquement.</p>
       </div>
+      <p style="font-size:12.5px;font-weight:700;color:var(--gr);margin-bottom:8px;">Pour changer le mot de passe :</p>
+      <ol style="font-size:12.5px;color:var(--tx);line-height:2.1;padding-left:18px;margin-bottom:14px;">
+        <li>Générez le hash du nouveau mot de passe ci-dessous</li>
+        <li>Allez sur <a href="https://github.com/christophebignon5-crypto/hub-enseignants/blob/main/config.json" target="_blank" style="color:var(--gr);font-weight:700;">GitHub → config.json</a> → cliquez ✏️</li>
+        <li>Remplacez la valeur de <code style="background:#eee;padding:1px 4px;border-radius:3px;">passwordHash</code> puis <strong>Commit changes</strong></li>
+      </ol>
+      <div class="sep"></div>
+      <p style="font-size:12px;font-weight:700;color:var(--gr);margin-bottom:8px;">🔧 Générateur de hash</p>
       <div class="fg">
-        <label class="lb">Nouveau mot de passe</label>
-        <input type="password" id="new-pwd" placeholder="••••••••" autocomplete="new-password">
+        <label class="lb">Nouveau mot de passe souhaité</label>
+        <input type="password" id="gen-pwd" placeholder="Saisissez le mot de passe…" autocomplete="new-password">
       </div>
-      <div class="fg">
-        <label class="lb">Confirmer le mot de passe</label>
-        <input type="password" id="new-pwd2" placeholder="••••••••" autocomplete="new-password">
+      <div class="btn-row" style="margin-bottom:12px;">
+        <button class="btn btn-gr" onclick="genHash()">⚙️ Générer le hash</button>
       </div>
-      <div class="info-msg" id="acces-msg"></div>
+      <div id="gen-result-row" style="display:none;">
+        <label class="lb">Hash SHA-256 à coller dans config.json</label>
+        <input type="text" id="gen-result" readonly onclick="this.select()" style="font-family:monospace;font-size:11px;cursor:copy;">
+        <p style="font-size:11px;color:var(--mu);margin-top:4px;">Cliquez sur le champ pour tout sélectionner, puis Cmd+C.</p>
+      </div>
+      <div class="sep"></div>
       <div class="btn-row">
-        <button class="btn btn-gr" onclick="saveAcces()">💾 Enregistrer</button>
         <button class="btn btn-cc" onclick="doLogout()">🔓 Déconnexion</button>
       </div>
     </div>
@@ -434,7 +444,29 @@ const CAT_STYLE = {
 };
 
 /* ══════════════════════════════
-   PARAMÈTRES
+   CONFIG GITHUB
+══════════════════════════════ */
+var CONFIG_URL = 'https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignants/main/config.json';
+var remoteHash = '3a0d1d9bdae44782fd698d3dd83760674498aaaee911f9846144275d86a96bd9'; // hash par défaut (Elfort2025)
+
+function sha256(str){
+  return crypto.subtle.digest('SHA-256', new TextEncoder().encode(str))
+    .then(function(buf){
+      return Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
+    });
+}
+
+function fetchRemoteCfg(){
+  fetch(CONFIG_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(remote){
+      if(remote.passwordHash) remoteHash = remote.passwordHash;
+    })
+    .catch(function(){});
+}
+
+/* ══════════════════════════════
+   PARAMÈTRES LOCAUX
 ══════════════════════════════ */
 var cfg = {};
 
@@ -443,7 +475,6 @@ function loadCfg(){
   cfg.ecole      = cfg.ecole      || 'Lycée Polyvalent Léopold Elfort';
   cfg.ville      = cfg.ville      || 'Mana, Guyane';
   cfg.login      = cfg.login      || 'proviseur';
-  cfg.password   = cfg.password   || 'Elfort2025';
   cfg.customApps = cfg.customApps || [];
 }
 
@@ -560,15 +591,17 @@ function closeAuth(){ document.getElementById('mod-auth').classList.remove('on')
 function doAuth(){
   var l = document.getElementById('auth-login').value.trim();
   var p = document.getElementById('auth-pwd').value;
-  if(l === cfg.login && p === cfg.password){
-    authOk = true;
-    closeAuth();
-    openSet();
-  } else {
-    document.getElementById('auth-err').className = 'auth-err on';
-    document.getElementById('auth-pwd').value = '';
-    document.getElementById('auth-pwd').focus();
-  }
+  sha256(p).then(function(hash){
+    if(l === cfg.login && hash === remoteHash){
+      authOk = true;
+      closeAuth();
+      openSet();
+    } else {
+      document.getElementById('auth-err').className = 'auth-err on';
+      document.getElementById('auth-pwd').value = '';
+      document.getElementById('auth-pwd').focus();
+    }
+  });
 }
 
 function doLogout(){ authOk = false; closeSet(); showToast('Déconnexion effectuée.'); }
@@ -610,24 +643,13 @@ function saveEcole(){
   showToast('✅ Établissement mis à jour !', 'green');
 }
 
-function saveAcces(){
-  var l  = document.getElementById('new-login').value.trim();
-  var p  = document.getElementById('new-pwd').value;
-  var p2 = document.getElementById('new-pwd2').value;
-  var msg = document.getElementById('acces-msg');
-  msg.className = 'info-msg';
-
-  if(!l){ msg.className='info-msg show err'; msg.textContent='L\'identifiant ne peut pas être vide.'; return; }
-  if(!p){ msg.className='info-msg show err'; msg.textContent='Le mot de passe ne peut pas être vide.'; return; }
-  if(p !== p2){ msg.className='info-msg show err'; msg.textContent='Les mots de passe ne correspondent pas.'; return; }
-
-  cfg.login = l; cfg.password = p;
-  saveCfg();
-  document.getElementById('new-login').value = '';
-  document.getElementById('new-pwd').value   = '';
-  document.getElementById('new-pwd2').value  = '';
-  msg.className = 'info-msg show ok';
-  msg.textContent = '✅ Identifiants mis à jour avec succès.';
+function genHash(){
+  var p = document.getElementById('gen-pwd').value;
+  if(!p){ showToast('Saisissez un mot de passe.','red'); return; }
+  sha256(p).then(function(hash){
+    document.getElementById('gen-result').value = hash;
+    document.getElementById('gen-result-row').style.display='block';
+  });
 }
 
 /* ── CUSTOM APPS ── */
@@ -696,6 +718,7 @@ function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repla
 (function(){
   document.getElementById('footer-year').textContent = new Date().getFullYear();
   loadCfg();
+  fetchRemoteCfg();
   applyEcole();
   renderPills();
   renderApps();

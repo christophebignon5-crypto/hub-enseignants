@@ -1166,8 +1166,11 @@ function dl(blob,name){
 }
 
 /* ── VERROUILLAGE DIRECTION ── */
+var _remoteHash='3a0d1d9bdae44782fd698d3dd83760674498aaaee911f9846144275d86a96bd9';
+fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignants/main/config.json')
+  .then(function(r){return r.json();}).then(function(c){if(c.passwordHash)_remoteHash=c.passwordHash;}).catch(function(){});
+function _sha256(s){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)).then(function(b){return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');});}
 (function(){
-  function adminPwd(){ try{var c=JSON.parse(localStorage.getItem('hub_v1')||'{}');return c.password||'Elfort2025';}catch(e){return 'Elfort2025';} }
   var sec=document.querySelector('.admin-card');
   if(!sec) return;
   sec.classList.add('admin-section-locked');
@@ -1183,15 +1186,17 @@ function dl(blob,name){
   };
   window.closeLock=function(){ document.getElementById('lock-modal').classList.remove('on'); };
   window.doUnlock=function(){
-    if(document.getElementById('lock-pwd').value===adminPwd()){
-      sec.classList.remove('admin-section-locked');
-      banner.style.display='none';
-      window.closeLock();
-    } else {
-      document.getElementById('lock-err').className='lock-err on';
-      document.getElementById('lock-pwd').value='';
-      document.getElementById('lock-pwd').focus();
-    }
+    _sha256(document.getElementById('lock-pwd').value).then(function(hash){
+      if(hash===_remoteHash){
+        sec.classList.remove('admin-section-locked');
+        banner.style.display='none';
+        window.closeLock();
+      } else {
+        document.getElementById('lock-err').className='lock-err on';
+        document.getElementById('lock-pwd').value='';
+        document.getElementById('lock-pwd').focus();
+      }
+    });
   };
   document.getElementById('lock-modal').addEventListener('click',function(e){ if(e.target===this) window.closeLock(); });
 })();
