@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Organisation d'Événements — LPO Léopold Elfort</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ════ VARIABLES ════════════════════════════════════════════════════ */
+:root{
+  --p:#1e3a6e;--pd:#122244;--ps:#2a52a0;
+  --a:#c4922a;--al:#f5e6c8;
+  --g:#1f7a52;--r:#c0392b;
+  --bg:#eef2f7;--ca:#ffffff;
+  --tx:#1a2a3a;--mu:#5a6a7a;--bo:#d0dae8;
+  --ok:#1f7a52;--warn:#8B6914;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ════ TOOLBAR ══════════════════════════════════════════════════════ */
+.toolbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--pd);
+  display:flex;align-items:center;gap:6px;
+  padding:8px 20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+  flex-wrap:wrap;
+}
+.tl{
+  font-family:'Source Serif 4',serif;
+  color:var(--a);font-size:14px;font-weight:700;
+  flex:1;min-width:140px;white-space:nowrap;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:6px;border:none;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.bp {background:var(--a);color:#fff}.bp:hover{background:#a87720}
+.bo2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}.bo2:hover{background:rgba(255,255,255,.12)}
+.bi {background:#2980b9;color:#fff}.bi:hover{background:#1f6a99}
+.bg2{background:var(--g);color:#fff}.bg2:hover{background:#166040}
+.br {background:rgba(192,57,43,.85);color:#fff}.br:hover{background:var(--r)}
+.toolbar-sep{width:1px;height:24px;background:rgba(255,255,255,.2);margin:0 2px;flex-shrink:0}
+
+/* ════ PAGE HEADER ══════════════════════════════════════════════════ */
+.page-header{
+  background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);
+  padding:20px 32px 18px;color:#fff;
+  display:flex;align-items:center;gap:18px;
+  border-bottom:3px solid var(--a);
+}
+.hlogo{
+  width:66px;height:66px;background:rgba(255,255,255,.13);
+  border-radius:12px;border:2px dashed rgba(255,255,255,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;flex-shrink:0;
+}
+.htitle h1{
+  font-family:'Source Serif 4',serif;
+  font-size:19px;font-weight:700;margin-bottom:2px;
+}
+.htitle p{font-size:12px;opacity:.75;margin-top:2px}
+.hinfo{
+  display:flex;flex-direction:column;gap:4px;align-items:flex-end;margin-left:auto;flex-shrink:0;
+}
+.hinfo-field{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,.75);
+}
+.hinfo-field input{
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  border-radius:5px;color:#fff;font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;padding:3px 8px;outline:none;
+  width:100px;text-align:center;
+}
+.hinfo-field input::placeholder{color:rgba(255,255,255,.5)}
+.hinfo-field input:focus{background:rgba(255,255,255,.25);border-color:var(--a)}
+
+/* ════ ALERTE DÉLAI ═════════════════════════════════════════════════ */
+.delai-banner{
+  background:#fef9e7;border-left:4px solid var(--a);
+  border-radius:8px;padding:10px 16px;
+  margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:var(--warn);font-weight:500;
+}
+.delai-banner strong{color:#7a5010}
+
+/* ════ MAIN LAYOUT ══════════════════════════════════════════════════ */
+.main{max-width:860px;margin:24px auto;padding:0 20px 60px}
+
+/* ════ SECTION CARDS ════════════════════════════════════════════════ */
+.section{
+  background:var(--ca);border-radius:12px;
+  margin-bottom:16px;
+  box-shadow:0 2px 10px rgba(30,58,110,.09);
+  overflow:hidden;
+}
+.sh{
+  background:linear-gradient(90deg,var(--p),var(--ps));
+  color:#fff;padding:11px 20px;
+  display:flex;align-items:center;gap:10px;
+  font-family:'Source Serif 4',serif;font-weight:600;font-size:14px;
+}
+.sh-num{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.sb{padding:18px 20px}
+
+/* ════ FORM FIELDS ══════════════════════════════════════════════════ */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fg1{grid-template-columns:1fr}
+.fgr{display:flex;flex-direction:column;gap:5px}
+.sp2{grid-column:span 2}
+.sp3{grid-column:span 3}
+.sp4{grid-column:span 4}
+.fl{font-size:12px;font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;display:block}
+input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],input[type=tel],select,textarea{
+  border:1.5px solid var(--bo);border-radius:7px;
+  padding:9px 12px;font-family:'Outfit',sans-serif;
+  font-size:14px;color:var(--tx);
+  transition:border-color .2s,box-shadow .2s;
+  background:#fff;width:100%;
+}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--p);
+  box-shadow:0 0 0 3px rgba(30,58,110,.10);
+}
+
+/* ════ CHECKBOXES MATÉRIEL ══════════════════════════════════════════ */
+.check-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:10px;margin-bottom:12px;
+}
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 13px;
+  border:1.5px solid var(--bo);border-radius:8px;
+  cursor:pointer;transition:all .15s;
+  user-select:none;
+}
+.check-item:hover{border-color:var(--p);background:#f5f8ff}
+.check-item input[type=checkbox]{
+  width:17px;height:17px;min-width:17px;
+  border:1.5px solid var(--bo);border-radius:4px;
+  cursor:pointer;margin-top:2px;accent-color:var(--p);
+}
+.check-item.checked{border-color:var(--p);background:#eff4fb}
+.check-label{font-size:13px;font-weight:500;color:var(--tx);line-height:1.35}
+.check-sub{font-size:11.5px;color:var(--mu);margin-top:2px}
+.check-extra{
+  margin-top:8px;display:none;
+}
+.check-extra.visible{display:block}
+.check-extra input{
+  padding:6px 10px;font-size:13px;border-radius:5px;
+}
+
+/* ════ ACCUEIL — RAFRAÎCHISSEMENTS ══════════════════════════════════ */
+.refresh-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:10px;margin-bottom:14px;
+}
+.rf-card{
+  border:2px solid var(--bo);border-radius:10px;
+  padding:12px 14px;cursor:pointer;
+  transition:all .18s;text-align:center;
+  user-select:none;
+}
+.rf-card:hover{border-color:var(--p);box-shadow:0 2px 10px rgba(30,58,110,.1)}
+.rf-card.checked{border-color:var(--p);background:#eff4fb}
+.rf-card input[type=checkbox]{display:none}
+.rf-icon{font-size:22px;display:block;margin-bottom:4px}
+.rf-title{font-size:12px;font-weight:600;color:var(--p)}
+
+/* ════ DESTINATAIRES ════════════════════════════════════════════════ */
+.dest-grid{
+  display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;
+}
+.dest-chip{
+  display:flex;align-items:center;gap:7px;
+  padding:7px 13px;
+  border:1.5px solid var(--bo);border-radius:20px;
+  cursor:pointer;transition:all .15s;
+  font-size:12.5px;font-weight:500;
+  user-select:none;
+}
+.dest-chip input[type=checkbox]{
+  width:14px;height:14px;min-width:14px;
+  accent-color:var(--p);cursor:pointer;
+}
+.dest-chip:hover{border-color:var(--p);background:#f0f4fb}
+.dest-chip.checked{border-color:var(--p);background:#eff4fb;color:var(--p);font-weight:600}
+
+/* ════ SIGNATURE ═══════════════════════════════════════════════════ */
+.sig-area{display:flex;gap:16px;flex-wrap:wrap;margin-top:4px}
+.sigbox{
+  flex:1;min-width:180px;
+  border:2px dashed var(--bo);border-radius:8px;
+  padding:12px 14px;
+}
+.sigbox-label{font-size:12px;font-weight:600;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.sigbox-area{height:46px;border-bottom:1.5px solid var(--bo);margin-top:6px}
+
+/* ════ CADRE ADMINISTRATION ════════════════════════════════════════ */
+.admin-card{
+  background:#f9f9f7;border:2px dashed #bbb;border-radius:10px;
+  margin-bottom:16px;overflow:hidden;
+}
+.admin-header{
+  background:#888;color:#fff;padding:7px 16px;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+}
+.admin-body{padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.admin-col{flex:1;min-width:160px}
+.admin-col-label{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;margin-bottom:6px;display:block}
+.admin-sig-area{height:44px;border-bottom:1.5px dashed #aaa}
+.decision-row{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.decision-opt{
+  display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;
+  padding:5px 10px;border-radius:6px;border:1.5px solid var(--bo);transition:all .15s;user-select:none
+}
+.decision-opt:hover{border-color:var(--p)}
+.decision-opt.opt-accord.checked{background:#eafaf1;border-color:var(--g);color:var(--g)}
+.decision-opt.opt-refus.checked {background:#fdedec;border-color:var(--r);color:var(--r)}
+.decision-opt input{width:14px;height:14px;cursor:pointer}
+
+/* ════ MODALS ═══════════════════════════════════════════════════════ */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:1000;
+  align-items:center;justify-content:center;
+}
+.modal-ov.open{display:flex}
+.modal{
+  background:#fff;border-radius:14px;
+  padding:0;max-width:540px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;
+}
+.modal-head{
+  background:linear-gradient(135deg,var(--p),var(--ps));
+  color:#fff;padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head h2{font-family:'Source Serif 4',serif;font-size:16px}
+.modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;opacity:.8}
+.modal-close:hover{opacity:1}
+.modal-body{padding:20px 22px}
+.modal-foot{
+  padding:14px 22px;border-top:1px solid var(--bo);
+  display:flex;gap:8px;justify-content:flex-end;
+}
+
+/* Guide steps */
+.guide-step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+.g-num{
+  width:32px;height:32px;flex-shrink:0;
+  background:var(--p);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;
+}
+.g-content h3{font-size:13.5px;font-weight:600;color:var(--p);margin-bottom:4px}
+.g-content p{font-size:12.5px;color:var(--tx);line-height:1.55}
+.g-content ul{margin:4px 0 0 16px;font-size:12px;color:var(--mu);line-height:1.7}
+.guide-tip{
+  background:#fef9e7;border:1px solid #f0c060;
+  border-radius:7px;padding:10px 13px;
+  font-size:12px;color:var(--warn);margin-top:4px;
+}
+
+/* Send steps */
+.send-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bo)}
+.send-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.s-num{
+  width:30px;height:30px;flex-shrink:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.s1{background:#2980b9}.s2{background:var(--g)}
+.send-step p{font-size:12.5px;line-height:1.55;color:var(--tx)}
+.send-step strong{color:var(--p)}
+
+/* ════ TOAST ════════════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--p);color:#fff;
+  padding:10px 22px;border-radius:20px;font-size:13px;font-weight:500;
+  z-index:9999;opacity:0;transition:opacity .25s,transform .25s;
+  pointer-events:none;white-space:nowrap;max-width:90vw;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok  {background:var(--ok)}
+#toast.warn{background:var(--warn)}
+#toast.err {background:var(--r)}
+
+/* ════ FOOTER ═══════════════════════════════════════════════════════ */
+.footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:var(--mu);
+  border-top:1px solid var(--bo);background:var(--ca);
+  margin-top:24px;
+}
+
+/* ════ PRINT ════════════════════════════════════════════════════════ */
+@media print{
+  @page{size:A4;margin:8mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .toolbar,.modal-ov,.footer,.no-print{display:none!important}
+  body{background:#fff;font-size:8.5pt;line-height:1.3;color:#000;font-family:Arial,sans-serif}
+  .main{margin:0;padding:0;max-width:100%}
+  .page-header{
+    background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%)!important;
+    padding:8px 14px;gap:10px;border-bottom:2px solid var(--a)!important;
+  }
+  .hlogo{width:44px;height:44px}
+  .htitle h1{font-size:11pt}
+  .htitle p{font-size:8pt}
+  .hinfo-field input{font-size:9pt;padding:1px 5px;background:transparent!important;border-color:rgba(255,255,255,.5)!important}
+  .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:5px;break-inside:avoid}
+  .sh{padding:4px 10px;font-size:9pt;background:linear-gradient(90deg,var(--p),var(--ps))!important}
+  .sh-num{width:16px;height:16px;font-size:8pt}
+  .sb{padding:6px 10px}
+  .fg{gap:7px}
+  .fgr{gap:2px}
+  .fl{font-size:7pt;letter-spacing:0;margin-bottom:2px}
+  input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],input[type=tel],select,textarea{
+    border:1px solid #bbb;border-radius:3px;padding:2px 5px;font-size:8pt;background:#fff;
+  }
+  .check-grid{gap:5px}
+  .check-item{padding:5px 8px;border-radius:3px}
+  .check-item:not(.checked){display:none}
+  .check-item.checked{border:1.5px solid var(--p)!important;background:#eff4fb!important}
+  .rf-card:not(.checked){display:none}
+  .rf-card.checked{border:1.5px solid var(--p)!important;background:#eff4fb!important}
+  .dest-chip:not(.checked){display:none}
+  .dest-chip.checked{border:1.5px solid var(--p)!important}
+  .delai-banner{padding:5px 10px;font-size:8pt;border-radius:3px}
+  .admin-card{border-radius:4px;margin-bottom:5px}
+  .admin-header{padding:3px 10px;font-size:7.5pt}
+  .admin-body{padding:6px 10px;gap:8px}
+  .admin-sig-area{height:26px}
+  .admin-col-label{font-size:7pt}
+  .decision-opt{font-size:9pt;padding:3px 7px;border-radius:3px}
+  .sigbox{padding:6px 10px;border-radius:4px}
+  .sigbox-label{font-size:7pt;margin-bottom:4px}
+  .sigbox-area{height:30px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOOLBAR ═══════════════════════════════════════ -->
+<div class="toolbar">
+  <div class="tl">Organisation d'Événements — LPO Elfort</div>
+  <button class="btn br" onclick="resetForm()">↺ Réinitialiser</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="loadFromJSON()">📂 Charger</button>
+  <button class="btn bo2" onclick="saveJSON()">💾 Sauvegarder</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="openGuide()">Guide</button>
+  <button class="btn bo2" onclick="window.print()">🖨 Imprimer</button>
+  <button class="btn bi" onclick="downloadPDF()">PDF</button>
+  <button class="btn bp" onclick="openSendModal()">✉ Envoyer la demande</button>
+</div>
+
+<!-- ═══════════════ HEADER ════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="hlogo">🎪</div>
+  <div class="htitle">
+    <h1>Organisation d'Événements</h1>
+    <p>LPO Léopold Elfort · Mana · Académie de Guyane</p>
+    <p style="margin-top:3px;font-size:11px;opacity:.6">Conférences · Intervenants · Journées à thème · Formations</p>
+  </div>
+  <div class="hinfo">
+    <div class="hinfo-field">
+      <span>Année scolaire</span>
+      <input type="text" id="annee-scolaire" maxlength="9" title="Année scolaire">
+    </div>
+    <div class="hinfo-field">
+      <span>N° fiche</span>
+      <input type="text" id="num-fiche" placeholder="—" title="Numéro de fiche">
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- Bannière délai -->
+  <div class="delai-banner">
+    ⏰ <span><strong>Délai :</strong> Transmettre cette fiche au moins <strong>1 semaine à l'avance</strong>, sauf cas exceptionnel validé par le Proviseur.</span>
+  </div>
+
+  <!-- ── 1. Destinataires ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">1</div>
+      Destinataires de la demande
+    </div>
+    <div class="sb">
+      <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Cochez les personnes concernées par cet événement :</p>
+      <div class="dest-grid" id="dest-grid">
+        <label class="dest-chip" onclick="toggleDest(this)">
+          <input type="checkbox" name="dest" value="Proviseur"> Proviseur
+        </label>
+        <label class="dest-chip" onclick="toggleDest(this)">
+          <input type="checkbox" name="dest" value="Proviseur Adjoint"> Proviseur Adjoint
+        </label>
+        <label class="dest-chip" onclick="toggleDest(this)">
+          <input type="checkbox" name="dest" value="DDFPT"> DDFPT
+        </label>
+        <label class="dest-chip" onclick="toggleDest(this)">
+          <input type="checkbox" name="dest" value="Gestionnaire"> Gestionnaire
+        </label>
+      </div>
+      <div class="fgr" style="margin-top:6px">
+        <label class="fl">Autres destinataires (préciser)</label>
+        <input type="text" id="dest-autres" placeholder="ex. CPE, Infirmière…">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Informations générales ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">2</div>
+      Informations générales sur l'événement
+    </div>
+    <div class="sb">
+      <div class="fg fg1" style="margin-bottom:14px">
+        <div class="fgr">
+          <label class="fl">Intitulé précis de l'événement (objet)</label>
+          <input type="text" id="intitule" placeholder="ex. Conférence sur le développement durable, Intervention de…">
+        </div>
+      </div>
+      <div class="fg fg3" style="margin-bottom:14px">
+        <div class="fgr">
+          <label class="fl">Date</label>
+          <input type="date" id="date-evenement">
+        </div>
+        <div class="fgr">
+          <label class="fl">Heure de début</label>
+          <input type="time" id="heure-debut">
+        </div>
+        <div class="fgr">
+          <label class="fl">Heure de fin</label>
+          <input type="time" id="heure-fin">
+        </div>
+      </div>
+      <p style="font-size:12px;font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">Organisateur</p>
+      <div class="fg" style="margin-bottom:10px">
+        <div class="fgr">
+          <label class="fl">Nom</label>
+          <input type="text" id="org-nom" placeholder="NOM" style="text-transform:uppercase;font-weight:600">
+        </div>
+        <div class="fgr">
+          <label class="fl">Prénom</label>
+          <input type="text" id="org-prenom" placeholder="Prénom">
+        </div>
+        <div class="fgr">
+          <label class="fl">Téléphone</label>
+          <input type="tel" id="org-tel" placeholder="06 …">
+        </div>
+        <div class="fgr">
+          <label class="fl">Adresse e-mail</label>
+          <input type="email" id="org-mail" placeholder="prenom.nom@ac-guyane.fr">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Lieu & Aménagements ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">3</div>
+      Lieu &amp; Aménagements souhaités
+    </div>
+    <div class="sb">
+      <div class="fg fg1" style="margin-bottom:14px">
+        <div class="fgr">
+          <label class="fl">Lieu de l'événement</label>
+          <input type="text" id="lieu" placeholder="ex. Salle de conférences, CDI, Gymnase, Cour principale…">
+        </div>
+      </div>
+      <div class="fg" style="margin-bottom:14px">
+        <div class="fgr">
+          <label class="fl">Accueil à un endroit spécifique ?</label>
+          <input type="text" id="lieu-accueil" placeholder="ex. Portail principal, Hall d'entrée… (laisser vide si non)">
+        </div>
+        <div class="fgr">
+          <label class="fl">Nombre total de personnes (places à préparer)</label>
+          <input type="number" id="nb-personnes" min="1" placeholder="ex. 30">
+        </div>
+      </div>
+      <div class="fg fg1">
+        <div class="fgr">
+          <label class="fl">Aménagements souhaités (description ou plan joint)</label>
+          <textarea id="amenagements" placeholder="Décrivez la disposition souhaitée : disposition en U, rangées face à un écran, tables rondes… Vous pouvez joindre un plan ou un schéma à votre e-mail."></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. Matériel & Installations ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">4</div>
+      Matériel &amp; Installations spécifiques
+    </div>
+    <div class="sb">
+      <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Cochez le matériel nécessaire :</p>
+      <div class="check-grid">
+
+        <label class="check-item" id="ci-sono" onclick="toggleCheck(this,'sono')">
+          <input type="checkbox" id="cb-sono">
+          <div>
+            <div class="check-label">🎤 Sono</div>
+            <div class="check-sub">Système de sonorisation</div>
+          </div>
+        </label>
+
+        <label class="check-item" id="ci-video" onclick="toggleCheck(this,'video')">
+          <input type="checkbox" id="cb-video">
+          <div>
+            <div class="check-label">📽 Vidéo-projecteur + câble HDMI</div>
+            <div class="check-sub">Projection sur écran</div>
+          </div>
+        </label>
+
+        <label class="check-item" id="ci-ordi" onclick="toggleCheck(this,'ordi')">
+          <input type="checkbox" id="cb-ordi">
+          <div>
+            <div class="check-label">💻 Ordinateur portable</div>
+            <div class="check-sub">Prêt d'un ordinateur</div>
+          </div>
+        </label>
+
+      </div>
+
+      <!-- Précision nombre de micros -->
+      <div class="check-extra" id="extra-sono">
+        <div class="fgr" style="max-width:320px">
+          <label class="fl">Nombre de microphones</label>
+          <input type="number" id="nb-micros" min="1" placeholder="ex. 2">
+        </div>
+      </div>
+
+      <!-- Autres demandes -->
+      <div class="fgr" style="margin-top:14px">
+        <label class="fl">Autres demandes spécifiques</label>
+        <textarea id="autres-materiel" placeholder="ex. Chaises supplémentaires, tables, rallonge électrique, accès Wi-Fi…" style="min-height:56px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Accueil privilégié ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">5</div>
+      Accueil privilégié — Rafraîchissements
+    </div>
+    <div class="sb">
+      <p style="font-size:12px;color:var(--mu);margin-bottom:12px">Sélectionnez les rafraîchissements souhaités pour l'accueil :</p>
+      <div class="refresh-grid">
+
+        <label class="rf-card" onclick="toggleRf(this,'cafe')">
+          <input type="checkbox" id="rf-cafe">
+          <span class="rf-icon">☕</span>
+          <div class="rf-title">Café</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'the')">
+          <input type="checkbox" id="rf-the">
+          <span class="rf-icon">🍵</span>
+          <div class="rf-title">Thé</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'eau')">
+          <input type="checkbox" id="rf-eau">
+          <span class="rf-icon">💧</span>
+          <div class="rf-title">Eau</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'jus')">
+          <input type="checkbox" id="rf-jus">
+          <span class="rf-icon">🥤</span>
+          <div class="rf-title">Jus frais</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'biscuits')">
+          <input type="checkbox" id="rf-biscuits">
+          <span class="rf-icon">🍪</span>
+          <div class="rf-title">Biscuits</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'viennoiseries')">
+          <input type="checkbox" id="rf-viennoiseries">
+          <span class="rf-icon">🥐</span>
+          <div class="rf-title">Viennoiseries</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'sucres')">
+          <input type="checkbox" id="rf-sucres">
+          <span class="rf-icon">🍬</span>
+          <div class="rf-title">Sucrés</div>
+        </label>
+
+        <label class="rf-card" onclick="toggleRf(this,'sales')">
+          <input type="checkbox" id="rf-sales">
+          <span class="rf-icon">🧀</span>
+          <div class="rf-title">Salés</div>
+        </label>
+
+      </div>
+
+      <div class="fg" style="align-items:end">
+        <div class="fgr" style="max-width:280px">
+          <label class="fl">Pour combien de personnes ?</label>
+          <input type="number" id="nb-accueil" min="1" placeholder="Nombre de personnes">
+        </div>
+        <div class="fgr">
+          <label class="fl">Précisions / remarques sur l'accueil</label>
+          <input type="text" id="accueil-remarques" placeholder="Allergies, préférences particulières…">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. Date & Signature demandeur ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">6</div>
+      Déclaration de l'organisateur
+    </div>
+    <div class="sb">
+      <div class="sig-area">
+        <div class="sigbox">
+          <div class="sigbox-label">Date de la demande</div>
+          <input type="date" id="date-demande" style="margin-top:6px">
+        </div>
+        <div class="sigbox" style="flex:2">
+          <div class="sigbox-label">Signature de l'organisateur</div>
+          <div id="sig-name" style="font-size:13px;font-weight:600;color:var(--p);margin-bottom:4px;min-height:18px;letter-spacing:.3px"></div>
+          <div class="sigbox-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cadre administration ── -->
+  <div class="admin-card">
+    <div class="admin-header">Cadre réservé à l'administration — Ne pas remplir</div>
+    <div class="admin-body">
+
+      <div class="admin-col">
+        <span class="admin-col-label">Date de réception</span>
+        <div class="admin-sig-area"></div>
+      </div>
+
+      <div class="admin-col" style="flex:2">
+        <span class="admin-col-label">Proviseur — Avis</span>
+        <div class="decision-row">
+          <label class="decision-opt opt-accord" id="lbl-accord-prov" onclick="toggleDecision('prov','accord')">
+            <input type="checkbox" id="accord-prov"> Favorable ✔
+          </label>
+          <label class="decision-opt opt-refus" id="lbl-refus-prov" onclick="toggleDecision('prov','refus')">
+            <input type="checkbox" id="refus-prov"> Défavorable ✘
+          </label>
+        </div>
+        <div class="admin-sig-area" style="margin-top:10px"></div>
+      </div>
+
+      <div class="admin-col" style="flex:2">
+        <span class="admin-col-label">Secrétaire Générale — Avis</span>
+        <div class="decision-row">
+          <label class="decision-opt opt-accord" id="lbl-accord-sg" onclick="toggleDecision('sg','accord')">
+            <input type="checkbox" id="accord-sg"> Favorable ✔
+          </label>
+          <label class="decision-opt opt-refus" id="lbl-refus-sg" onclick="toggleDecision('sg','refus')">
+            <input type="checkbox" id="refus-sg"> Défavorable ✘
+          </label>
+        </div>
+        <div class="admin-sig-area" style="margin-top:10px"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<!-- ═════════════════ FOOTER ══════════════════════════════════════ -->
+<div class="footer">
+  Académie de Guyane · LPO Léopold Elfort · Mana &nbsp;|&nbsp;
+  Données traitées localement — aucun serveur, aucune donnée transmise &nbsp;|&nbsp;
+  Conforme RGPD
+</div>
+
+<!-- ═════════════════ MODAL GUIDE ════════════════════════════════ -->
+<div class="modal-ov" id="modal-guide">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <h2>Guide pas à pas — Organisation d'Événement</h2>
+      <button class="modal-close" onclick="closeModal('modal-guide')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:75vh;overflow-y:auto">
+
+      <div class="guide-step">
+        <div class="g-num">1</div>
+        <div class="g-content">
+          <h3>Destinataires</h3>
+          <p>Cochez les personnes qui doivent être informées de votre événement (Proviseur, Proviseur Adjoint, DDFPT, Gestionnaire).</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">2</div>
+        <div class="g-content">
+          <h3>Informations générales</h3>
+          <p>Renseignez l'<strong>intitulé précis</strong> de l'événement, la <strong>date</strong>, les <strong>horaires</strong>, ainsi que vos coordonnées complètes en tant qu'organisateur.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">3</div>
+        <div class="g-content">
+          <h3>Lieu &amp; Aménagements</h3>
+          <p>Indiquez le <strong>lieu</strong> souhaité, le point d'accueil des participants, le <strong>nombre de personnes</strong>, et décrivez les aménagements nécessaires.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">4</div>
+        <div class="g-content">
+          <h3>Matériel</h3>
+          <p>Cochez le matériel requis : sono (précisez le nombre de micros), vidéoprojecteur, ordinateur. Ajoutez toute autre demande spécifique.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">5</div>
+        <div class="g-content">
+          <h3>Accueil privilégié</h3>
+          <p>Si un accueil avec rafraîchissements est souhaité, sélectionnez les boissons et collations et indiquez le nombre de personnes concernées.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">6</div>
+        <div class="g-content">
+          <h3>Envoyer la demande</h3>
+          <p>Cliquez sur <strong>✉ Envoyer la demande</strong> :</p>
+          <ul>
+            <li>Le formulaire est généré en <strong>PDF</strong> et téléchargé</li>
+            <li>Votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis</li>
+            <li><strong>Joignez le PDF</strong> avant d'envoyer</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-tip">
+        ⏰ <strong>Rappel :</strong> Transmettez la fiche au moins <strong>1 semaine à l'avance</strong>. Le service de gestion ne donnera suite qu'après réception de l'avis favorable du Proviseur.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn bi" onclick="closeModal('modal-guide')">Fermer le guide</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════ MODAL ENVOI ════════════════════════════════ -->
+<div class="modal-ov" id="modal-send">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2>✉ Envoyer la fiche d'organisation</h2>
+      <button class="modal-close" onclick="closeModal('modal-send')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="send-step">
+        <div class="s-num s1">1</div>
+        <p>Cliquez sur <strong>Télécharger le PDF</strong> pour générer et enregistrer la fiche remplie sur votre appareil.</p>
+      </div>
+      <div class="send-step">
+        <div class="s-num s2">2</div>
+        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF téléchargé</strong> avant d'envoyer.<br>
+        <span style="color:var(--mu);font-size:11.5px;margin-top:4px;display:block">
+          Destinataire : <strong>tatiana.agesilas@ac-guyane.fr</strong>
+        </span>
+        </p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('modal-send')" style="background:#eee;color:var(--tx)">Annuler</button>
+      <button class="btn bi" onclick="downloadPDF()">Télécharger le PDF</button>
+      <button class="btn bg2" onclick="doEmail()">Ouvrir la messagerie</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═════════════════ SCRIPT ══════════════════════════════════════ -->
+<script>
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('annee-scolaire').value = schoolYear();
+  document.getElementById('date-demande').value   = today();
+  ['org-nom','org-prenom'].forEach(id =>
+    document.getElementById(id).addEventListener('input', updateSigName)
+  );
+});
+
+function today()      { return new Date().toISOString().slice(0,10); }
+function schoolYear() {
+  const n = new Date(), y = n.getFullYear();
+  return n.getMonth() >= 8 ? `${y}-${y+1}` : `${y-1}-${y}`;
+}
+function updateSigName(){
+  const nom    = (document.getElementById('org-nom').value||'').toUpperCase().trim();
+  const prenom = (document.getElementById('org-prenom').value||'').trim();
+  document.getElementById('sig-name').textContent = [prenom, nom].filter(Boolean).join(' ');
+}
+
+/* ── Destinataires ── */
+function toggleDest(el){
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  if(cb) cb.checked = el.classList.contains('checked');
+}
+
+/* ── Matériel (checkboxes) ── */
+function toggleCheck(el, key){
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  if(cb) cb.checked = el.classList.contains('checked');
+  if(key === 'sono'){
+    document.getElementById('extra-sono').classList.toggle('visible', el.classList.contains('checked'));
+  }
+}
+
+/* ── Rafraîchissements ── */
+function toggleRf(el, key){
+  el.classList.toggle('checked');
+  const cb = el.querySelector('input[type=checkbox]');
+  if(cb) cb.checked = el.classList.contains('checked');
+}
+
+/* ── Décisions administration ── */
+function toggleDecision(who, choice){
+  const isAccord = choice === 'accord';
+  document.getElementById('accord-'+who).checked = isAccord;
+  document.getElementById('refus-'+who).checked  = !isAccord;
+  document.getElementById('lbl-accord-'+who).classList.toggle('checked',  isAccord);
+  document.getElementById('lbl-refus-'+who).classList.toggle('checked',  !isAccord);
+}
+
+/* ── Collecte ── */
+function collectData(){
+  const dests = Array.from(document.querySelectorAll('#dest-grid .dest-chip.checked'))
+    .map(el => el.querySelector('input').value);
+
+  const refreshments = ['cafe','the','eau','jus','biscuits','viennoiseries','sucres','sales']
+    .filter(k => document.getElementById('rf-'+k).checked);
+
+  const materiel = [];
+  if(document.getElementById('cb-sono').checked)  materiel.push('Sono ('+  (document.getElementById('nb-micros').value||'?')+' micro(s))');
+  if(document.getElementById('cb-video').checked) materiel.push('Vidéo-projecteur + HDMI');
+  if(document.getElementById('cb-ordi').checked)  materiel.push('Ordinateur portable');
+
+  return {
+    annee_scolaire: document.getElementById('annee-scolaire').value,
+    num_fiche:      document.getElementById('num-fiche').value,
+    destinataires:  dests,
+    dest_autres:    document.getElementById('dest-autres').value,
+    intitule:       document.getElementById('intitule').value,
+    date_evenement: document.getElementById('date-evenement').value,
+    heure_debut:    document.getElementById('heure-debut').value,
+    heure_fin:      document.getElementById('heure-fin').value,
+    org_nom:        document.getElementById('org-nom').value,
+    org_prenom:     document.getElementById('org-prenom').value,
+    org_tel:        document.getElementById('org-tel').value,
+    org_mail:       document.getElementById('org-mail').value,
+    lieu:           document.getElementById('lieu').value,
+    lieu_accueil:   document.getElementById('lieu-accueil').value,
+    nb_personnes:   document.getElementById('nb-personnes').value,
+    amenagements:   document.getElementById('amenagements').value,
+    materiel,
+    cb_sono:        document.getElementById('cb-sono').checked,
+    nb_micros:      document.getElementById('nb-micros').value,
+    cb_video:       document.getElementById('cb-video').checked,
+    cb_ordi:        document.getElementById('cb-ordi').checked,
+    autres_materiel:document.getElementById('autres-materiel').value,
+    refreshments,
+    nb_accueil:     document.getElementById('nb-accueil').value,
+    accueil_remarques: document.getElementById('accueil-remarques').value,
+    date_demande:   document.getElementById('date-demande').value,
+  };
+}
+
+/* ── Sauvegarde JSON ── */
+function saveJSON(){
+  const d = collectData();
+  const slug = (d.org_nom||'evenement').replace(/\s+/g,'-').toLowerCase();
+  const blob = new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  dl(blob,`sauvegarde-evenement-${slug}.json`);
+  toast('Sauvegarde téléchargée','ok');
+}
+
+/* ── Chargement JSON ── */
+function loadFromJSON(){
+  const inp = document.createElement('input');
+  inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      try{ populate(JSON.parse(ev.target.result)); toast('Formulaire chargé','ok'); }
+      catch{ toast('Fichier JSON invalide','err'); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+function populate(d){
+  const s = (id,v) => { const e=document.getElementById(id); if(e&&v!==undefined) e.value=v; };
+  s('annee-scolaire',d.annee_scolaire); s('num-fiche',d.num_fiche);
+  s('intitule',d.intitule); s('date-evenement',d.date_evenement);
+  s('heure-debut',d.heure_debut); s('heure-fin',d.heure_fin);
+  s('org-nom',d.org_nom); s('org-prenom',d.org_prenom);
+  s('org-tel',d.org_tel); s('org-mail',d.org_mail);
+  s('lieu',d.lieu); s('lieu-accueil',d.lieu_accueil);
+  s('nb-personnes',d.nb_personnes); s('amenagements',d.amenagements);
+  s('nb-micros',d.nb_micros); s('autres-materiel',d.autres_materiel);
+  s('nb-accueil',d.nb_accueil); s('accueil-remarques',d.accueil_remarques);
+  s('date-demande',d.date_demande); s('dest-autres',d.dest_autres);
+
+  // Destinataires
+  document.querySelectorAll('#dest-grid .dest-chip').forEach(chip => {
+    const val = chip.querySelector('input').value;
+    const on  = (d.destinataires||[]).includes(val);
+    chip.classList.toggle('checked', on);
+    chip.querySelector('input').checked = on;
+  });
+
+  // Matériel
+  const setCheck = (ci,cb,on) => {
+    document.getElementById(ci).classList.toggle('checked',on);
+    document.getElementById(cb).checked = on;
+  };
+  setCheck('ci-sono','cb-sono',!!d.cb_sono);
+  document.getElementById('extra-sono').classList.toggle('visible',!!d.cb_sono);
+  setCheck('ci-video','cb-video',!!d.cb_video);
+  setCheck('ci-ordi','cb-ordi',!!d.cb_ordi);
+
+  // Rafraîchissements
+  ['cafe','the','eau','jus','biscuits','viennoiseries','sucres','sales'].forEach(k => {
+    const on = (d.refreshments||[]).includes(k);
+    const card = document.getElementById('rf-'+k).closest('.rf-card');
+    card.classList.toggle('checked', on);
+    document.getElementById('rf-'+k).checked = on;
+  });
+
+  updateSigName();
+}
+
+/* ── Génération PDF ── */
+async function downloadPDF(){
+  if(!window.html2canvas||!window.jspdf){
+    alert('Librairies PDF non chargées — vérifiez votre connexion Internet et rechargez la page.'); return;
+  }
+  toast('Génération du PDF…');
+  const toolbar = document.querySelector('.toolbar');
+  const footer  = document.querySelector('.footer');
+  const noPrint = document.querySelectorAll('.no-print');
+  toolbar.style.display='none'; footer.style.display='none';
+  noPrint.forEach(e=>e.style.visibility='hidden');
+  const scrollY = window.scrollY; window.scrollTo(0,0);
+  try{
+    const canvas = await html2canvas(document.body,{
+      scale:1.8, useCORS:true, backgroundColor:'#eef2f7', logging:false,
+      ignoreElements: e => e.classList.contains('modal-ov') || e.id==='toast',
+    });
+    const{jsPDF} = window.jspdf;
+    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pW=210, pH=297;
+    const ratio = pW/canvas.width;
+    const imgH  = canvas.height*ratio;
+    let pos=0;
+    while(pos<imgH){
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-pos,pW,imgH);
+      pos+=pH; if(pos<imgH) pdf.addPage();
+    }
+    const d = collectData();
+    const nom = (d.org_nom||'evenement').replace(/\s+/g,'-').toLowerCase();
+    pdf.save(`organisation-evenement-${nom}-${d.date_evenement||today()}.pdf`);
+    toast('PDF téléchargé','ok');
+  }finally{
+    toolbar.style.display=''; footer.style.display='';
+    noPrint.forEach(e=>e.style.visibility='');
+    window.scrollTo(0,scrollY);
+  }
+}
+
+/* ── Email ── */
+function fmtDate(iso){ if(!iso) return '—'; const[y,m,d]=iso.split('-'); return`${d}/${m}/${y}`; }
+function fmtTime(t)  { return t||'—'; }
+
+function doEmail(){
+  const d = collectData();
+  const nom    = d.org_nom    ? d.org_nom.toUpperCase() : '…';
+  const prenom = d.org_prenom || '…';
+  const date   = fmtDate(d.date_evenement);
+  const hdeb   = fmtTime(d.heure_debut);
+  const hfin   = fmtTime(d.heure_fin);
+  const intit  = d.intitule || '—';
+  const dests  = d.destinataires.length ? d.destinataires.join(', ') : '—';
+  const mat    = d.materiel.length ? d.materiel.join(', ') : 'Aucun';
+  const rf     = d.refreshments.length ? d.refreshments.join(', ') : 'Aucun';
+
+  const subj = encodeURIComponent(`Organisation d'événement – ${intit} – ${date} – ${nom} ${prenom}`);
+  const body = encodeURIComponent(`Madame, Monsieur,
+
+Je vous adresse ci-joint ma fiche de demande d'organisation d'événement.
+
+─── INFORMATIONS GÉNÉRALES ───
+Intitulé : ${intit}
+Date : ${date}
+Horaires : ${hdeb} – ${hfin}
+Lieu : ${d.lieu||'—'}
+Nombre de personnes : ${d.nb_personnes||'—'}
+
+─── ORGANISATEUR ───
+Nom : ${nom}
+Prénom : ${prenom}
+Tél : ${d.org_tel||'—'}
+Mail : ${d.org_mail||'—'}
+
+─── DESTINATAIRES ───
+${dests}${d.dest_autres?'\nAutres : '+d.dest_autres:''}
+
+─── MATÉRIEL DEMANDÉ ───
+${mat}${d.autres_materiel?'\nAutres : '+d.autres_materiel:''}
+
+─── ACCUEIL PRIVILÉGIÉ ───
+Rafraîchissements : ${rf}
+Pour : ${d.nb_accueil||'—'} personne(s)
+
+Veuillez trouver en pièce jointe la fiche PDF complète.
+
+Cordialement,
+${prenom} ${nom}`);
+
+  window.location.href = `mailto:tatiana.agesilas@ac-guyane.fr?subject=${subj}&body=${body}`;
+  closeModal('modal-send');
+}
+
+/* ── Réinitialiser ── */
+function resetForm(){
+  if(!confirm('Réinitialiser tous les champs ?')) return;
+
+  document.querySelectorAll('input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],input[type=tel],textarea').forEach(e=>e.value='');
+  document.querySelectorAll('select').forEach(e=>e.selectedIndex=0);
+
+  // Destinataires
+  document.querySelectorAll('#dest-grid .dest-chip').forEach(chip=>{
+    chip.classList.remove('checked');
+    chip.querySelector('input').checked=false;
+  });
+
+  // Matériel
+  ['ci-sono','ci-video','ci-ordi'].forEach(id=>document.getElementById(id).classList.remove('checked'));
+  ['cb-sono','cb-video','cb-ordi'].forEach(id=>document.getElementById(id).checked=false);
+  document.getElementById('extra-sono').classList.remove('visible');
+
+  // Rafraîchissements
+  ['cafe','the','eau','jus','biscuits','viennoiseries','sucres','sales'].forEach(k=>{
+    const card = document.getElementById('rf-'+k).closest('.rf-card');
+    card.classList.remove('checked');
+    document.getElementById('rf-'+k).checked=false;
+  });
+
+  // Admin
+  ['prov','sg'].forEach(who=>{
+    document.getElementById('accord-'+who).checked=false;
+    document.getElementById('refus-'+who).checked=false;
+    document.getElementById('lbl-accord-'+who).classList.remove('checked');
+    document.getElementById('lbl-refus-'+who).classList.remove('checked');
+  });
+
+  document.getElementById('annee-scolaire').value = schoolYear();
+  document.getElementById('date-demande').value   = today();
+  document.getElementById('sig-name').textContent = '';
+  toast('Formulaire réinitialisé','ok');
+}
+
+/* ── Modals ── */
+function openGuide()    { document.getElementById('modal-guide').classList.add('open'); }
+function openSendModal(){ document.getElementById('modal-send').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+document.querySelectorAll('.modal-ov').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-ov.open').forEach(m=>m.classList.remove('open'));
+});
+
+/* ── Toast ── */
+function toast(msg,type='',dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+(type||'');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',dur);
+}
+
+/* ── Download helper ── */
+function dl(blob,name){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+</script>
+</body>
+</html>

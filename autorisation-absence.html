@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Autorisation d'absence exceptionnelle — LPO Léopold Elfort</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ════ VARIABLES ════════════════════════════════════════════════════ */
+:root{
+  --p:#1e3a6e;--pd:#122244;--ps:#2a52a0;
+  --a:#c4922a;--al:#f5e6c8;
+  --g:#1f7a52;--r:#c0392b;
+  --bg:#eef2f7;--ca:#ffffff;
+  --tx:#1a2a3a;--mu:#5a6a7a;--bo:#d0dae8;
+  --ok:#1f7a52;--warn:#8B6914;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ════ TOOLBAR ══════════════════════════════════════════════════════ */
+.toolbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--pd);
+  display:flex;align-items:center;gap:6px;
+  padding:8px 20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+  flex-wrap:wrap;
+}
+.tl{
+  font-family:'Source Serif 4',serif;
+  color:var(--a);font-size:14px;font-weight:700;
+  flex:1;min-width:140px;white-space:nowrap;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:6px;border:none;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.bp {background:var(--a);color:#fff}.bp:hover{background:#a87720}
+.bo2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}.bo2:hover{background:rgba(255,255,255,.12)}
+.bi {background:#2980b9;color:#fff}.bi:hover{background:#1f6a99}
+.bg2{background:var(--g);color:#fff}.bg2:hover{background:#166040}
+.br {background:rgba(192,57,43,.85);color:#fff}.br:hover{background:var(--r)}
+.toolbar-sep{width:1px;height:24px;background:rgba(255,255,255,.2);margin:0 2px;flex-shrink:0}
+
+/* ════ PAGE HEADER ══════════════════════════════════════════════════ */
+.page-header{
+  background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);
+  padding:20px 32px 18px;color:#fff;
+  display:flex;align-items:center;gap:18px;
+  border-bottom:3px solid var(--a);
+}
+.hlogo{
+  width:66px;height:66px;background:rgba(255,255,255,.13);
+  border-radius:12px;border:2px dashed rgba(255,255,255,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;flex-shrink:0;
+}
+.htitle h1{
+  font-family:'Source Serif 4',serif;
+  font-size:19px;font-weight:700;margin-bottom:2px;
+}
+.htitle p{font-size:12px;opacity:.75;margin-top:2px}
+.hbadge{
+  margin-left:auto;padding:5px 16px;border-radius:20px;
+  font-size:12px;font-weight:600;background:var(--a);color:#fff;
+  flex-shrink:0;white-space:nowrap;
+}
+.hinfo{
+  display:flex;flex-direction:column;gap:4px;align-items:flex-end;margin-left:auto;flex-shrink:0;
+}
+.hinfo-field{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,.75);
+}
+.hinfo-field input{
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  border-radius:5px;color:#fff;font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;padding:3px 8px;outline:none;
+  width:100px;text-align:center;
+}
+.hinfo-field input::placeholder{color:rgba(255,255,255,.5)}
+.hinfo-field input:focus{background:rgba(255,255,255,.25);border-color:var(--a)}
+
+/* ════ MAIN LAYOUT ══════════════════════════════════════════════════ */
+.main{max-width:860px;margin:24px auto;padding:0 20px 60px}
+
+/* ════ SECTION CARDS ════════════════════════════════════════════════ */
+.section{
+  background:var(--ca);border-radius:12px;
+  margin-bottom:16px;
+  box-shadow:0 2px 10px rgba(30,58,110,.09);
+  overflow:hidden;
+}
+.sh{
+  background:linear-gradient(90deg,var(--p),var(--ps));
+  color:#fff;padding:11px 20px;
+  display:flex;align-items:center;gap:10px;
+  font-family:'Source Serif 4',serif;font-weight:600;font-size:14px;
+}
+.sh-num{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.sb{padding:18px 20px}
+
+/* ════ FORM FIELDS ══════════════════════════════════════════════════ */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg1{grid-template-columns:1fr}
+.fgr{display:flex;flex-direction:column;gap:5px}
+.sp2{grid-column:span 2}
+.fl{font-size:12px;font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;display:block}
+input[type=text],input[type=date],input[type=number],select{
+  border:1.5px solid var(--bo);border-radius:7px;
+  padding:9px 12px;font-family:'Outfit',sans-serif;
+  font-size:14px;color:var(--tx);
+  transition:border-color .2s,box-shadow .2s;
+  background:#fff;width:100%;
+}
+input:focus,select:focus{
+  outline:none;border-color:var(--p);
+  box-shadow:0 0 0 3px rgba(30,58,110,.10);
+}
+input[type=text]{text-transform:inherit}
+
+/* Durée en ligne */
+.duree-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.duree-row input{flex:0 0 90px}
+.duree-row span{color:var(--mu);font-size:13px;white-space:nowrap}
+
+/* ════ TYPE D'ABSENCE — CARDS ════════════════════════════════════ */
+.type-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:600px){.type-cards{grid-template-columns:1fr}}
+
+.type-card{
+  border:2px solid var(--bo);border-radius:10px;
+  padding:14px 16px;cursor:pointer;
+  transition:all .18s;
+  position:relative;
+}
+.type-card:hover{border-color:var(--p);box-shadow:0 2px 12px rgba(30,58,110,.12)}
+.type-card.active{border-color:var(--p);background:#eff4fb;box-shadow:0 2px 12px rgba(30,58,110,.15)}
+.type-card.active::after{
+  content:'✓';position:absolute;top:10px;right:12px;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--p);color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  line-height:20px;text-align:center;
+}
+.tc-icon{font-size:24px;margin-bottom:8px;display:block}
+.tc-title{font-size:13px;font-weight:700;color:var(--p);margin-bottom:3px}
+.tc-sub{font-size:11px;color:var(--mu);line-height:1.4}
+.tc-note{font-size:10.5px;color:var(--warn);margin-top:8px;
+  padding:5px 8px;background:#fef9e7;border-radius:5px;border-left:3px solid var(--a);
+  display:none;
+}
+.type-card.active .tc-note{display:block}
+
+/* Motif (détail du type) */
+.motif-block{
+  display:none;
+  background:#f5f8ff;border:1.5px solid var(--bo);
+  border-radius:8px;padding:14px 16px;margin-top:0;
+}
+.motif-block.visible{display:block}
+.motif-prec{margin-top:10px;display:none}
+.motif-prec.visible{display:block}
+
+/* ════ TABLEAUX EDT ═════════════════════════════════════════════ */
+.edt-block{margin-top:12px}
+.edt-label{
+  font-size:12px;font-weight:700;color:var(--p);
+  text-transform:uppercase;letter-spacing:.4px;
+  margin-bottom:8px;display:flex;align-items:center;gap:8px;
+}
+.edt-label::after{content:'';flex:1;height:1px;background:var(--bo)}
+.etbl{width:100%;border-collapse:collapse;font-size:13px}
+.etbl th{
+  background:var(--p);color:#fff;
+  padding:8px 10px;text-align:left;font-size:12px;font-weight:600;
+}
+.etbl td{padding:4px 6px;border-bottom:1px solid var(--bo)}
+.etbl tr:last-child td{border-bottom:none}
+.etbl tr:hover td{background:#f5f8ff}
+.etbl td input{
+  border:1px solid var(--bo);border-radius:5px;
+  padding:5px 8px;width:100%;
+  font-family:'Outfit',sans-serif;font-size:13px;
+  background:transparent;transition:border-color .15s;
+}
+.etbl td input:focus{outline:none;border-color:var(--p);background:#fff}
+.edt-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+.edt-add-btn{
+  font-size:12px;background:#e8f5e9;border:1px solid #a5d6a7;
+  color:#1f7a52;padding:4px 10px;cursor:pointer;border-radius:5px;font-family:'Outfit',sans-serif;
+}
+.edt-del-btn{
+  background:#fdedec;border:1px solid #f5c6c0;color:var(--r);
+  font-size:11px;padding:3px 7px;cursor:pointer;border-radius:4px;font-family:'Outfit',sans-serif;
+}
+
+/* ════ SIGNATURE ═══════════════════════════════════════════════ */
+.sig-area{
+  display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;
+}
+.sigbox{
+  flex:1;min-width:180px;
+  border:2px dashed var(--bo);border-radius:8px;
+  padding:12px 14px;
+}
+.sigbox-label{font-size:12px;font-weight:600;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.sigbox-area{height:50px;border-bottom:1.5px solid var(--bo);margin-top:6px}
+
+/* ════ CADRE ADMINISTRATION ════════════════════════════════════ */
+.admin-card{
+  background:#f9f9f7;border:2px dashed #bbb;border-radius:10px;
+  margin-bottom:16px;overflow:hidden;
+}
+.admin-header{
+  background:#888;color:#fff;padding:7px 16px;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+}
+.admin-body{
+  padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;
+}
+.admin-col{flex:1;min-width:130px}
+.admin-col-label{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;margin-bottom:6px;display:block}
+.admin-sig-area{height:44px;border-bottom:1.5px dashed #aaa}
+.decision-row{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.decision-opt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;
+  padding:5px 10px;border-radius:6px;border:1.5px solid var(--bo);transition:all .15s;user-select:none}
+.decision-opt:hover{border-color:var(--p)}
+.decision-opt.opt-accord.checked{background:#eafaf1;border-color:var(--g);color:var(--g)}
+.decision-opt.opt-refus.checked {background:#fdedec;border-color:var(--r);color:var(--r)}
+.decision-opt input{width:14px;height:14px;cursor:pointer}
+.motif-refus-block{
+  display:none;margin-top:10px;
+  background:#fdedec;border:1.5px solid #f5c6c0;
+  border-radius:7px;padding:10px 12px;
+}
+.motif-refus-block.visible{display:block}
+.motif-refus-block label{
+  font-size:11px;font-weight:600;color:var(--r);
+  text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:5px;
+}
+.motif-refus-block textarea{
+  width:100%;border:1px solid #f5c6c0;border-radius:5px;
+  padding:7px 10px;font-family:'Outfit',sans-serif;font-size:13px;
+  color:var(--tx);background:#fff;resize:vertical;min-height:52px;
+  line-height:1.5;
+}
+.motif-refus-block textarea:focus{outline:none;border-color:var(--r);box-shadow:0 0 0 3px rgba(192,57,43,.1)}
+
+/* ════ MODALS ═══════════════════════════════════════════════════ */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:1000;
+  align-items:center;justify-content:center;
+}
+.modal-ov.open{display:flex}
+.modal{
+  background:#fff;border-radius:14px;
+  padding:0;max-width:540px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;
+}
+.modal-head{
+  background:linear-gradient(135deg,var(--p),var(--ps));
+  color:#fff;padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head h2{font-family:'Source Serif 4',serif;font-size:16px}
+.modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;opacity:.8}
+.modal-close:hover{opacity:1}
+.modal-body{padding:20px 22px}
+.modal-foot{
+  padding:14px 22px;border-top:1px solid var(--bo);
+  display:flex;gap:8px;justify-content:flex-end;
+}
+
+/* Guide steps */
+.guide-step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+.g-num{
+  width:32px;height:32px;flex-shrink:0;
+  background:var(--p);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;
+}
+.g-content h3{font-size:13.5px;font-weight:600;color:var(--p);margin-bottom:4px}
+.g-content p{font-size:12.5px;color:var(--tx);line-height:1.55}
+.g-content ul{margin:4px 0 0 16px;font-size:12px;color:var(--mu);line-height:1.7}
+.guide-tip{
+  background:#fef9e7;border:1px solid #f0c060;
+  border-radius:7px;padding:10px 13px;
+  font-size:12px;color:var(--warn);margin-top:4px;
+}
+
+/* Send steps */
+.send-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bo)}
+.send-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.s-num{
+  width:30px;height:30px;flex-shrink:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.s1{background:#2980b9}.s2{background:var(--g)}
+.send-step p{font-size:12.5px;line-height:1.55;color:var(--tx)}
+.send-step strong{color:var(--p)}
+
+/* ════ TOAST ════════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--p);color:#fff;
+  padding:10px 22px;border-radius:20px;font-size:13px;font-weight:500;
+  z-index:9999;opacity:0;transition:opacity .25s,transform .25s;
+  pointer-events:none;white-space:nowrap;max-width:90vw;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok  {background:var(--ok)}
+#toast.warn{background:var(--warn)}
+#toast.err {background:var(--r)}
+
+/* ════ FOOTER ═══════════════════════════════════════════════════ */
+.footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:var(--mu);
+  border-top:1px solid var(--bo);background:var(--ca);
+  margin-top:24px;
+}
+
+/* ════ PRINT ════════════════════════════════════════════════════ */
+@media print{
+  @page{size:A4;margin:8mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .toolbar,.modal-ov,.edt-add-btn,.edt-del-btn,.edt-actions,.footer,.no-print{display:none!important}
+  body{background:#fff;font-size:8.5pt;line-height:1.3;color:#000;font-family:Arial,sans-serif}
+  .main{margin:0;padding:0;max-width:100%}
+  .page-header{
+    background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%)!important;
+    padding:8px 14px;gap:10px;border-bottom:2px solid var(--a)!important;
+  }
+  .hlogo{width:44px;height:44px}
+  .htitle h1{font-size:11pt}
+  .htitle p{font-size:8pt}
+  .hinfo-field input{font-size:9pt;padding:1px 5px;background:transparent!important;border-color:rgba(255,255,255,.5)!important}
+  .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:5px;break-inside:avoid}
+  .sh{padding:4px 10px;font-size:9pt;background:linear-gradient(90deg,var(--p),var(--ps))!important}
+  .sh-num{width:16px;height:16px;font-size:8pt}
+  .sb{padding:6px 10px}
+  .fg{gap:7px}
+  .fgr{gap:2px}
+  .fl{font-size:7pt;letter-spacing:0;margin-bottom:2px}
+  input[type=text],input[type=date],input[type=number],select{
+    border:1px solid #bbb;border-radius:3px;padding:2px 5px;font-size:8pt;background:#fff;
+  }
+  .type-cards{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+  .type-card{padding:6px 8px;border-radius:4px}
+  .type-card:not(.active){display:none}
+  .type-card.active{border:1.5px solid var(--p)!important;background:#eff4fb!important;display:block}
+  .type-card.active::after{width:14px;height:14px;font-size:8pt;top:5px;right:6px;line-height:14px}
+  .tc-icon{font-size:14px;margin-bottom:3px}
+  .tc-title{font-size:8pt}
+  .tc-sub{font-size:7pt}
+  .tc-note{font-size:7.5pt;padding:3px 5px;margin-top:4px}
+  .motif-block.visible{background:#f5f8ff!important;padding:7px 10px;margin-top:4px}
+  .motif-block.visible .fl{font-size:7pt}
+  .motif-block.visible select{font-size:8pt;padding:2px 5px}
+  .motif-prec.visible{margin-top:4px}
+  .sig-area{gap:8px}
+  .sigbox{padding:6px 10px;border-radius:4px}
+  .sigbox-label{font-size:7pt;margin-bottom:4px}
+  .sigbox-area{height:30px}
+  .admin-card{border-radius:4px;margin-bottom:5px}
+  .admin-header{padding:3px 10px;font-size:7.5pt}
+  .admin-body{padding:6px 10px;gap:8px}
+  .admin-sig-area{height:26px}
+  .admin-col-label{font-size:7pt}
+  .decision-opt{font-size:9pt;padding:3px 7px;border-radius:3px}
+  .motif-refus-block{padding:6px 8px;border-radius:3px;margin-top:5px}
+  .motif-refus-block label{font-size:7pt;margin-bottom:3px}
+  .motif-refus-block textarea{font-size:8pt;padding:3px 6px;min-height:32px;border:1px solid #f5c6c0}
+  .edt-block{margin-top:7px}
+  .edt-label{font-size:7.5pt;margin-bottom:4px}
+  .etbl th{padding:4px 7px;font-size:8pt}
+  .etbl td{padding:2px 5px}
+  .etbl td input{font-size:8pt;padding:2px 5px;border:1px solid #ccc}
+  .section.edt-section .sb{padding:6px 10px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOOLBAR ═══════════════════════════════════════ -->
+<div class="toolbar">
+  <div class="tl">Autorisation d'absence — LPO Elfort</div>
+  <button class="btn br" onclick="resetForm()">↺ Réinitialiser</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="loadFromJSON()">📂 Charger</button>
+  <button class="btn bo2" onclick="saveJSON()">💾 Sauvegarder</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="openGuide()">Guide</button>
+  <button class="btn bo2" onclick="window.print()">🖨 Imprimer</button>
+  <button class="btn bi" onclick="downloadPDF()">PDF</button>
+  <button class="btn bp" onclick="openSendModal()">✉ Envoyer la demande</button>
+</div>
+
+<!-- ═══════════════ HEADER ════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="hlogo">📋</div>
+  <div class="htitle">
+    <h1>Demande d'autorisation d'absence exceptionnelle</h1>
+    <p>LPO Léopold Elfort · Mana · Académie de Guyane</p>
+    <p style="margin-top:3px;font-size:11px;opacity:.6">Personnel de l'établissement — Traitement local, aucune donnée transmise</p>
+  </div>
+  <div class="hinfo">
+    <div class="hinfo-field">
+      <span>Année scolaire</span>
+      <input type="text" id="annee-scolaire" maxlength="9" title="Année scolaire">
+    </div>
+    <div class="hinfo-field">
+      <span>N° dossier</span>
+      <input type="text" id="num-dossier" placeholder="—" title="Numéro de dossier">
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- ── 1. Identification ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">1</div>
+      Identification du personnel
+    </div>
+    <div class="sb">
+      <div class="fg">
+        <div class="fgr">
+          <label class="fl">Nom</label>
+          <input type="text" id="nom" placeholder="NOM" style="text-transform:uppercase;font-weight:600">
+        </div>
+        <div class="fgr">
+          <label class="fl">Prénom</label>
+          <input type="text" id="prenom" placeholder="Prénom">
+        </div>
+        <div class="fgr">
+          <label class="fl">Fonction / Grade</label>
+          <input type="text" id="fonction" placeholder="ex. Professeur certifié, CPE, AED…">
+        </div>
+        <div class="fgr">
+          <label class="fl">Discipline / Service</label>
+          <input type="text" id="discipline" placeholder="ex. Mathématiques, Vie scolaire…">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Période ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">2</div>
+      Période d'absence sollicitée
+    </div>
+    <div class="sb">
+      <div class="fg fg3">
+        <div class="fgr">
+          <label class="fl">Date de début</label>
+          <input type="date" id="date-debut" onchange="calcDuree()">
+        </div>
+        <div class="fgr">
+          <label class="fl">Date de fin</label>
+          <input type="date" id="date-fin" onchange="calcDuree()">
+        </div>
+        <div class="fgr">
+          <label class="fl">Durée totale</label>
+          <div class="duree-row">
+            <input type="number" id="duree-jours" min="0" step="0.5" placeholder="0" oninput="syncH()" style="flex:0 0 75px">
+            <span>j</span>
+            <input type="number" id="duree-heures" min="0" step="0.5" placeholder="0" style="flex:0 0 75px">
+            <span>h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Nature ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">3</div>
+      Nature de la demande
+    </div>
+    <div class="sb">
+      <div class="type-cards">
+
+        <div class="type-card" id="tc-droit" onclick="selectType('droit')">
+          <span class="tc-icon">⚖️</span>
+          <div class="tc-title">Absence de droit</div>
+          <div class="tc-sub">Mariage, naissance, décès d'un proche, représentation syndicale…</div>
+          <div class="tc-note">Justificatif obligatoire à joindre</div>
+        </div>
+
+        <div class="type-card" id="tc-facult" onclick="selectType('facult')">
+          <span class="tc-icon">📋</span>
+          <div class="tc-title">Absence facultative</div>
+          <div class="tc-sub">Soins médicaux, démarches administratives, déménagement…</div>
+          <div class="tc-note">Justificatif requis — rattrapage à l'appréciation du chef d'établissement</div>
+        </div>
+
+        <div class="type-card" id="tc-perso" onclick="selectType('perso')">
+          <span class="tc-icon">👤</span>
+          <div class="tc-title">Absence personnelle</div>
+          <div class="tc-sub">Convenance personnelle, bénévolat, voyage…</div>
+          <div class="tc-note">Rattrapage des heures obligatoire</div>
+        </div>
+
+      </div>
+
+      <!-- Détail motif : Droit -->
+      <div class="motif-block" id="mb-droit">
+        <div class="fg fg1">
+          <div class="fgr">
+            <label class="fl">Motif précis</label>
+            <select id="motif-droit" onchange="checkPrec('droit')">
+              <option value="">— Sélectionner un motif —</option>
+              <optgroup label="Événements familiaux">
+                <option>Mariage / PACS de l'agent (5 jours)</option>
+                <option>Mariage d'un enfant (1 jour)</option>
+                <option>Naissance ou adoption d'un enfant (3 jours)</option>
+                <option>Décès du conjoint / partenaire PACS / concubin (5 jours)</option>
+                <option>Décès d'un enfant (5 jours)</option>
+                <option>Décès du père ou de la mère (3 jours)</option>
+                <option>Décès du beau-père / belle-mère (3 jours)</option>
+                <option>Décès d'un frère / d'une sœur (3 jours)</option>
+                <option>Décès d'un grand-parent (1 jour)</option>
+              </optgroup>
+              <optgroup label="Santé / Obligations légales">
+                <option>Maladie d'un enfant de moins de 16 ans</option>
+                <option>Convocation jury d'assises</option>
+                <option>Convocation médecine du travail (obligatoire)</option>
+                <option>Examen médical de prévention obligatoire</option>
+              </optgroup>
+              <optgroup label="Représentation">
+                <option>Mandat de représentation syndicale</option>
+                <option>Membre élu de commission paritaire (CAP / CCP)</option>
+                <option>Délégué du personnel</option>
+              </optgroup>
+              <option value="__autre__">Autre (préciser ci-dessous)</option>
+            </select>
+          </div>
+          <div class="fgr motif-prec" id="prec-droit">
+            <label class="fl">Précision</label>
+            <input type="text" id="prec-droit-txt" placeholder="Détaillez le motif…">
+          </div>
+        </div>
+      </div>
+
+      <!-- Détail motif : Facultative -->
+      <div class="motif-block" id="mb-facult">
+        <div class="fg fg1">
+          <div class="fgr">
+            <label class="fl">Motif précis</label>
+            <select id="motif-facult" onchange="checkPrec('facult')">
+              <option value="">— Sélectionner un motif —</option>
+              <option>Soins médicaux / consultation spécialisée</option>
+              <option>Déménagement</option>
+              <option>Démarche administrative (préfecture, URSSAF…)</option>
+              <option>Événement familial (hors absence de droit)</option>
+              <option>Préparation d'un concours ou examen</option>
+              <option>Formation non obligatoire</option>
+              <option>Garde d'enfant (fermeture exceptionnelle d'école)</option>
+              <option value="__autre__">Autre (préciser ci-dessous)</option>
+            </select>
+          </div>
+          <div class="fgr motif-prec" id="prec-facult">
+            <label class="fl">Précision</label>
+            <input type="text" id="prec-facult-txt" placeholder="Détaillez le motif…">
+          </div>
+        </div>
+      </div>
+
+      <!-- Détail motif : Personnelle -->
+      <div class="motif-block" id="mb-perso">
+        <div class="fg fg1">
+          <div class="fgr">
+            <label class="fl">Motif précis</label>
+            <select id="motif-perso" onchange="checkPrec('perso')">
+              <option value="">— Sélectionner un motif —</option>
+              <option>Convenance personnelle</option>
+              <option>Engagement associatif / bénévolat</option>
+              <option>Voyage / déplacement personnel</option>
+              <option value="__autre__">Autre (préciser ci-dessous)</option>
+            </select>
+          </div>
+          <div class="fgr motif-prec" id="prec-perso">
+            <label class="fl">Précision</label>
+            <input type="text" id="prec-perso-txt" placeholder="Détaillez le motif…">
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 4. Emploi du temps ── -->
+  <div class="section edt-section">
+    <div class="sh">
+      <div class="sh-num">4</div>
+      Modification de l'emploi du temps — Rattrapage d'heures
+    </div>
+    <div class="sb">
+
+      <div class="edt-block">
+        <div class="edt-label">Emploi du temps normal (heures à remplacer)</div>
+        <table class="etbl" id="edt-normal">
+          <thead>
+            <tr>
+              <th style="width:34%">Date(s)</th>
+              <th style="width:34%">Horaires</th>
+              <th style="width:22%">Heures à rattraper</th>
+              <th class="no-print" style="width:10%"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-normal"></tbody>
+        </table>
+        <div class="edt-actions no-print">
+          <button class="edt-add-btn" onclick="addRow('normal')">+ Ajouter une ligne</button>
+        </div>
+      </div>
+
+      <div class="edt-block" style="margin-top:18px">
+        <div class="edt-label" style="color:var(--g)">Emploi du temps modifié (créneaux de rattrapage)</div>
+        <table class="etbl" id="edt-modif">
+          <thead style="background:var(--g)!important">
+            <tr>
+              <th style="width:34%;background:var(--g)">Date(s)</th>
+              <th style="width:34%;background:var(--g)">Horaires</th>
+              <th style="width:22%;background:var(--g)">Heures récupérées</th>
+              <th class="no-print" style="width:10%;background:var(--g)"></th>
+            </tr>
+          </thead>
+          <tbody id="tbody-modif"></tbody>
+        </table>
+        <div class="edt-actions no-print">
+          <button class="edt-add-btn" onclick="addRow('modif')">+ Ajouter une ligne</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── 5. Déclaration ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">5</div>
+      Déclaration du demandeur
+    </div>
+    <div class="sb">
+      <div class="sig-area">
+        <div class="sigbox">
+          <div class="sigbox-label">Date de la demande</div>
+          <input type="date" id="date-demande" style="margin-top:6px">
+        </div>
+        <div class="sigbox" style="flex:2">
+          <div class="sigbox-label">Signature du personnel</div>
+          <div id="sig-name" style="font-size:13px;font-weight:600;color:var(--p);margin-bottom:4px;min-height:18px;letter-spacing:.3px"></div>
+          <div class="sigbox-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cadre administration ── -->
+  <div class="admin-card">
+    <div class="admin-header">Cadre réservé à l'administration — Ne pas remplir</div>
+    <div class="admin-body">
+      <div class="admin-col">
+        <span class="admin-col-label">Date de réception</span>
+        <div class="admin-sig-area"></div>
+      </div>
+      <div class="admin-col" style="flex:2">
+        <span class="admin-col-label">Signature du Chef de Service</span>
+        <div class="admin-sig-area"></div>
+      </div>
+      <div class="admin-col" style="flex:2.5">
+        <span class="admin-col-label">Chef d'établissement — Décision</span>
+        <div class="decision-row">
+          <label class="decision-opt opt-accord" id="lbl-accord" onclick="toggleDecision('accord')">
+            <input type="checkbox" id="accordee"> Accordée ✔
+          </label>
+          <label class="decision-opt opt-refus" id="lbl-refus" onclick="toggleDecision('refus')">
+            <input type="checkbox" id="refusee"> Refusée ✘
+          </label>
+        </div>
+        <div class="motif-refus-block" id="motif-refus-block">
+          <label for="motif-refus">Motif du refus</label>
+          <textarea id="motif-refus" placeholder="Indiquez le motif du refus…" rows="2"></textarea>
+        </div>
+        <div class="admin-sig-area" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .main -->
+
+<!-- ═════════════════ FOOTER ══════════════════════════════════════ -->
+<div class="footer">
+  Académie de Guyane · LPO Léopold Elfort · Mana &nbsp;|&nbsp;
+  Données traitées localement — aucun serveur, aucune donnée transmise &nbsp;|&nbsp;
+  Conforme RGPD
+</div>
+
+<!-- ═════════════════ MODAL GUIDE ════════════════════════════════ -->
+<div class="modal-ov" id="modal-guide">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <h2>Guide pas à pas — Demande d'autorisation</h2>
+      <button class="modal-close" onclick="closeModal('modal-guide')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:75vh;overflow-y:auto">
+
+      <div class="guide-step">
+        <div class="g-num">1</div>
+        <div class="g-content">
+          <h3>Informations personnelles</h3>
+          <p>Renseignez votre <strong>Nom</strong>, <strong>Prénom</strong>, votre <strong>Fonction</strong> et votre <strong>Discipline</strong>. L'année scolaire est pré-remplie automatiquement.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">2</div>
+        <div class="g-content">
+          <h3>Période d'absence</h3>
+          <p>Sélectionnez les <strong>dates de début et de fin</strong>. La durée en jours et en heures est calculée automatiquement (6h/jour par défaut) — ajustez si nécessaire.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">3</div>
+        <div class="g-content">
+          <h3>Type d'autorisation et motif</h3>
+          <p>Cliquez sur <strong>une des trois cartes</strong> pour sélectionner le type, puis choisissez le motif dans la liste :</p>
+          <ul>
+            <li><strong>De droit</strong> — motifs légaux (mariage, naissance, décès…) → justificatif obligatoire</li>
+            <li><strong>Facultative</strong> — soins, démarches, événement… → justificatif requis</li>
+            <li><strong>Personnelle</strong> — convenance personnelle → rattrapage obligatoire</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">4</div>
+        <div class="g-content">
+          <h3>Emploi du temps (si rattrapage)</h3>
+          <p>Complétez les deux tableaux : <strong>heures habituelles à remplacer</strong> puis <strong>créneaux de rattrapage prévus</strong>. Utilisez <em>+ Ajouter une ligne</em> si besoin.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">5</div>
+        <div class="g-content">
+          <h3>Sauvegarder pour reprendre plus tard</h3>
+          <p>Cliquez sur <strong>💾 Sauvegarder</strong> pour télécharger un fichier de sauvegarde JSON. Rechargez-le à tout moment via <strong>📂 Charger</strong>.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">6</div>
+        <div class="g-content">
+          <h3>Envoyer la demande</h3>
+          <p>Cliquez sur <strong>✉ Envoyer la demande</strong> :</p>
+          <ul>
+            <li>Le formulaire est généré en <strong>PDF</strong> et téléchargé</li>
+            <li>Votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis</li>
+            <li><strong>Joignez le PDF</strong> et envoyez le message</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-tip">
+        💡 <strong>Astuce :</strong> Le bouton <strong>Imprimer</strong> génère une impression A4 optimisée — seul le type d'absence sélectionné apparaît. Vous pouvez aussi utiliser <strong>PDF</strong> pour une capture directe via les librairies intégrées.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn bi" onclick="closeModal('modal-guide')">Fermer le guide</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════ MODAL ENVOI ════════════════════════════════ -->
+<div class="modal-ov" id="modal-send">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2>✉ Envoyer la demande d'autorisation</h2>
+      <button class="modal-close" onclick="closeModal('modal-send')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="send-step">
+        <div class="s-num s1">1</div>
+        <p>Cliquez sur <strong>Télécharger le PDF</strong> pour générer et enregistrer le formulaire rempli sur votre appareil.</p>
+      </div>
+      <div class="send-step">
+        <div class="s-num s2">2</div>
+        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF téléchargé</strong> avant d'envoyer.<br>
+        <span style="color:var(--mu);font-size:11.5px;margin-top:4px;display:block">
+          Destinataire : <strong>tatiana.agesilas@ac-guyane.fr</strong>
+        </span>
+        </p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('modal-send')" style="background:#eee;color:var(--tx)">Annuler</button>
+      <button class="btn bi" onclick="downloadPDF()">Télécharger le PDF</button>
+      <button class="btn bg2" onclick="doEmail()">Ouvrir la messagerie</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═════════════════ SCRIPT ══════════════════════════════════════ -->
+<script>
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('annee-scolaire').value = schoolYear();
+  document.getElementById('date-demande').value   = today();
+  initTables();
+  ['nom','prenom'].forEach(id => document.getElementById(id).addEventListener('input', updateSigName));
+});
+
+function today()      { return new Date().toISOString().slice(0,10); }
+function updateSigName(){
+  const nom    = (document.getElementById('nom').value||'').toUpperCase().trim();
+  const prenom = (document.getElementById('prenom').value||'').trim();
+  document.getElementById('sig-name').textContent = [prenom, nom].filter(Boolean).join(' ');
+}
+function schoolYear() {
+  const n = new Date(), y = n.getFullYear();
+  return n.getMonth() >= 8 ? `${y}-${y+1}` : `${y-1}-${y}`;
+}
+
+/* ── Tables EDT ── */
+function initTables(){
+  ['normal','modif'].forEach(t => {
+    const tb = document.getElementById('tbody-'+t);
+    tb.innerHTML='';
+    for(let i=0;i<3;i++) rowInto(tb);
+  });
+}
+function addRow(t){ rowInto(document.getElementById('tbody-'+t)); }
+function rowInto(tb){
+  const tr = document.createElement('tr');
+  tr.innerHTML=`
+    <td><input type="text" placeholder="ex. lun. 02/06"></td>
+    <td><input type="text" placeholder="ex. 08h00–10h00"></td>
+    <td><input type="text" placeholder="ex. 2h"></td>
+    <td class="no-print" style="text-align:center">
+      <button class="edt-del-btn" onclick="delRow(this)">✕</button>
+    </td>`;
+  tb.appendChild(tr);
+}
+function delRow(b){
+  const tb=b.closest('tbody');
+  if(tb.rows.length>1) b.closest('tr').remove();
+}
+
+/* ── Décision chef d'établissement ── */
+function toggleDecision(choice){
+  const isAccord = choice === 'accord';
+  document.getElementById('accordee').checked = isAccord;
+  document.getElementById('refusee').checked  = !isAccord;
+  document.getElementById('lbl-accord').classList.toggle('checked',  isAccord);
+  document.getElementById('lbl-refus').classList.toggle('checked',  !isAccord);
+  const block = document.getElementById('motif-refus-block');
+  block.classList.toggle('visible', !isAccord);
+  if(isAccord) document.getElementById('motif-refus').value = '';
+}
+
+/* ── Type d'absence ── */
+let currentType = '';
+function selectType(k){
+  currentType=k;
+  ['droit','facult','perso'].forEach(t=>{
+    document.getElementById('tc-'+t).classList.toggle('active', t===k);
+    document.getElementById('mb-'+t).classList.toggle('visible', t===k);
+  });
+}
+function checkPrec(k){
+  const sel = document.getElementById('motif-'+k);
+  document.getElementById('prec-'+k).classList.toggle('visible', sel.value==='__autre__');
+}
+
+/* ── Durée auto ── */
+function calcDuree(){
+  const d1=document.getElementById('date-debut').value;
+  const d2=document.getElementById('date-fin').value;
+  if(!d1||!d2) return;
+  const diff=(new Date(d2)-new Date(d1))/86400000;
+  if(diff>=0){
+    document.getElementById('duree-jours').value = diff+1;
+    document.getElementById('duree-heures').value= (diff+1)*6;
+  }
+}
+function syncH(){
+  const j=parseFloat(document.getElementById('duree-jours').value)||0;
+  document.getElementById('duree-heures').value=j*6;
+}
+
+/* ── Collecte ── */
+function collectData(){
+  const km={droit:'droit',facult:'facult',perso:'perso'};
+  const k=km[currentType]||'';
+  const selEl=k?document.getElementById('motif-'+k):null;
+  let motif=selEl?selEl.value:'';
+  if(motif==='__autre__'){
+    const el=document.getElementById('prec-'+k+'-txt');
+    motif=el?el.value:'';
+  }
+  const typeLabels={droit:'droit',facult:'facultative',perso:'personnelle'};
+  const rows=id=>Array.from(document.querySelectorAll('#tbody-'+id+' tr')).map(r=>{
+    const c=r.querySelectorAll('input');
+    return{date:c[0].value,horaires:c[1].value,heures:c[2].value};
+  }).filter(r=>r.date||r.horaires||r.heures);
+  return{
+    annee_scolaire:document.getElementById('annee-scolaire').value,
+    num_dossier:document.getElementById('num-dossier').value,
+    nom:document.getElementById('nom').value,
+    prenom:document.getElementById('prenom').value,
+    fonction:document.getElementById('fonction').value,
+    discipline:document.getElementById('discipline').value,
+    date_debut:document.getElementById('date-debut').value,
+    date_fin:document.getElementById('date-fin').value,
+    duree_jours:document.getElementById('duree-jours').value,
+    duree_heures:document.getElementById('duree-heures').value,
+    type_autorisation:typeLabels[currentType]||'',
+    type_key:currentType,
+    motif,
+    date_demande:document.getElementById('date-demande').value,
+    edt_normal:rows('normal'),
+    edt_modif:rows('modif'),
+    decision: document.getElementById('accordee').checked ? 'accordee'
+            : document.getElementById('refusee').checked  ? 'refusee'
+            : '',
+    motif_refus: document.getElementById('motif-refus').value,
+  };
+}
+
+/* ── Sauvegarde JSON ── */
+function saveJSON(){
+  const d=collectData();
+  const slug=(d.nom||'demande').replace(/\s+/g,'-').toLowerCase();
+  const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  dl(blob,`sauvegarde-absence-${slug}.json`);
+  toast('Sauvegarde téléchargée','ok');
+}
+
+/* ── Chargement JSON ── */
+function loadFromJSON(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{populate(JSON.parse(ev.target.result));toast('Formulaire chargé','ok');}
+      catch{toast('Fichier JSON invalide','err');}
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+function populate(d){
+  const s=(id,v)=>{const e=document.getElementById(id);if(e&&v!==undefined)e.value=v;};
+  s('annee-scolaire',d.annee_scolaire);s('num-dossier',d.num_dossier);
+  s('nom',d.nom);s('prenom',d.prenom);
+  s('fonction',d.fonction);s('discipline',d.discipline);
+  s('date-debut',d.date_debut);s('date-fin',d.date_fin);
+  s('duree-jours',d.duree_jours);s('duree-heures',d.duree_heures);
+  s('date-demande',d.date_demande);
+
+  const key=d.type_key||(d.type_autorisation==='droit'?'droit':d.type_autorisation==='facultative'?'facult':d.type_autorisation==='personnelle'?'perso':'');
+  if(key){
+    selectType(key);
+    const sel=document.getElementById('motif-'+key);
+    if(sel&&d.motif){
+      const opt=Array.from(sel.options).find(o=>o.text===d.motif||o.value===d.motif);
+      sel.value=opt?opt.value:'__autre__';
+      if(!opt){const p=document.getElementById('prec-'+key+'-txt');if(p)p.value=d.motif;}
+      checkPrec(key);
+    }
+  }
+
+  const fill=(tbId,rows)=>{
+    const tb=document.getElementById('tbody-'+tbId);tb.innerHTML='';
+    const list=(rows&&rows.length)?rows:[{},{},{}];
+    list.forEach(r=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`
+        <td><input type="text" value="${esc(r.date||'')}"></td>
+        <td><input type="text" value="${esc(r.horaires||'')}"></td>
+        <td><input type="text" value="${esc(r.heures||'')}"></td>
+        <td class="no-print" style="text-align:center">
+          <button class="edt-del-btn" onclick="delRow(this)">✕</button>
+        </td>`;
+      tb.appendChild(tr);
+    });
+    for(let i=(rows||[]).length;i<3;i++)rowInto(tb);
+  };
+  fill('normal',d.edt_normal);fill('modif',d.edt_modif);
+  if(d.decision==='accordee') toggleDecision('accord');
+  else if(d.decision==='refusee'){
+    toggleDecision('refus');
+    document.getElementById('motif-refus').value = d.motif_refus||'';
+  }
+  updateSigName();
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ── Génération PDF ── */
+async function downloadPDF(){
+  if(!window.html2canvas||!window.jspdf){
+    alert('Librairies PDF non chargées — vérifiez votre connexion Internet et rechargez la page.');return;
+  }
+  toast('Génération du PDF…');
+  const toolbar=document.querySelector('.toolbar');
+  const footer =document.querySelector('.footer');
+  const noPrint=document.querySelectorAll('.no-print');
+  toolbar.style.display='none';footer.style.display='none';
+  noPrint.forEach(e=>e.style.visibility='hidden');
+  const scrollY=window.scrollY;window.scrollTo(0,0);
+  try{
+    const canvas=await html2canvas(document.body,{
+      scale:1.8,useCORS:true,backgroundColor:'#eef2f7',logging:false,
+      ignoreElements:e=>e.classList.contains('modal-ov')||e.id==='toast',
+    });
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pW=210,pH=297;
+    const ratio=pW/canvas.width;
+    const imgH=canvas.height*ratio;
+    let pos=0;
+    while(pos<imgH){
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-pos,pW,imgH);
+      pos+=pH;if(pos<imgH)pdf.addPage();
+    }
+    const d=collectData();
+    const nom=(d.nom||'demande').replace(/\s+/g,'-').toLowerCase();
+    pdf.save(`absence-${nom}-${d.date_demande||today()}.pdf`);
+    toast('PDF téléchargé','ok');
+  }finally{
+    toolbar.style.display='';footer.style.display='';
+    noPrint.forEach(e=>e.style.visibility='');
+    window.scrollTo(0,scrollY);
+  }
+}
+
+/* ── Email ── */
+function fmtDate(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return`${d}/${m}/${y}`;}
+function doEmail(){
+  const d=collectData();
+  const nom=d.nom?d.nom.toUpperCase():'…';
+  const prenom=d.prenom||'…';
+  const debut=fmtDate(d.date_debut);const fin=fmtDate(d.date_fin);
+  const typeLabel={droit:'de droit',facultative:'facultative',personnelle:'personnelle'}[d.type_autorisation]||'—';
+  const subj=encodeURIComponent(`Demande d'autorisation d'absence – ${nom} ${prenom} – du ${debut} au ${fin}`);
+  const body=encodeURIComponent(`Madame, Monsieur,
+
+Je vous adresse ci-joint ma demande d'autorisation d'absence exceptionnelle.
+
+Nom : ${nom}
+Prénom : ${prenom}
+Période : du ${debut} au ${fin}
+Type d'autorisation : ${typeLabel}
+Motif : ${d.motif||'—'}
+
+Veuillez trouver en pièce jointe le formulaire PDF de ma demande.
+
+Cordialement,
+${prenom} ${nom}`);
+  window.location.href=`mailto:tatiana.agesilas@ac-guyane.fr?subject=${subj}&body=${body}`;
+  closeModal('modal-send');
+}
+
+/* ── Réinitialiser ── */
+function resetForm(){
+  if(!confirm('Réinitialiser tous les champs ?'))return;
+  document.querySelectorAll('input[type=text],input[type=date],input[type=number]').forEach(e=>e.value='');
+  document.querySelectorAll('select').forEach(e=>e.selectedIndex=0);
+  currentType='';
+  ['droit','facult','perso'].forEach(k=>{
+    document.getElementById('tc-'+k).classList.remove('active');
+    document.getElementById('mb-'+k).classList.remove('visible');
+    document.getElementById('prec-'+k).classList.remove('visible');
+  });
+  initTables();
+  document.getElementById('annee-scolaire').value=schoolYear();
+  document.getElementById('date-demande').value=today();
+  document.getElementById('sig-name').textContent='';
+  document.getElementById('accordee').checked=false;
+  document.getElementById('refusee').checked=false;
+  document.getElementById('lbl-accord').classList.remove('checked');
+  document.getElementById('lbl-refus').classList.remove('checked');
+  document.getElementById('motif-refus-block').classList.remove('visible');
+  document.getElementById('motif-refus').value='';
+  toast('Formulaire réinitialisé','ok');
+}
+
+/* ── Modals ── */
+function openGuide()    {document.getElementById('modal-guide').classList.add('open');}
+function openSendModal(){document.getElementById('modal-send').classList.add('open');}
+function closeModal(id) {document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-ov').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-ov.open').forEach(m=>m.classList.remove('open'));
+});
+
+/* ── Toast ── */
+function toast(msg,type='',dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+(type||'');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.className='',dur);
+}
+
+/* ── Download helper ── */
+function dl(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+</script>
+</body>
+</html>

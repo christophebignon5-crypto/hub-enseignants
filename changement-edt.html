@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande de changement d'emploi du temps — LPO Léopold Elfort</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ════ VARIABLES ════════════════════════════════════════════════════ */
+:root{
+  --p:#1e3a6e;--pd:#122244;--ps:#2a52a0;
+  --a:#c4922a;--al:#f5e6c8;
+  --g:#1f7a52;--r:#c0392b;
+  --bg:#eef2f7;--ca:#ffffff;
+  --tx:#1a2a3a;--mu:#5a6a7a;--bo:#d0dae8;
+  --ok:#1f7a52;--warn:#8B6914;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;min-height:100vh}
+
+/* ════ TOOLBAR ══════════════════════════════════════════════════════ */
+.toolbar{
+  position:sticky;top:0;z-index:200;
+  background:var(--pd);
+  display:flex;align-items:center;gap:6px;
+  padding:8px 20px;
+  box-shadow:0 2px 12px rgba(0,0,0,.35);
+  flex-wrap:wrap;
+}
+.tl{
+  font-family:'Source Serif 4',serif;
+  color:var(--a);font-size:14px;font-weight:700;
+  flex:1;min-width:140px;white-space:nowrap;
+}
+.btn{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:7px 13px;border-radius:6px;border:none;
+  font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .15s;white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.bp {background:var(--a);color:#fff}.bp:hover{background:#a87720}
+.bo2{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35)}.bo2:hover{background:rgba(255,255,255,.12)}
+.bi {background:#2980b9;color:#fff}.bi:hover{background:#1f6a99}
+.bg2{background:var(--g);color:#fff}.bg2:hover{background:#166040}
+.br {background:rgba(192,57,43,.85);color:#fff}.br:hover{background:var(--r)}
+.toolbar-sep{width:1px;height:24px;background:rgba(255,255,255,.2);margin:0 2px;flex-shrink:0}
+
+/* ════ PAGE HEADER ══════════════════════════════════════════════════ */
+.page-header{
+  background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%);
+  padding:20px 32px 18px;color:#fff;
+  display:flex;align-items:center;gap:18px;
+  border-bottom:3px solid var(--a);
+}
+.hlogo{
+  width:66px;height:66px;background:rgba(255,255,255,.13);
+  border-radius:12px;border:2px dashed rgba(255,255,255,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;flex-shrink:0;
+}
+.htitle h1{
+  font-family:'Source Serif 4',serif;
+  font-size:19px;font-weight:700;margin-bottom:2px;
+}
+.htitle p{font-size:12px;opacity:.75;margin-top:2px}
+.hinfo{
+  display:flex;flex-direction:column;gap:4px;align-items:flex-end;margin-left:auto;flex-shrink:0;
+}
+.hinfo-field{
+  display:flex;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,.75);
+}
+.hinfo-field input{
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  border-radius:5px;color:#fff;font-family:'Outfit',sans-serif;
+  font-size:12px;font-weight:600;padding:3px 8px;outline:none;
+  width:100px;text-align:center;
+}
+.hinfo-field input::placeholder{color:rgba(255,255,255,.5)}
+.hinfo-field input:focus{background:rgba(255,255,255,.25);border-color:var(--a)}
+
+/* ════ MAIN LAYOUT ══════════════════════════════════════════════════ */
+.main{max-width:860px;margin:24px auto;padding:0 20px 60px}
+
+/* ════ SECTION CARDS ════════════════════════════════════════════════ */
+.section{
+  background:var(--ca);border-radius:12px;
+  margin-bottom:16px;
+  box-shadow:0 2px 10px rgba(30,58,110,.09);
+  overflow:hidden;
+}
+.sh{
+  background:linear-gradient(90deg,var(--p),var(--ps));
+  color:#fff;padding:11px 20px;
+  display:flex;align-items:center;gap:10px;
+  font-family:'Source Serif 4',serif;font-weight:600;font-size:14px;
+}
+.sh-num{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.sb{padding:18px 20px}
+
+/* ════ FORM FIELDS ══════════════════════════════════════════════════ */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg3{grid-template-columns:1fr 1fr 1fr}
+.fg1{grid-template-columns:1fr}
+.fgr{display:flex;flex-direction:column;gap:5px}
+.sp2{grid-column:span 2}
+.fl{font-size:12px;font-weight:600;color:var(--p);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;display:block}
+input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{
+  border:1.5px solid var(--bo);border-radius:7px;
+  padding:9px 12px;font-family:'Outfit',sans-serif;
+  font-size:14px;color:var(--tx);
+  transition:border-color .2s,box-shadow .2s;
+  background:#fff;width:100%;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--p);
+  box-shadow:0 0 0 3px rgba(30,58,110,.10);
+}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+/* Plage horaire en ligne */
+.heure-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.heure-row input[type=time]{flex:0 0 130px}
+.heure-row span{color:var(--mu);font-size:13px;white-space:nowrap;font-weight:600}
+
+/* ════ SIGNATURE ═══════════════════════════════════════════════ */
+.sig-area{
+  display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;
+}
+.sigbox{
+  flex:1;min-width:180px;
+  border:2px dashed var(--bo);border-radius:8px;
+  padding:12px 14px;
+}
+.sigbox-label{font-size:12px;font-weight:600;color:var(--p);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.sigbox-area{height:50px;border-bottom:1.5px solid var(--bo);margin-top:6px}
+
+/* ════ CADRE ADMINISTRATION ════════════════════════════════════ */
+.admin-card{
+  background:#f9f9f7;border:2px dashed #bbb;border-radius:10px;
+  margin-bottom:16px;overflow:hidden;
+}
+.admin-header{
+  background:#888;color:#fff;padding:7px 16px;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;
+}
+.admin-body{
+  padding:14px 16px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start;
+}
+.admin-col{flex:1;min-width:130px}
+.admin-col-label{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;margin-bottom:6px;display:block}
+.admin-sig-area{height:44px;border-bottom:1.5px dashed #aaa}
+.decision-row{display:flex;gap:16px;margin-top:8px;flex-wrap:wrap}
+.decision-opt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;
+  padding:5px 10px;border-radius:6px;border:1.5px solid var(--bo);transition:all .15s;user-select:none}
+.decision-opt:hover{border-color:var(--p)}
+.decision-opt.opt-accord.checked{background:#eafaf1;border-color:var(--g);color:var(--g)}
+.decision-opt.opt-refus.checked {background:#fdedec;border-color:var(--r);color:var(--r)}
+.decision-opt input{width:14px;height:14px;cursor:pointer}
+
+/* ════ NOTE ═════════════════════════════════════════════════════ */
+.nb-note{
+  background:#fef9e7;border:1px solid #f0c060;
+  border-radius:7px;padding:10px 13px;
+  font-size:12px;color:var(--warn);margin-top:4px;
+  display:flex;gap:8px;align-items:flex-start;
+}
+
+/* ════ MODALS ═══════════════════════════════════════════════════ */
+.modal-ov{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.52);z-index:1000;
+  align-items:center;justify-content:center;
+}
+.modal-ov.open{display:flex}
+.modal{
+  background:#fff;border-radius:14px;
+  padding:0;max-width:540px;width:90%;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;
+}
+.modal-head{
+  background:linear-gradient(135deg,var(--p),var(--ps));
+  color:#fff;padding:16px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.modal-head h2{font-family:'Source Serif 4',serif;font-size:16px}
+.modal-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;opacity:.8}
+.modal-close:hover{opacity:1}
+.modal-body{padding:20px 22px}
+.modal-foot{
+  padding:14px 22px;border-top:1px solid var(--bo);
+  display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;
+}
+
+/* Guide steps */
+.guide-step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start}
+.g-num{
+  width:32px;height:32px;flex-shrink:0;
+  background:var(--p);color:#fff;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;
+}
+.g-content h3{font-size:13.5px;font-weight:600;color:var(--p);margin-bottom:4px}
+.g-content p{font-size:12.5px;color:var(--tx);line-height:1.55}
+.g-content ul{margin:4px 0 0 16px;font-size:12px;color:var(--mu);line-height:1.7}
+.guide-tip{
+  background:#fef9e7;border:1px solid #f0c060;
+  border-radius:7px;padding:10px 13px;
+  font-size:12px;color:var(--warn);margin-top:4px;
+}
+
+/* Send steps */
+.send-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--bo)}
+.send-step:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.s-num{
+  width:30px;height:30px;flex-shrink:0;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:#fff;
+}
+.s1{background:#2980b9}.s2{background:var(--g)}
+.send-step p{font-size:12.5px;line-height:1.55;color:var(--tx)}
+.send-step strong{color:var(--p)}
+
+/* ════ TOAST ════════════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--p);color:#fff;
+  padding:10px 22px;border-radius:20px;font-size:13px;font-weight:500;
+  z-index:9999;opacity:0;transition:opacity .25s,transform .25s;
+  pointer-events:none;white-space:nowrap;max-width:90vw;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.ok  {background:var(--ok)}
+#toast.warn{background:var(--warn)}
+#toast.err {background:var(--r)}
+
+/* ════ FOOTER ═══════════════════════════════════════════════════ */
+.footer{
+  text-align:center;padding:20px;
+  font-size:11px;color:var(--mu);
+  border-top:1px solid var(--bo);background:var(--ca);
+  margin-top:24px;
+}
+
+/* ════ PRINT ════════════════════════════════════════════════════ */
+@media print{
+  @page{size:A4;margin:8mm 10mm}
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  .toolbar,.modal-ov,.footer,.no-print{display:none!important}
+  body{background:#fff;font-size:9pt;line-height:1.35;color:#000;font-family:Arial,sans-serif}
+  .main{margin:0;padding:0;max-width:100%}
+  .page-header{
+    background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%)!important;
+    padding:8px 14px;gap:10px;border-bottom:2px solid var(--a)!important;
+  }
+  .hlogo{width:44px;height:44px;font-size:20px}
+  .htitle h1{font-size:12pt}
+  .htitle p{font-size:8pt}
+  .hinfo-field input{font-size:9pt;padding:1px 5px;background:transparent!important;border-color:rgba(255,255,255,.5)!important}
+  .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:6px;break-inside:avoid}
+  .sh{padding:5px 10px;font-size:10pt;background:linear-gradient(90deg,var(--p),var(--ps))!important}
+  .sh-num{width:17px;height:17px;font-size:8pt}
+  .sb{padding:8px 10px}
+  .fg{gap:8px}
+  .fgr{gap:2px}
+  .fl{font-size:7.5pt;letter-spacing:0;margin-bottom:2px}
+  input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{
+    border:1px solid #bbb;border-radius:3px;padding:3px 6px;font-size:9pt;background:#fff;
+  }
+  textarea{min-height:48px}
+  .heure-row{gap:6px}
+  .heure-row input[type=time]{flex:0 0 100px}
+  .sig-area{gap:10px}
+  .sigbox{padding:8px 10px;border-radius:4px}
+  .sigbox-label{font-size:7.5pt;margin-bottom:4px}
+  .sigbox-area{height:34px}
+  .admin-card{border-radius:4px;margin-bottom:6px;break-inside:avoid}
+  .admin-header{padding:4px 10px;font-size:8pt}
+  .admin-body{padding:8px 10px;gap:10px}
+  .admin-sig-area{height:30px}
+  .admin-col-label{font-size:7.5pt}
+  .decision-opt{font-size:9pt;padding:3px 8px;border-radius:3px}
+  .nb-note{font-size:8pt;padding:6px 9px;background:#fef9e7!important;border:1px solid #f0c060!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ TOOLBAR ═══════════════════════════════════════ -->
+<div class="toolbar">
+  <div class="tl">Changement d'emploi du temps — LPO Elfort</div>
+  <button class="btn br" onclick="resetForm()">↺ Réinitialiser</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="loadFromJSON()">📂 Charger</button>
+  <button class="btn bo2" onclick="saveJSON()">💾 Sauvegarder</button>
+  <div class="toolbar-sep"></div>
+  <button class="btn bo2" onclick="openGuide()">Guide</button>
+  <button class="btn bo2" onclick="window.print()">🖨 Imprimer</button>
+  <button class="btn bi" onclick="downloadPDF()">PDF</button>
+  <button class="btn bp" onclick="openSendModal()">✉ Envoyer la demande</button>
+</div>
+
+<!-- ═══════════════ HEADER ════════════════════════════════════════ -->
+<div class="page-header">
+  <div class="hlogo">🗓️</div>
+  <div class="htitle">
+    <h1>Demande de changement d'emploi du temps</h1>
+    <p>LPO Léopold Elfort · Mana · Académie de Guyane</p>
+    <p style="margin-top:3px;font-size:11px;opacity:.6">À remettre à la Direction au moins 24h à l'avance — Traitement local, aucune donnée transmise</p>
+  </div>
+  <div class="hinfo">
+    <div class="hinfo-field">
+      <span>Année scolaire</span>
+      <input type="text" id="annee-scolaire" maxlength="9" title="Année scolaire">
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN ═══════════════════════════════════════════ -->
+<div class="main">
+
+  <!-- ── 1. Identification ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">1</div>
+      Identification du demandeur
+    </div>
+    <div class="sb">
+      <div class="fg">
+        <div class="fgr">
+          <label class="fl">Nom du professeur demandeur</label>
+          <input type="text" id="nom-prof" placeholder="NOM Prénom" style="font-weight:600" oninput="updateSigName()">
+        </div>
+        <div class="fgr">
+          <label class="fl">Date de la demande</label>
+          <input type="date" id="date-demande">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. Cours concerné ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">2</div>
+      Cours concerné
+    </div>
+    <div class="sb">
+      <div class="fg fg3">
+        <div class="fgr">
+          <label class="fl">Date du cours</label>
+          <input type="date" id="date-cours">
+        </div>
+        <div class="fgr">
+          <label class="fl">Classe</label>
+          <input type="text" id="classe" placeholder="ex. 2nde 3, Tle Pro MA…">
+        </div>
+        <div class="fgr">
+          <label class="fl">Salle</label>
+          <input type="text" id="salle-cours" placeholder="ex. B12">
+        </div>
+      </div>
+      <div class="fgr" style="margin-top:14px">
+        <label class="fl">Horaire du cours</label>
+        <div class="heure-row">
+          <span>de</span>
+          <input type="time" id="heure-cours-debut">
+          <span>à</span>
+          <input type="time" id="heure-cours-fin">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. Report souhaité ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">3</div>
+      Report souhaité
+    </div>
+    <div class="sb">
+      <div class="fg">
+        <div class="fgr">
+          <label class="fl">Date du report</label>
+          <input type="date" id="date-report">
+        </div>
+        <div class="fgr">
+          <label class="fl">Salle proposée</label>
+          <input type="text" id="salle-report" placeholder="ex. A04">
+        </div>
+      </div>
+      <div class="fgr" style="margin-top:14px">
+        <label class="fl">Horaire proposé</label>
+        <div class="heure-row">
+          <span>de</span>
+          <input type="time" id="heure-report-debut">
+          <span>à</span>
+          <input type="time" id="heure-report-fin">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4. Motif ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">4</div>
+      Motif de la demande
+    </div>
+    <div class="sb">
+      <div class="fgr">
+        <label class="fl">Motif</label>
+        <textarea id="motif" rows="4" placeholder="Décrivez le motif de votre demande de changement d'emploi du temps…"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. Déclaration ── -->
+  <div class="section">
+    <div class="sh">
+      <div class="sh-num">5</div>
+      Déclaration du demandeur
+    </div>
+    <div class="sb">
+      <div class="sig-area">
+        <div class="sigbox">
+          <div class="sigbox-label">Mana, le</div>
+          <input type="date" id="date-signature" style="margin-top:6px">
+        </div>
+        <div class="sigbox" style="flex:2">
+          <div class="sigbox-label">Le Professeur</div>
+          <div id="sig-name" style="font-size:13px;font-weight:600;color:var(--p);margin-bottom:4px;min-height:18px;letter-spacing:.3px"></div>
+          <div class="sigbox-area"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Cadre administration ── -->
+  <div class="admin-card">
+    <div class="admin-header">Réservé à la Direction — Ne pas remplir</div>
+    <div class="admin-body">
+      <div class="admin-col" style="flex:2.5">
+        <span class="admin-col-label">Décision — Modification</span>
+        <div class="decision-row">
+          <label class="decision-opt opt-accord" id="lbl-accord" onclick="toggleDecision('accord')">
+            <input type="checkbox" id="accordee"> Accordée ✔
+          </label>
+          <label class="decision-opt opt-refus" id="lbl-refus" onclick="toggleDecision('refus')">
+            <input type="checkbox" id="refusee"> Refusée ✘
+          </label>
+        </div>
+      </div>
+      <div class="admin-col">
+        <span class="admin-col-label">Mana, le</span>
+        <div class="admin-sig-area"></div>
+      </div>
+      <div class="admin-col" style="flex:2">
+        <span class="admin-col-label">Le Proviseur</span>
+        <div class="admin-sig-area"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nb-note">
+    <span>ℹ️</span>
+    <span><strong>N.B.</strong> — En cas d'accord, le professeur devra veiller à faire inscrire la modification dans le carnet de correspondance.</span>
+  </div>
+
+</div><!-- .main -->
+
+<!-- ═════════════════ FOOTER ══════════════════════════════════════ -->
+<div class="footer">
+  Académie de Guyane · LPO Léopold Elfort · Mana &nbsp;|&nbsp;
+  Données traitées localement — aucun serveur, aucune donnée transmise &nbsp;|&nbsp;
+  Conforme RGPD
+</div>
+
+<!-- ═════════════════ MODAL GUIDE ════════════════════════════════ -->
+<div class="modal-ov" id="modal-guide">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-head">
+      <h2>Guide pas à pas — Changement d'EDT</h2>
+      <button class="modal-close" onclick="closeModal('modal-guide')">✕</button>
+    </div>
+    <div class="modal-body" style="max-height:75vh;overflow-y:auto">
+
+      <div class="guide-step">
+        <div class="g-num">1</div>
+        <div class="g-content">
+          <h3>Identification</h3>
+          <p>Renseignez votre <strong>Nom et Prénom</strong> ainsi que la <strong>date de la demande</strong>. Pensez à déposer la demande au moins <strong>24h à l'avance</strong>.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">2</div>
+        <div class="g-content">
+          <h3>Cours concerné</h3>
+          <p>Indiquez la <strong>date</strong>, la <strong>classe</strong>, la <strong>salle</strong> et les <strong>horaires</strong> du cours que vous souhaitez déplacer.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">3</div>
+        <div class="g-content">
+          <h3>Report souhaité</h3>
+          <p>Précisez la <strong>nouvelle date</strong>, la <strong>salle proposée</strong> et les <strong>nouveaux horaires</strong> envisagés pour le report.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">4</div>
+        <div class="g-content">
+          <h3>Motif</h3>
+          <p>Expliquez brièvement la <strong>raison</strong> de votre demande de changement.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">5</div>
+        <div class="g-content">
+          <h3>Sauvegarder pour reprendre plus tard</h3>
+          <p>Cliquez sur <strong>💾 Sauvegarder</strong> pour télécharger un fichier JSON. Rechargez-le à tout moment via <strong>📂 Charger</strong>.</p>
+        </div>
+      </div>
+
+      <div class="guide-step">
+        <div class="g-num">6</div>
+        <div class="g-content">
+          <h3>Envoyer la demande</h3>
+          <p>Cliquez sur <strong>✉ Envoyer la demande</strong> :</p>
+          <ul>
+            <li>Le formulaire est généré en <strong>PDF</strong> et téléchargé</li>
+            <li>Votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis</li>
+            <li><strong>Joignez le PDF</strong> et envoyez le message</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="guide-tip">
+        💡 <strong>Astuce :</strong> le bouton <strong>🖨 Imprimer</strong> génère une impression A4 propre si vous préférez remettre la demande en main propre à la Direction.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn bi" onclick="closeModal('modal-guide')">Fermer le guide</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════ MODAL ENVOI ════════════════════════════════ -->
+<div class="modal-ov" id="modal-send">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head">
+      <h2>✉ Envoyer la demande</h2>
+      <button class="modal-close" onclick="closeModal('modal-send')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="send-step">
+        <div class="s-num s1">1</div>
+        <p>Cliquez sur <strong>Télécharger le PDF</strong> pour générer et enregistrer le formulaire rempli sur votre appareil.</p>
+      </div>
+      <div class="send-step">
+        <div class="s-num s2">2</div>
+        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF téléchargé</strong> avant d'envoyer.<br>
+        <span style="color:var(--mu);font-size:11.5px;margin-top:4px;display:block">
+          Destinataire : <strong id="dest-display">direction.0973xxxx@ac-guyane.fr</strong>
+        </span>
+        </p>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('modal-send')" style="background:#eee;color:var(--tx)">Annuler</button>
+      <button class="btn bi" onclick="downloadPDF()">Télécharger le PDF</button>
+      <button class="btn bg2" onclick="doEmail()">Ouvrir la messagerie</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ═════════════════ SCRIPT ══════════════════════════════════════ -->
+<script>
+/* ═══ CONFIGURATION — adresse(s) destinataire(s) ═══════════════════ */
+/* Modifiez ci-dessous l'adresse de la Direction. Pour plusieurs        */
+/* destinataires, séparez-les par une virgule.                          */
+const EMAIL_DESTINATAIRES = "tatiana.agesilas@ac-guyane.fr";
+/* ══════════════════════════════════════════════════════════════════ */
+
+/* ── Init ── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('annee-scolaire').value = schoolYear();
+  document.getElementById('date-demande').value   = today();
+  document.getElementById('date-signature').value = today();
+  const dd = document.getElementById('dest-display');
+  if(dd) dd.textContent = EMAIL_DESTINATAIRES;
+});
+
+function today(){ return new Date().toISOString().slice(0,10); }
+function updateSigName(){
+  const v = (document.getElementById('nom-prof').value||'').trim();
+  document.getElementById('sig-name').textContent = v;
+}
+function schoolYear(){
+  const n=new Date(), y=n.getFullYear();
+  return n.getMonth()>=8 ? `${y}-${y+1}` : `${y-1}-${y}`;
+}
+function fmtDate(iso){ if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+function fmtHeure(t){ return t ? t.replace(':','h') : '—'; }
+
+/* ── Décision Direction ── */
+function toggleDecision(choice){
+  const isAccord = choice==='accord';
+  document.getElementById('accordee').checked = isAccord;
+  document.getElementById('refusee').checked  = !isAccord;
+  document.getElementById('lbl-accord').classList.toggle('checked',  isAccord);
+  document.getElementById('lbl-refus').classList.toggle('checked',  !isAccord);
+}
+
+/* ── Collecte ── */
+function collectData(){
+  return {
+    annee_scolaire:   document.getElementById('annee-scolaire').value,
+    nom_prof:         document.getElementById('nom-prof').value,
+    date_demande:     document.getElementById('date-demande').value,
+    date_cours:       document.getElementById('date-cours').value,
+    classe:           document.getElementById('classe').value,
+    salle_cours:      document.getElementById('salle-cours').value,
+    heure_cours_debut:document.getElementById('heure-cours-debut').value,
+    heure_cours_fin:  document.getElementById('heure-cours-fin').value,
+    date_report:      document.getElementById('date-report').value,
+    salle_report:     document.getElementById('salle-report').value,
+    heure_report_debut:document.getElementById('heure-report-debut').value,
+    heure_report_fin: document.getElementById('heure-report-fin').value,
+    motif:            document.getElementById('motif').value,
+    date_signature:   document.getElementById('date-signature').value,
+    decision: document.getElementById('accordee').checked ? 'accordee'
+            : document.getElementById('refusee').checked  ? 'refusee' : '',
+  };
+}
+
+/* ── Sauvegarde JSON ── */
+function saveJSON(){
+  const d=collectData();
+  const slug=(d.nom_prof||'demande').replace(/\s+/g,'-').toLowerCase();
+  const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  dl(blob,`sauvegarde-edt-${slug}.json`);
+  toast('Sauvegarde téléchargée','ok');
+}
+
+/* ── Chargement JSON ── */
+function loadFromJSON(){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='.json,application/json';
+  inp.onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>{
+      try{ populate(JSON.parse(ev.target.result)); toast('Formulaire chargé','ok'); }
+      catch{ toast('Fichier JSON invalide','err'); }
+    };
+    r.readAsText(f);
+  };
+  inp.click();
+}
+
+function populate(d){
+  const s=(id,v)=>{const e=document.getElementById(id);if(e&&v!==undefined)e.value=v;};
+  s('annee-scolaire',d.annee_scolaire);
+  s('nom-prof',d.nom_prof);
+  s('date-demande',d.date_demande);
+  s('date-cours',d.date_cours);
+  s('classe',d.classe);
+  s('salle-cours',d.salle_cours);
+  s('heure-cours-debut',d.heure_cours_debut);
+  s('heure-cours-fin',d.heure_cours_fin);
+  s('date-report',d.date_report);
+  s('salle-report',d.salle_report);
+  s('heure-report-debut',d.heure_report_debut);
+  s('heure-report-fin',d.heure_report_fin);
+  s('motif',d.motif);
+  s('date-signature',d.date_signature);
+  if(d.decision==='accordee') toggleDecision('accord');
+  else if(d.decision==='refusee') toggleDecision('refus');
+  updateSigName();
+}
+
+/* ── Génération PDF ── */
+async function downloadPDF(){
+  if(!window.html2canvas||!window.jspdf){
+    alert('Librairies PDF non chargées — vérifiez votre connexion Internet et rechargez la page.');return;
+  }
+  toast('Génération du PDF…');
+  const toolbar=document.querySelector('.toolbar');
+  const footer =document.querySelector('.footer');
+  const noPrint=document.querySelectorAll('.no-print');
+  toolbar.style.display='none';footer.style.display='none';
+  noPrint.forEach(e=>e.style.visibility='hidden');
+  const scrollY=window.scrollY;window.scrollTo(0,0);
+  try{
+    const canvas=await html2canvas(document.body,{
+      scale:1.8,useCORS:true,backgroundColor:'#eef2f7',logging:false,
+      ignoreElements:e=>e.classList.contains('modal-ov')||e.id==='toast',
+    });
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const pW=210,pH=297;
+    const ratio=pW/canvas.width;
+    const imgH=canvas.height*ratio;
+    let pos=0;
+    while(pos<imgH){
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-pos,pW,imgH);
+      pos+=pH;if(pos<imgH)pdf.addPage();
+    }
+    const d=collectData();
+    const nom=(d.nom_prof||'demande').replace(/\s+/g,'-').toLowerCase();
+    pdf.save(`changement-edt-${nom}-${d.date_demande||today()}.pdf`);
+    toast('PDF téléchargé','ok');
+  }finally{
+    toolbar.style.display='';footer.style.display='';
+    noPrint.forEach(e=>e.style.visibility='');
+    window.scrollTo(0,scrollY);
+  }
+}
+
+/* ── Email ── */
+function doEmail(){
+  const d=collectData();
+  const nom=d.nom_prof||'…';
+  const subj=encodeURIComponent(`Demande de changement d'EDT – ${nom} – cours du ${fmtDate(d.date_cours)} (${d.classe||'—'})`);
+  const body=encodeURIComponent(`Madame, Monsieur,
+
+Je vous adresse ci-joint ma demande de changement d'emploi du temps.
+
+Professeur : ${nom}
+Date de la demande : ${fmtDate(d.date_demande)}
+
+COURS CONCERNÉ
+  Date : ${fmtDate(d.date_cours)}
+  Classe : ${d.classe||'—'}   Salle : ${d.salle_cours||'—'}
+  Horaire : de ${fmtHeure(d.heure_cours_debut)} à ${fmtHeure(d.heure_cours_fin)}
+
+REPORT SOUHAITÉ
+  Date : ${fmtDate(d.date_report)}
+  Salle proposée : ${d.salle_report||'—'}
+  Horaire : de ${fmtHeure(d.heure_report_debut)} à ${fmtHeure(d.heure_report_fin)}
+
+Motif : ${d.motif||'—'}
+
+Veuillez trouver en pièce jointe le formulaire PDF de ma demande.
+
+Cordialement,
+${nom}`);
+  window.location.href=`mailto:${EMAIL_DESTINATAIRES}?subject=${subj}&body=${body}`;
+  closeModal('modal-send');
+}
+
+/* ── Réinitialiser ── */
+function resetForm(){
+  if(!confirm('Réinitialiser tous les champs ?'))return;
+  document.querySelectorAll('input[type=text],input[type=date],input[type=time],input[type=number],textarea').forEach(e=>e.value='');
+  document.getElementById('annee-scolaire').value=schoolYear();
+  document.getElementById('date-demande').value=today();
+  document.getElementById('date-signature').value=today();
+  document.getElementById('sig-name').textContent='';
+  document.getElementById('accordee').checked=false;
+  document.getElementById('refusee').checked=false;
+  document.getElementById('lbl-accord').classList.remove('checked');
+  document.getElementById('lbl-refus').classList.remove('checked');
+  toast('Formulaire réinitialisé','ok');
+}
+
+/* ── Modals ── */
+function openGuide()    {document.getElementById('modal-guide').classList.add('open');}
+function openSendModal(){document.getElementById('modal-send').classList.add('open');}
+function closeModal(id) {document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-ov').forEach(m=>{
+  m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.modal-ov.open').forEach(m=>m.classList.remove('open'));
+});
+
+/* ── Toast ── */
+function toast(msg,type='',dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+(type||'');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.className='',dur);
+}
+
+/* ── Download helper ── */
+function dl(blob,name){
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+</script>
+</body>
+</html>
