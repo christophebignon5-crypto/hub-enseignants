@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Budget Sorties & Voyages — Lycée Léopold ELFORT, Mana</title>
+  <meta name="description" content="Outil de calcul du budget prévisionnel des sorties et voyages scolaires — Lycée Polyvalent Léopold ELFORT, Mana, Guyane." />
+
+  <!-- ===========================================================
+       DÉPENDANCES (CDN) — fonctionne en local ET en ligne
+       React 18 + ReactDOM + Babel (JSX) + Recharts
+       =========================================================== -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/prop-types@15/prop-types.min.js"></script>
+  <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    /* ===========================================================
+       VARIABLES DE COULEUR — identité visuelle de l'établissement
+       =========================================================== */
+    :root {
+      --vert:        #2e7d32;   /* couleur principale : établissement */
+      --vert-fonce:  #1b5e20;
+      --vert-clair:  #e8f5e9;
+      --orange:      #f57c00;   /* couleur secondaire : familles */
+      --orange-fonce:#e65100;
+      --orange-clair:#fff3e0;
+      --blanc:       #ffffff;
+      --gris-fond:   #f4f6f5;
+      --gris-bord:   #d7dedb;
+      --gris-texte:  #455a52;
+      --texte:       #1c2b25;
+      --bleu-info:   #1565c0;
+      --bleu-clair:  #e3f2fd;
+      --rouge:       #c62828;
+      --rouge-clair: #ffebee;
+      --ombre:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --ombre-fort:  0 4px 14px rgba(0,0,0,.12);
+      --radius:      10px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--texte);
+      background: var(--gris-fond);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    /* ============================ EN-TÊTE ============================ */
+    header.app-header {
+      background: linear-gradient(135deg, var(--vert) 0%, var(--vert-fonce) 100%);
+      color: var(--blanc);
+      padding: 14px 22px;
+      display: flex; align-items: center; gap: 16px;
+      box-shadow: var(--ombre-fort);
+      position: sticky; top: 0; z-index: 50;
+    }
+    .logo-badge {
+      width: 52px; height: 52px; flex: 0 0 52px;
+      border-radius: 12px;
+      background: var(--blanc);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 22px; color: var(--vert);
+      border: 3px solid var(--orange);
+      box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    }
+    .app-header h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: .2px; }
+    .app-header .sub { margin: 2px 0 0; font-size: 12.5px; opacity: .9; font-weight: 400; }
+    .header-spacer { flex: 1; }
+    .save-state {
+      font-size: 12px; background: rgba(255,255,255,.18);
+      padding: 5px 11px; border-radius: 20px; white-space: nowrap;
+    }
+    .save-state b { color: #c8e6c9; }
+
+    /* ============================ BARRE D'OUTILS ============================ */
+    .toolbar {
+      background: var(--blanc);
+      border-bottom: 1px solid var(--gris-bord);
+      padding: 10px 22px;
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      position: sticky; top: 80px; z-index: 40;
+    }
+
+    button {
+      font-family: inherit; font-size: 14px; cursor: pointer;
+      border: none; border-radius: 8px; padding: 9px 15px;
+      font-weight: 600; transition: filter .12s, transform .05s;
+      display: inline-flex; align-items: center; gap: 7px;
+    }
+    button:active { transform: translateY(1px); }
+    button:hover { filter: brightness(1.06); }
+    .btn-vert    { background: var(--vert); color: #fff; }
+    .btn-orange  { background: var(--orange); color: #fff; }
+    .btn-gris    { background: #eceff1; color: var(--texte); border: 1px solid var(--gris-bord); }
+    .btn-rouge   { background: var(--rouge); color: #fff; }
+    .btn-bleu    { background: var(--bleu-info); color: #fff; }
+    .btn-sm      { padding: 5px 10px; font-size: 13px; }
+    .btn-ico     { padding: 6px 9px; font-size: 15px; }
+
+    /* ============================ MISE EN PAGE ============================ */
+    main { max-width: 1180px; margin: 0 auto; padding: 22px; }
+
+    /* ============================ ONGLETS ============================ */
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .tab {
+      background: var(--blanc); border: 2px solid var(--gris-bord);
+      color: var(--gris-texte); border-radius: 12px;
+      padding: 12px 18px; font-weight: 700; font-size: 14.5px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .tab .num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--gris-bord); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex: 0 0 24px;
+    }
+    .tab.actif { border-color: var(--vert); color: var(--vert-fonce); background: var(--vert-clair); }
+    .tab.actif .num { background: var(--vert); }
+    .tab.actif.tab-bleu { border-color: var(--bleu-info); color: var(--bleu-info); background: var(--bleu-clair); }
+    .tab.actif.tab-bleu .num { background: var(--bleu-info); }
+
+    /* ============================ CARTES / SECTIONS ============================ */
+    .carte {
+      background: var(--blanc); border-radius: var(--radius);
+      box-shadow: var(--ombre); margin-bottom: 20px;
+      border: 1px solid var(--gris-bord); overflow: hidden;
+    }
+    .carte > .carte-titre {
+      background: var(--vert-clair); color: var(--vert-fonce);
+      padding: 12px 18px; font-weight: 700; font-size: 15.5px;
+      border-bottom: 1px solid var(--gris-bord);
+      display: flex; align-items: center; gap: 9px;
+    }
+    .carte.orange > .carte-titre { background: var(--orange-clair); color: var(--orange-fonce); }
+    .carte-corps { padding: 18px; }
+
+    .etape-pastille {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 26px; height: 26px; border-radius: 50%; background: var(--vert);
+      color: #fff; font-size: 14px; font-weight: 800; flex: 0 0 26px;
+    }
+    .carte.orange .etape-pastille { background: var(--orange); }
+
+    /* ============================ FORMULAIRES ============================ */
+    .grille {
+      display: grid; gap: 14px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+    label.champ { display: flex; flex-direction: column; gap: 5px; font-size: 13.5px; font-weight: 600; color: var(--gris-texte); }
+    label.champ .oblig { color: var(--rouge); }
+    input, select, textarea {
+      font-family: inherit; font-size: 14.5px;
+      padding: 9px 11px; border: 1px solid var(--gris-bord);
+      border-radius: 8px; background: #fff; color: var(--texte); width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: var(--vert); box-shadow: 0 0 0 3px var(--vert-clair);
+    }
+    input.invalide { border-color: var(--rouge); background: var(--rouge-clair); }
+    .aide { font-size: 12px; color: var(--gris-texte); font-weight: 400; font-style: italic; }
+    .num-input { text-align: right; }
+
+    /* ============================ TABLEAUX ============================ */
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 9px 10px; text-align: left; border-bottom: 1px solid #eef2f0; }
+    th { background: #f1f6f3; font-size: 12.5px; text-transform: uppercase; letter-spacing: .3px; color: var(--gris-texte); }
+    td.montant, th.montant { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    tr.cat-ligne td { background: #fafcfb; }
+    .tbl-input { padding: 6px 8px; font-size: 13.5px; }
+    .tbl-wrap { overflow-x: auto; }
+
+    /* ============================ ENCADRÉS / ALERTES ============================ */
+    .info-box, .warn-box, .legal-box {
+      border-radius: 8px; padding: 12px 14px; font-size: 13.5px; margin: 6px 0 14px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .info-box  { background: var(--bleu-clair); border-left: 4px solid var(--bleu-info); color: #0d3c6e; }
+    .warn-box  { background: var(--orange-clair); border-left: 4px solid var(--orange); color: var(--orange-fonce); }
+    .legal-box { background: #fafafa; border: 1px solid var(--gris-bord); border-left: 4px solid var(--gris-texte); color: var(--gris-texte); font-size: 12.5px; }
+    .info-box .ico, .warn-box .ico, .legal-box .ico { font-size: 18px; flex: 0 0 auto; }
+
+    /* ============================ CARTES RÉSULTAT ============================ */
+    .resultats { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(210px,1fr)); }
+    .res-carte {
+      border-radius: var(--radius); padding: 16px; color: #fff;
+      box-shadow: var(--ombre); position: relative; overflow: hidden;
+    }
+    .res-carte .lbl { font-size: 13px; opacity: .92; font-weight: 600; margin-bottom: 6px; }
+    .res-carte .val { font-size: 26px; font-weight: 800; line-height: 1.1; }
+    .res-carte .note { font-size: 12px; opacity: .9; margin-top: 5px; }
+    .res-vert   { background: linear-gradient(135deg, var(--vert), var(--vert-fonce)); }
+    .res-orange { background: linear-gradient(135deg, var(--orange), var(--orange-fonce)); }
+    .res-bleu   { background: linear-gradient(135deg, #1976d2, #0d47a1); }
+    .res-gris   { background: linear-gradient(135deg, #546e7a, #37474f); }
+    .res-rouge  { background: linear-gradient(135deg, #e53935, #b71c1c); }
+
+    .phrase-cle {
+      background: var(--orange-clair); border: 2px dashed var(--orange);
+      border-radius: var(--radius); padding: 16px 18px; margin: 16px 0;
+      font-size: 17px; color: var(--orange-fonce); font-weight: 700; text-align: center;
+    }
+    .phrase-cle b { font-size: 22px; }
+
+    /* ============================ CASCADE DE FINANCEMENT ============================ */
+    .cascade { margin: 8px 0 4px; }
+    .cascade .ligne {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 14.5px;
+    }
+    .cascade .ligne b { font-variant-numeric: tabular-nums; }
+    .cascade .l-cout    { background: #eceff1; }
+    .cascade .l-subv    { background: var(--bleu-clair); color: #0d3c6e; }
+    .cascade .l-reste   { background: #fff8e1; font-weight: 700; }
+    .cascade .l-etab    { background: var(--vert-clair); color: var(--vert-fonce); }
+    .cascade .l-fam     { background: var(--orange-clair); color: var(--orange-fonce); }
+
+    /* ============================ GRAPHIQUES ============================ */
+    .graphiques { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(320px,1fr)); }
+    .graph-titre { text-align: center; font-weight: 700; color: var(--gris-texte); margin-bottom: 6px; font-size: 14px; }
+
+    /* ============================ DIVERS ============================ */
+    .ligne-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    .toggle-segment { display: inline-flex; border: 1px solid var(--gris-bord); border-radius: 8px; overflow: hidden; }
+    .toggle-segment button { border-radius: 0; background: #fff; color: var(--gris-texte); padding: 7px 13px; }
+    .toggle-segment button.on { background: var(--vert); color: #fff; }
+    .guide-banner {
+      background: #fff; border: 1px solid var(--gris-bord); border-left: 5px solid var(--vert);
+      border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px; box-shadow: var(--ombre);
+    }
+    .guide-banner h3 { margin: 0 0 8px; color: var(--vert-fonce); font-size: 15px; display: flex; align-items: center; gap: 8px; }
+    .guide-banner ol { margin: 6px 0 0; padding-left: 22px; }
+    .guide-banner li { margin: 3px 0; font-size: 13.5px; }
+    .footer-note { text-align: center; color: var(--gris-texte); font-size: 12px; padding: 18px 0 30px; }
+
+    .delete-x {
+      background: var(--rouge-clair); color: var(--rouge);
+      border: none; border-radius: 6px; width: 30px; height: 30px;
+      font-size: 16px; font-weight: 700; padding: 0; cursor: pointer; line-height: 1;
+    }
+    .delete-x:hover { background: var(--rouge); color: #fff; }
+
+    /* ============================ IMPRESSION (PDF) ============================ */
+    .print-only { display: none; }
+    @media print {
+      /* Objectif : tenir sur UN RECTO-VERSO (2 pages A4 maximum) */
+      @page { margin: 10mm; size: A4; }
+      body { background: #fff; font-size: 10px; line-height: 1.25; }
+      header.app-header, .toolbar, .tabs, .no-print, .guide-banner,
+      .ligne-actions, .delete-x, button,
+      .graphiques, .info-box, .footer-note.no-print { display: none !important; }
+      /* Les graphiques (camemberts / barres) sont masqués pour rester en 2 pages :
+         seuls les tableaux et la synthèse chiffrée sont imprimés. */
+      .print-only { display: block; }
+      main { max-width: none; padding: 0; }
+      .carte { box-shadow: none; border: 1px solid #bbb; break-inside: avoid; margin-bottom: 8px; }
+      .carte-corps { padding: 8px 10px; }
+      .carte > .carte-titre { padding: 5px 10px; font-size: 11.5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .res-carte, .res-carte *, .cascade .ligne { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .res-carte { padding: 8px 10px; }
+      .res-carte .val { font-size: 17px; }
+      .resultats { gap: 6px; break-inside: avoid; }
+      .cascade .ligne { padding: 4px 8px; margin-bottom: 3px; }
+      input, select, textarea { border: none !important; padding: 1px 0 !important; background: transparent !important; font-size: 10px; }
+      .phrase-cle { padding: 8px 10px; font-size: 12px; margin: 8px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .phrase-cle b { font-size: 15px; }
+      .grille { gap: 5px 14px; }
+      th, td { padding: 2px 5px; font-size: 9.5px; }
+      h4 { margin: 4px 0; }
+      hr { margin: 6px 0 !important; }
+    }
+
+    @media (max-width: 640px) {
+      .app-header h1 { font-size: 16px; }
+      .toolbar { top: 76px; }
+      main { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+//<![CDATA[
+const { useReducer, useState, useEffect, useMemo, useRef } = React;
+const {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid
+} = Recharts;
+
+/* ===============================================================
+   OUTILS / FORMATAGE
+   =============================================================== */
+const euro = (n) => (isNaN(n) ? 0 : n).toLocaleString("fr-FR", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const nf   = (n) => (isNaN(n) ? 0 : n).toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+const num  = (v) => { const n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? 0 : n; };
+const uid  = () => Math.random().toString(36).slice(2, 9);
+const auj  = () => new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+
+/* Palette pour les graphiques (déclinaisons vert / orange / neutres) */
+const PALETTE = ["#2e7d32", "#f57c00", "#1976d2", "#7b1fa2", "#00897b", "#c62828", "#5d4037", "#558b2f", "#ef6c00", "#0277bd", "#8e24aa", "#00695c"];
+
+/* ===============================================================
+   ÉTAT INITIAL DU BUDGET
+   =============================================================== */
+const categoriesParDefaut = [
+  "Transport (car, avion, bateau, train)",
+  "Hébergement (nuits × tarif)",
+  "Restauration (repas × jours × personnes)",
+  "Entrées / Visites culturelles",
+  "Assurance voyage élèves",
+  "Matériel pédagogique",
+];
+
+function ligneDepense(categorie = "", designation = "") {
+  return { id: uid(), categorie, designation, quantite: 1, prixUnitaire: 0 };
+}
+function ligneSubvention(source = "", montant = 0) {
+  return { id: uid(), source, montant };
+}
+/* Poste Erasmus : participants × forfait ERASMUS = montant calculé */
+function ligneErasmus(code, libelle, participants = 0, forfait = 0) {
+  return { id: uid(), code, libelle, participants, forfait };
+}
+
+function etatInitial() {
+  return {
+    meta: { creeLe: auj(), version: 3 },
+
+    /* -------- MODULE 1 : Sortie / Voyage -------- */
+    sortie: {
+      nom: "", dates: "", enseignant: "", classes: "",
+      nbEleves: 0, nbAccompagnateurs: 0,
+      depenses: [
+        ligneDepense(categoriesParDefaut[0], "Car / transport aller-retour"),
+        ligneDepense(categoriesParDefaut[2], "Déjeuner"),
+        ligneDepense(categoriesParDefaut[3], "Billet d'entrée"),
+      ],
+      subventions: [
+        ligneSubvention("Région", 0),
+        ligneSubvention("Rectorat", 0),
+      ],
+      partEtabMode: "euro",        // "euro" ou "pct"
+      partEtabValeur: 0,
+      famillesMode: "calcule",     // "calcule" ou "connu"
+      famillesMontantParEleve: 0,  // utilisé si famillesMode === "connu"
+      /* Accompagnateurs PROPRES à la sortie (jamais à la charge des familles) */
+      depensesAccomp: [
+        ligneDepense(categoriesParDefaut[0], "Transport accompagnateurs"),
+        ligneDepense(categoriesParDefaut[1], "Hébergement accompagnateurs"),
+        ligneDepense(categoriesParDefaut[2], "Restauration accompagnateurs"),
+      ],
+    },
+
+    /* -------- MODULE 2 : Erasmus+ -------- */
+    erasmus: {
+      intitule: "", reference: "", paysPartenaires: "", periode: "", coordinateur: "",
+      nbEleves: 0,
+      postes: [
+        ligneErasmus("A1", "Mobilités des apprenants (forfait ERASMUS par participant)", 0, 0),
+        ligneErasmus("A2", "Soutien organisationnel (forfait par participant)", 0, 350),
+        ligneErasmus("B",  "Activités d'apprentissage / enseignement / formation", 0, 0),
+        ligneErasmus("C",  "Soutien besoins spécifiques (inclusion, accessibilité)", 0, 0),
+        ligneErasmus("D",  "Coûts exceptionnels (visas, vaccins — sur justificatifs)", 0, 0),
+      ],
+      subventionRecue: 0,          // Bourse ERASMUS reçue
+      cofinancementEtab: 0,        // Co-financement établissement
+      autresSubventions: 0,        // Autres subventions obtenues
+      famillesMode: "calcule",     // "calcule" ou "connu"
+      famillesMontantParEleve: 0,
+      /* Accompagnateurs PROPRES au projet Erasmus (indépendants de la sortie) */
+      depensesAccomp: [
+        ligneDepense(categoriesParDefaut[0], "Transport accompagnateurs"),
+        ligneDepense(categoriesParDefaut[1], "Hébergement accompagnateurs"),
+        ligneDepense(categoriesParDefaut[2], "Restauration accompagnateurs"),
+      ],
+    },
+  };
+}
+
+/* ===============================================================
+   REDUCER — gestion centralisée du budget
+   =============================================================== */
+function reducer(state, action) {
+  switch (action.type) {
+    case "REMPLACER": return action.payload;
+    case "RESET":     return etatInitial();
+
+    case "CHAMP": {
+      const { module, champ, valeur } = action;
+      return { ...state, [module]: { ...state[module], [champ]: valeur } };
+    }
+
+    /* ---- listes génériques (depenses, subventions, postes, accompagnateurs) ---- */
+    case "LISTE_AJOUT": {
+      const { module, cle, item } = action;
+      return { ...state, [module]: { ...state[module], [cle]: [...state[module][cle], item] } };
+    }
+    case "LISTE_SUPPR": {
+      const { module, cle, id } = action;
+      return { ...state, [module]: { ...state[module], [cle]: state[module][cle].filter(x => x.id !== id) } };
+    }
+    case "LISTE_MAJ": {
+      const { module, cle, id, champ, valeur } = action;
+      return {
+        ...state,
+        [module]: {
+          ...state[module],
+          [cle]: state[module][cle].map(x => x.id === id ? { ...x, [champ]: valeur } : x),
+        },
+      };
+    }
+
+    default: return state;
+  }
+}
+
+/* ===============================================================
+   PERSISTANCE LOCALE (localStorage)
+   =============================================================== */
+const CLE_STOCKAGE = "budget_sorties_elfort_v3";
+function chargerLocal() {
+  try {
+    const brut = localStorage.getItem(CLE_STOCKAGE);
+    if (!brut) return null;
+    const data = JSON.parse(brut);
+    const base = etatInitial();
+    return { ...base, ...data,
+      sortie:  { ...base.sortie,  ...(data.sortie  || {}) },
+      erasmus: { ...base.erasmus, ...(data.erasmus || {}) },
+    };
+  } catch (e) { return null; }
+}
+
+/* ===============================================================
+   COMPOSANTS RÉUTILISABLES
+   =============================================================== */
+function Champ({ label, valeur, onChange, type = "text", oblig, aide, placeholder, min, invalide }) {
+  return (
+    <label className="champ">
+      <span>{label}{oblig && <span className="oblig"> *</span>}</span>
+      <input
+        type={type} value={valeur} placeholder={placeholder} min={min}
+        className={(type === "number" ? "num-input " : "") + (invalide ? "invalide" : "")}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {aide && <span className="aide">{aide}</span>}
+    </label>
+  );
+}
+
+function ResCarte({ classe, lbl, val, note }) {
+  return (
+    <div className={"res-carte " + classe}>
+      <div className="lbl">{lbl}</div>
+      <div className="val">{val}</div>
+      {note && <div className="note">{note}</div>}
+    </div>
+  );
+}
+
+function TitreEtape({ n, children }) {
+  return (
+    <div className="carte-titre">
+      <span className="etape-pastille">{n}</span> {children}
+    </div>
+  );
+}
+
+/* Choix du mode de calcul de la part familles (commun Sortie / Erasmus) */
+function ChoixPartFamilles({ data, set }) {
+  return (
+    <div className="info-box" style={{ flexDirection: "column", alignItems: "stretch" }}>
+      <div style={{ display: "flex", gap: 10 }}>
+        <span className="ico">👪</span>
+        <div style={{ flex: 1 }}>
+          <b>Part demandée aux familles</b>
+          <div className="ligne-actions no-print" style={{ marginTop: 8 }}>
+            <div className="toggle-segment">
+              <button className={data.famillesMode === "calcule" ? "on" : ""} onClick={() => set("famillesMode", "calcule")}>Calcul automatique</button>
+              <button className={data.famillesMode === "connu" ? "on" : ""} onClick={() => set("famillesMode", "connu")}>Je connais le montant par élève</button>
+            </div>
+            {data.famillesMode === "connu" && (
+              <label className="champ" style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <span style={{ whiteSpace: "nowrap" }}>Montant par élève</span>
+                <input type="number" min="0" step="0.01" style={{ width: 110 }} className="num-input"
+                  value={data.famillesMontantParEleve} onChange={(e) => set("famillesMontantParEleve", e.target.value)} /> <span>€</span>
+              </label>
+            )}
+          </div>
+          <div className="aide" style={{ marginTop: 4 }}>
+            {data.famillesMode === "connu"
+              ? "Le montant saisi est utilisé tel quel ; l'établissement et les subventions prennent en charge le reste (et la totalité des frais d'accompagnateurs)."
+              : "Par défaut, l'établissement et les subventions couvrent l'intégralité du projet (part familles = 0 €). Choisissez « Je connais le montant » si les familles participent."}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===============================================================
+   SECTION ACCOMPAGNATEURS — intégrée dans CHAQUE module
+   (entre la section 2 et la section 3)
+   =============================================================== */
+function SectionAccompagnateurs({ n, module, depenses, dispatch, totalAccomp, contexte }) {
+  const maj = (id, champ, valeur) => dispatch({ type: "LISTE_MAJ", module, cle: "depensesAccomp", id, champ, valeur });
+
+  return (
+    <div className="carte orange" style={{ borderWidth: 2, borderColor: "var(--orange)" }}>
+      <TitreEtape n={n}>🧑‍🏫 Budget Accompagnateurs</TitreEtape>
+      <div className="carte-corps">
+
+        <div className="info-box">
+          <span className="ico">💶</span>
+          <span>{contexte === "erasmus"
+            ? <span>Pour un projet <b>Erasmus+</b>, les frais des accompagnateurs peuvent être pris en charge <b>à 100 % par la bourse Erasmus</b>, ou en partie par l'établissement / les subventions. Ils ne sont <b>jamais</b> répercutés sur les familles. Ils sont ajoutés au budget total du projet (section suivante).</span>
+            : <span>Pour une <b>sortie / voyage</b>, les frais des accompagnateurs sont <b>financés à 100 % par l'établissement ou les subventions</b> — ils ne sont <b>jamais</b> répercutés sur les familles. Ils sont intégrés au financement (section suivante).</span>}
+          </span>
+        </div>
+
+        <div className="info-box">
+          <span className="ico">💡</span>
+          <span>Saisissez les dépenses des accompagnateurs comme pour les élèves : une ligne par poste. Le <b>Total</b> se calcule automatiquement (Quantité × Prix unitaire).</span>
+        </div>
+
+        <div className="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style={{ width: "26%" }}>Catégorie</th>
+                <th>Désignation</th>
+                <th className="montant" style={{ width: 90 }}>Quantité</th>
+                <th className="montant" style={{ width: 120 }}>Prix unitaire</th>
+                <th className="montant" style={{ width: 120 }}>Total</th>
+                <th className="no-print" style={{ width: 40 }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {depenses.map((d) => (
+                <tr key={d.id} className="cat-ligne">
+                  <td><input className="tbl-input" list="liste-categories-accomp" value={d.categorie}
+                    onChange={(ev) => maj(d.id, "categorie", ev.target.value)} placeholder="Catégorie" /></td>
+                  <td><input className="tbl-input" value={d.designation}
+                    onChange={(ev) => maj(d.id, "designation", ev.target.value)} placeholder="Désignation" /></td>
+                  <td className="montant"><input className="tbl-input num-input" type="number" min="0" value={d.quantite}
+                    onChange={(ev) => maj(d.id, "quantite", ev.target.value)} /></td>
+                  <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={d.prixUnitaire}
+                    onChange={(ev) => maj(d.id, "prixUnitaire", ev.target.value)} /></td>
+                  <td className="montant"><b>{euro(num(d.quantite) * num(d.prixUnitaire))}</b></td>
+                  <td className="no-print"><button className="delete-x" onClick={() => dispatch({ type: "LISTE_SUPPR", module, cle: "depensesAccomp", id: d.id })}>×</button></td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot>
+              <tr style={{ fontWeight: 800, background: "var(--orange-clair)", color: "var(--orange-fonce)" }}>
+                <td colSpan={4}>TOTAL GÉNÉRAL ACCOMPAGNATEURS</td>
+                <td className="montant">{euro(totalAccomp)}</td>
+                <td className="no-print"></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <datalist id="liste-categories-accomp">
+          {categoriesParDefaut.map((c) => <option key={c} value={c} />)}
+        </datalist>
+
+        <div className="ligne-actions no-print">
+          <button className="btn-orange btn-sm" onClick={() => dispatch({ type: "LISTE_AJOUT", module, cle: "depensesAccomp", item: ligneDepense() })}>＋ Ajouter une dépense accompagnateur</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===============================================================
+   MODULE 1 — SORTIE / VOYAGE SCOLAIRE
+   =============================================================== */
+function ModuleSortie({ state, dispatch, calc }) {
+  const s = state.sortie;
+  const set = (champ, valeur) => dispatch({ type: "CHAMP", module: "sortie", champ, valeur });
+  const majLigne = (cle, id, champ, valeur) => dispatch({ type: "LISTE_MAJ", module: "sortie", cle, id, champ, valeur });
+  const supprLigne = (cle, id) => dispatch({ type: "LISTE_SUPPR", module: "sortie", cle, id });
+
+  return (
+    <div>
+      {/* ---------- ÉTAPE 1 : informations générales ---------- */}
+      <div className="carte">
+        <TitreEtape n={1}>Informations sur la sortie</TitreEtape>
+        <div className="carte-corps">
+          <div className="grille">
+            <Champ label="Nom de la sortie / destination" oblig valeur={s.nom} onChange={v => set("nom", v)} placeholder="Ex. : Visite du Centre Spatial — Kourou" invalide={calc.erreurs.nom} />
+            <Champ label="Date(s) du voyage" valeur={s.dates} onChange={v => set("dates", v)} placeholder="Ex. : du 12 au 14 mai 2026" />
+            <Champ label="Enseignant(e) responsable" oblig valeur={s.enseignant} onChange={v => set("enseignant", v)} placeholder="Nom Prénom" invalide={calc.erreurs.enseignant} />
+            <Champ label="Classe(s) concernée(s)" valeur={s.classes} onChange={v => set("classes", v)} placeholder="Ex. : 1ère G2, Term STMG" />
+            <Champ label="Nombre d'élèves participants" oblig type="number" min="0" valeur={s.nbEleves} onChange={v => set("nbEleves", v)} aide="Sert à calculer la part par famille" invalide={calc.erreurs.nbEleves} />
+            <Champ label="Nombre d'accompagnateurs (personnel)" type="number" min="0" valeur={s.nbAccompagnateurs} onChange={v => set("nbAccompagnateurs", v)} aide="Détail des frais en section 3" />
+          </div>
+        </div>
+      </div>
+
+      {/* ---------- ÉTAPE 2 : dépenses ---------- */}
+      <div className="carte">
+        <TitreEtape n={2}>Les dépenses prévues (élèves)</TitreEtape>
+        <div className="carte-corps">
+          <div className="info-box">
+            <span className="ico">💡</span>
+            <span>Saisissez chaque dépense sur une ligne. Le <b>Total</b> se calcule tout seul (Quantité × Prix unitaire). Exemple hébergement : Quantité = nombre de nuits, Prix unitaire = prix d'une nuit.</span>
+          </div>
+
+          <div className="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: "26%" }}>Catégorie</th>
+                  <th>Désignation</th>
+                  <th className="montant" style={{ width: 90 }}>Quantité</th>
+                  <th className="montant" style={{ width: 120 }}>Prix unitaire</th>
+                  <th className="montant" style={{ width: 120 }}>Total</th>
+                  <th className="no-print" style={{ width: 40 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {s.depenses.map((d) => (
+                  <tr key={d.id} className="cat-ligne">
+                    <td>
+                      <input className="tbl-input" list="liste-categories" value={d.categorie}
+                        onChange={(e) => majLigne("depenses", d.id, "categorie", e.target.value)} placeholder="Catégorie" />
+                    </td>
+                    <td>
+                      <input className="tbl-input" value={d.designation}
+                        onChange={(e) => majLigne("depenses", d.id, "designation", e.target.value)} placeholder="Désignation" />
+                    </td>
+                    <td className="montant">
+                      <input className="tbl-input num-input" type="number" min="0" value={d.quantite}
+                        onChange={(e) => majLigne("depenses", d.id, "quantite", e.target.value)} />
+                    </td>
+                    <td className="montant">
+                      <input className="tbl-input num-input" type="number" min="0" step="0.01" value={d.prixUnitaire}
+                        onChange={(e) => majLigne("depenses", d.id, "prixUnitaire", e.target.value)} />
+                    </td>
+                    <td className="montant"><b>{euro(num(d.quantite) * num(d.prixUnitaire))}</b></td>
+                    <td className="no-print">
+                      <button className="delete-x" title="Supprimer la ligne" onClick={() => supprLigne("depenses", d.id)}>×</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <datalist id="liste-categories">
+            {categoriesParDefaut.map((c) => <option key={c} value={c} />)}
+          </datalist>
+
+          <div className="ligne-actions no-print">
+            <button className="btn-vert btn-sm" onClick={() => dispatch({ type: "LISTE_AJOUT", module: "sortie", cle: "depenses", item: ligneDepense() })}>＋ Ajouter une dépense</button>
+          </div>
+
+          <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end", gap: 30, flexWrap: "wrap", fontSize: 15 }}>
+            <div style={{ color: "var(--vert-fonce)", fontSize: 17 }}>Total dépenses élèves : <b>{euro(calc.totalDepenses)}</b></div>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------- ÉTAPE 3 : ACCOMPAGNATEURS (propres à la sortie) ---------- */}
+      <SectionAccompagnateurs n={3} module="sortie" depenses={s.depensesAccomp} totalAccomp={calc.totalAccomp} dispatch={dispatch} contexte="sortie" />
+
+      {/* ---------- ÉTAPE 4 : financement ---------- */}
+      <div className="carte">
+        <TitreEtape n={4}>Le financement</TitreEtape>
+        <div className="carte-corps">
+          <div className="info-box">
+            <span className="ico">💡</span>
+            <span>Indiquez d'abord les <b>subventions attendues</b>. Les frais des <b style={{color:"var(--orange-fonce)"}}>accompagnateurs</b> sont couverts en priorité (établissement / subventions). Ce qui reste sur les dépenses élèves est partagé entre l'<b style={{color:"var(--vert)"}}>établissement</b> et les <b style={{color:"var(--orange)"}}>familles</b>.</span>
+          </div>
+
+          <h4 style={{ margin: "6px 0 8px", color: "var(--gris-texte)" }}>Subventions attendues</h4>
+          <div className="tbl-wrap">
+            <table>
+              <thead><tr><th>Financeur</th><th className="montant" style={{ width: 160 }}>Montant attendu</th><th className="no-print" style={{ width: 40 }}></th></tr></thead>
+              <tbody>
+                {s.subventions.map((sub) => (
+                  <tr key={sub.id}>
+                    <td><input className="tbl-input" list="liste-financeurs" value={sub.source}
+                      onChange={(e) => majLigne("subventions", sub.id, "source", e.target.value)} placeholder="Ex. : Région, Mairie, FSE…" /></td>
+                    <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={sub.montant}
+                      onChange={(e) => majLigne("subventions", sub.id, "montant", e.target.value)} /></td>
+                    <td className="no-print"><button className="delete-x" onClick={() => supprLigne("subventions", sub.id)}>×</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <datalist id="liste-financeurs">
+            {["Région Guyane","Rectorat","FSE","Mairie de Mana","CTG","Coopérative / FSE établissement","Partenaire privé","Autre"].map(f => <option key={f} value={f} />)}
+          </datalist>
+          <div className="ligne-actions no-print">
+            <button className="btn-vert btn-sm" onClick={() => dispatch({ type: "LISTE_AJOUT", module: "sortie", cle: "subventions", item: ligneSubvention() })}>＋ Ajouter une subvention</button>
+            <div style={{ marginLeft: "auto" }}>Total subventions : <b>{euro(calc.totalSubventions)}</b></div>
+          </div>
+
+          <hr style={{ border: "none", borderTop: "1px solid var(--gris-bord)", margin: "18px 0" }} />
+
+          {/* Choix mode part familles */}
+          <ChoixPartFamilles data={s} set={set} />
+
+          {/* ---- Cascade de financement ---- */}
+          <div className="cascade">
+            <div className="ligne l-cout"><span>Dépenses élèves</span><b>{euro(calc.totalDepenses)}</b></div>
+            <div className="ligne l-cout"><span>+ Frais accompagnateurs (à la charge établissement / subventions)</span><b>{euro(calc.totalAccomp)}</b></div>
+            <div className="ligne l-cout" style={{ fontWeight: 700 }}><span>= Coût total du projet</span><b>{euro(calc.coutTotal)}</b></div>
+            <div style={{ fontSize: 12.5, color: "var(--gris-texte)", margin: "8px 2px 4px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".3px" }}>Recettes / financement</div>
+            <div className="ligne l-subv"><span>− Subventions (affectées d'abord aux accompagnateurs, puis aux élèves)</span><b>− {euro(calc.totalSubventions)}</b></div>
+            <div className="ligne l-fam"><span>− Part familles (recette)</span><b>− {euro(calc.partFamillesTotal)}</b></div>
+            <div className="ligne l-etab"><span>− Part établissement (recette, dont accompagnateurs)</span><b>− {euro(calc.partEtabTotal)}</b></div>
+            <div className="ligne l-reste"><span>= Reste à financer</span><b>{euro(calc.resteAFinancer)}</b></div>
+          </div>
+
+          <div className="info-box" style={{ background: "var(--vert-clair)", borderLeftColor: "var(--vert)", color: "var(--vert-fonce)" }}>
+            <span className="ico">🏫</span>
+            <span>La <b>part de l'établissement est calculée automatiquement</b> : sans subvention, l'établissement finance 100 % ; avec subventions, sa part est ajustée en conséquence. Les frais d'accompagnateurs sont toujours couverts par l'établissement et/ou les subventions.</span>
+          </div>
+
+          <div className="resultats" style={{ marginTop: 16 }}>
+            <ResCarte classe="res-vert" lbl="🏫 Part ÉTABLISSEMENT (totale)" val={euro(calc.partEtabTotal)} note={"dont accompagnateurs : " + euro(calc.accompResteEtab)} />
+            <ResCarte classe="res-orange" lbl="👪 Part FAMILLES (total)" val={euro(calc.partFamillesTotal)} note={s.famillesMode === "connu" ? "montant saisi" : "aucune (couvert par l'établissement)"} />
+            <ResCarte classe="res-bleu" lbl="👤 Part par élève" val={euro(calc.partParEleve)} note={num(s.nbEleves) > 0 ? "pour " + nf(num(s.nbEleves)) + " élève(s)" : "Renseignez le nb d'élèves"} />
+          </div>
+
+          {num(s.nbEleves) > 0 && calc.partFamillesTotal > 0 && (
+            <div className="phrase-cle">
+              👉 Chaque famille devra payer environ <b>{euro(calc.partParEleve)}</b> par élève.
+            </div>
+          )}
+          {num(s.nbEleves) > 0 && calc.partFamillesTotal === 0 && (
+            <div className="phrase-cle" style={{ background: "var(--vert-clair)", borderColor: "var(--vert)", color: "var(--vert-fonce)" }}>
+              ✅ Aucune participation demandée aux familles — projet entièrement financé par l'établissement et les subventions.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ---------- GRAPHIQUES ---------- */}
+      <div className="carte">
+        <div className="carte-titre">📊 Visualisation</div>
+        <div className="carte-corps">
+          <div className="graphiques">
+            <div>
+              <div className="graph-titre">Répartition des dépenses par catégorie</div>
+              {calc.depParCategorie.length > 0 ? (
+                <ResponsiveContainer width="100%" height={290}>
+                  <PieChart>
+                    <Pie data={calc.depParCategorie} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={95}
+                      label={(e) => nf((e.value / calc.coutTotal) * 100) + "%"}>
+                      {calc.depParCategorie.map((e, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}
+                    </Pie>
+                    <Tooltip formatter={(v) => euro(v)} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : <p className="aide" style={{ textAlign: "center" }}>Ajoutez des dépenses pour voir le graphique.</p>}
+            </div>
+            <div>
+              <div className="graph-titre">Origine du financement</div>
+              {calc.financement.length > 0 ? (
+                <ResponsiveContainer width="100%" height={290}>
+                  <PieChart>
+                    <Pie data={calc.financement} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={95}
+                      label={(e) => nf((e.value / calc.coutTotal) * 100) + "%"}>
+                      {calc.financement.map((e, i) => <Cell key={i} fill={e.couleur} />)}
+                    </Pie>
+                    <Tooltip formatter={(v) => euro(v)} />
+                    <Legend wrapperStyle={{ fontSize: 12 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : <p className="aide" style={{ textAlign: "center" }}>Renseignez le financement.</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===============================================================
+   MODULE 2 — ERASMUS+
+   =============================================================== */
+function ModuleErasmus({ state, dispatch, calc }) {
+  const e = state.erasmus;
+  const set = (champ, valeur) => dispatch({ type: "CHAMP", module: "erasmus", champ, valeur });
+  const maj = (id, champ, valeur) => dispatch({ type: "LISTE_MAJ", module: "erasmus", cle: "postes", id, champ, valeur });
+
+  return (
+    <div>
+      <div className="carte">
+        <TitreEtape n={1}>Informations sur le projet Erasmus+</TitreEtape>
+        <div className="carte-corps">
+          <div className="grille">
+            <Champ label="Intitulé du projet" oblig valeur={e.intitule} onChange={v => set("intitule", v)} placeholder="Titre du projet" />
+            <Champ label="Numéro de référence" valeur={e.reference} onChange={v => set("reference", v)} placeholder="Ex. : 2026-1-FR01-KA122-…" />
+            <Champ label="Pays partenaires" valeur={e.paysPartenaires} onChange={v => set("paysPartenaires", v)} placeholder="Ex. : Portugal, Espagne" />
+            <Champ label="Période du projet" valeur={e.periode} onChange={v => set("periode", v)} placeholder="Ex. : sept. 2026 → juin 2027" />
+            <Champ label="Coordinateur responsable" valeur={e.coordinateur} onChange={v => set("coordinateur", v)} placeholder="Nom Prénom" />
+            <Champ label="Nombre d'élèves participants" type="number" min="0" valeur={e.nbEleves} onChange={v => set("nbEleves", v)} aide="Pour la part familles éventuelle" />
+          </div>
+        </div>
+      </div>
+
+      <div className="carte">
+        <TitreEtape n={2}>Budget par poste (règles ERASMUS)</TitreEtape>
+        <div className="carte-corps">
+          <div className="info-box">
+            <span className="ico">ℹ️</span>
+            <span>Les montants forfaitaires dépendent du pays de destination et de l'année. <b>Vérifiez les forfaits dans le Guide du programme Erasmus+ en vigueur</b> (Agence Erasmus+ France / Éducation Formation). Les champs sont modifiables.</span>
+          </div>
+          <div className="tbl-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style={{ width: 50 }}>Poste</th>
+                  <th>Libellé</th>
+                  <th className="montant" style={{ width: 120 }}>Participants</th>
+                  <th className="montant" style={{ width: 130 }}>Forfait ERASMUS</th>
+                  <th className="montant" style={{ width: 140 }}>Montant calculé</th>
+                </tr>
+              </thead>
+              <tbody>
+                {e.postes.map((p) => {
+                  const calcule = num(p.participants) * num(p.forfait);
+                  return (
+                    <tr key={p.id}>
+                      <td><b>{p.code}</b></td>
+                      <td style={{ fontSize: 13 }}>{p.libelle}</td>
+                      <td className="montant"><input className="tbl-input num-input" type="number" min="0" value={p.participants} onChange={(ev) => maj(p.id, "participants", ev.target.value)} /></td>
+                      <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={p.forfait} onChange={(ev) => maj(p.id, "forfait", ev.target.value)} /></td>
+                      <td className="montant"><b>{euro(calcule)}</b></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr style={{ fontWeight: 700, background: "#f1f6f3" }}>
+                  <td colSpan={4}>TOTAL DES POSTES ERASMUS</td>
+                  <td className="montant">{euro(calc.totalCalcule)}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* ---------- ACCOMPAGNATEURS (intégrée) ---------- */}
+      <SectionAccompagnateurs n={3} module="erasmus" depenses={e.depensesAccomp} totalAccomp={calc.totalAccomp} dispatch={dispatch} contexte="erasmus" />
+
+      <div className="carte">
+        <TitreEtape n={4}>Répartition du financement</TitreEtape>
+        <div className="carte-corps">
+          <div className="info-box">
+            <span className="ico">💡</span>
+            <span>Le <b>budget total</b> = postes Erasmus + frais accompagnateurs. Il est financé par la <b>bourse Erasmus+</b>, éventuellement complétée par l'établissement, d'autres subventions, et le cas échéant les familles.</span>
+          </div>
+          <div className="grille">
+            <Champ label="Bourse ERASMUS+ reçue (€)" type="number" min="0" valeur={e.subventionRecue} onChange={v => set("subventionRecue", v)} />
+            <Champ label="Co-financement établissement (€)" type="number" min="0" valeur={e.cofinancementEtab} onChange={v => set("cofinancementEtab", v)} aide="Si applicable" />
+            <Champ label="Autres subventions obtenues (€)" type="number" min="0" valeur={e.autresSubventions} onChange={v => set("autresSubventions", v)} aide="Région, Rectorat, etc." />
+          </div>
+
+          {/* Choix mode part familles */}
+          <ChoixPartFamilles data={e} set={set} />
+
+          {/* Cascade */}
+          <div className="cascade">
+            <div className="ligne l-cout"><span>Postes Erasmus</span><b>{euro(calc.totalCalcule)}</b></div>
+            <div className="ligne l-cout"><span>+ Frais accompagnateurs</span><b>{euro(calc.totalAccomp)}</b></div>
+            <div className="ligne l-cout" style={{ fontWeight: 700 }}><span>= Budget total du projet</span><b>{euro(calc.budgetTotal)}</b></div>
+            <div style={{ fontSize: 12.5, color: "var(--gris-texte)", margin: "8px 2px 4px", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".3px" }}>Recettes / financement</div>
+            <div className="ligne l-subv"><span>− Bourse Erasmus+ (recette)</span><b>− {euro(num(e.subventionRecue))}</b></div>
+            <div className="ligne l-etab"><span>− Co-financement établissement (recette)</span><b>− {euro(num(e.cofinancementEtab))}</b></div>
+            <div className="ligne l-subv"><span>− Autres subventions (recette)</span><b>− {euro(num(e.autresSubventions))}</b></div>
+            <div className="ligne l-fam"><span>− Part familles (recette)</span><b>− {euro(calc.partFamillesTotal)}</b></div>
+            <div className="ligne l-reste"><span>= Reste à financer</span><b>{euro(calc.resteAFinancer)}</b></div>
+          </div>
+
+          <div className="resultats" style={{ marginTop: 16 }}>
+            <ResCarte classe="res-gris" lbl="Budget total du projet" val={euro(calc.budgetTotal)} note="postes + accompagnateurs" />
+            <ResCarte classe="res-vert" lbl="Couverture Erasmus+" val={nf(calc.couverture) + " %"} note={euro(num(e.subventionRecue)) + " de bourse"} />
+            <ResCarte classe="res-orange" lbl="👪 Part FAMILLES" val={euro(calc.partFamillesTotal)} note={num(e.nbEleves) > 0 ? euro(calc.partParEleve) + " / élève" : "—"} />
+            <ResCarte classe={calc.resteAFinancer > 0 ? "res-rouge" : "res-bleu"} lbl="Reste à financer" val={euro(calc.resteAFinancer)} note={calc.resteAFinancer > 0 ? "à couvrir" : "intégralement financé ✔"} />
+          </div>
+
+          {num(e.nbEleves) > 0 && calc.partFamillesTotal > 0 && (
+            <div className="phrase-cle">
+              👉 Chaque famille devra payer environ <b>{euro(calc.partParEleve)}</b> par élève.
+            </div>
+          )}
+
+          <div className="carte" style={{ marginTop: 16 }}>
+            <div className="carte-titre">📊 Couverture du budget</div>
+            <div className="carte-corps">
+              {calc.budgetTotal > 0 ? (
+                <ResponsiveContainer width="100%" height={280}>
+                  <BarChart data={calc.barresFinancement} layout="vertical" margin={{ left: 40, right: 30 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                    <XAxis type="number" tickFormatter={(v) => nf(v) + " €"} fontSize={11} />
+                    <YAxis type="category" dataKey="name" width={130} fontSize={12} />
+                    <Tooltip formatter={(v) => euro(v)} />
+                    <Bar dataKey="value">
+                      {calc.barresFinancement.map((b, i) => <Cell key={i} fill={b.couleur} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : <p className="aide" style={{ textAlign: "center" }}>Renseignez les postes de budget.</p>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===============================================================
+   EN-TÊTE D'IMPRESSION (visible uniquement à l'impression)
+   =============================================================== */
+function EnteteImpression({ moduleNom }) {
+  return (
+    <div className="print-only" style={{ marginBottom: 16, borderBottom: "2px solid #2e7d32", paddingBottom: 10 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: "#2e7d32" }}>Lycée Polyvalent Léopold ELFORT</div>
+          <div style={{ fontSize: 12 }}>Mana — Guyane Française</div>
+        </div>
+        <div style={{ textAlign: "right", fontSize: 11 }}>
+          <div><b>Budget prévisionnel</b></div>
+          <div>Module : {moduleNom}</div>
+          <div>Généré le {auj()}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===============================================================
+   APPLICATION PRINCIPALE
+   =============================================================== */
+function App() {
+  const [state, dispatch] = useReducer(reducer, undefined, () => chargerLocal() || etatInitial());
+  const [onglet, setOnglet] = useState("sortie");   // sortie | erasmus
+  const [sauveLe, setSauveLe] = useState(null);
+  const premierRendu = useRef(true);
+
+  /* ---- Sauvegarde automatique dans localStorage (anti-rebond) ---- */
+  useEffect(() => {
+    if (premierRendu.current) { premierRendu.current = false; return; }
+    const t = setTimeout(() => {
+      try {
+        localStorage.setItem(CLE_STOCKAGE, JSON.stringify(state));
+        setSauveLe(new Date().toLocaleTimeString("fr-FR"));
+      } catch (e) { /* quota plein : on ignore */ }
+    }, 500);
+    return () => clearTimeout(t);
+  }, [state]);
+
+  /* ============================================================
+     CALCULS — ACCOMPAGNATEURS (propres à CHAQUE module)
+     Chaque module a ses propres lignes (state.sortie.depensesAccomp /
+     state.erasmus.depensesAccomp) : aucune saisie n'est partagée.
+     ============================================================ */
+  const totalDepensesAccomp = (depAccomp) =>
+    depAccomp.reduce((t, d) => t + num(d.quantite) * num(d.prixUnitaire), 0);
+
+  /* ============================================================
+     CALCULS — MODULE 1 (Sortie)
+     - Accompagnateurs : 100 % établissement / subventions (jamais familles)
+     - Subventions affectées d'abord aux accompagnateurs, puis aux élèves
+     ============================================================ */
+  const calcSortie = useMemo(() => {
+    const s = state.sortie;
+    const Da = totalDepensesAccomp(s.depensesAccomp);      // dépenses accompagnateurs (propres à la sortie)
+    const sousTotal = s.depenses.reduce((t, d) => t + num(d.quantite) * num(d.prixUnitaire), 0);
+    const totalDepenses = sousTotal;                       // dépenses élèves (De)
+    const coutTotal = totalDepenses + Da;
+    const totalSubventions = s.subventions.reduce((t, x) => t + num(x.montant), 0);
+
+    /* Subventions affectées EN PRIORITÉ aux accompagnateurs (jamais à la
+       charge des familles), puis le reliquat aux dépenses élèves */
+    const subvPourAccomp = Math.min(totalSubventions, Da);
+    const accompResteEtab = Da - subvPourAccomp;           // accompagnateurs pris par l'établissement
+    const subvResteEleves = totalSubventions - subvPourAccomp;
+    const resteEleves = Math.max(0, totalDepenses - subvResteEleves);
+
+    const nbEleves = num(s.nbEleves);
+    let partFamillesTotal, partEtabEleves;
+
+    if (s.famillesMode === "connu") {
+      /* Le professeur connaît le montant : on l'utilise tel quel, plafonné au
+         reste à charge élèves (les familles ne paient jamais les accompagnateurs) */
+      const famillesSaisi = num(s.famillesMontantParEleve) * nbEleves;
+      partFamillesTotal = Math.min(famillesSaisi, resteEleves);
+      partEtabEleves = resteEleves - partFamillesTotal;   // l'établissement complète automatiquement
+    } else {
+      /* Calcul automatique : familles = 0, l'établissement (+ subventions)
+         couvre tout. Aucune subvention saisie => 100 % établissement. */
+      partFamillesTotal = 0;
+      partEtabEleves = resteEleves;
+    }
+
+    /* Part ÉTABLISSEMENT = reliquat accompagnateurs + reliquat dépenses élèves */
+    const partEtabTotal = accompResteEtab + partEtabEleves;
+    const partParEleve = nbEleves > 0 ? partFamillesTotal / nbEleves : 0;
+
+    /* Contrôle d'équilibre : coût total − (subventions + familles + établissement).
+       Doit valoir 0 quand tout est couvert (recettes = dépenses). */
+    const totalRecettes = totalSubventions + partFamillesTotal + partEtabTotal;
+    const resteAFinancer = Math.max(0, coutTotal - totalRecettes);
+
+    /* dépenses agrégées par catégorie (camembert) — accompagnateurs inclus */
+    const map = {};
+    s.depenses.forEach((d) => {
+      const cat = d.categorie || "Autre";
+      map[cat] = (map[cat] || 0) + num(d.quantite) * num(d.prixUnitaire);
+    });
+    if (Da > 0) map["Accompagnateurs"] = (map["Accompagnateurs"] || 0) + Da;
+    const depParCategorie = Object.entries(map).filter(([, v]) => v > 0).map(([name, value]) => ({ name, value }));
+
+    /* financement (camembert) */
+    const financement = [];
+    if (totalSubventions > 0) financement.push({ name: "Subventions", value: totalSubventions, couleur: "#1976d2" });
+    if (partEtabTotal > 0)    financement.push({ name: "Établissement", value: partEtabTotal, couleur: "#2e7d32" });
+    if (partFamillesTotal > 0)financement.push({ name: "Familles", value: partFamillesTotal, couleur: "#f57c00" });
+
+    const erreurs = {
+      nom: !s.nom.trim(),
+      enseignant: !s.enseignant.trim(),
+      nbEleves: nbEleves <= 0,
+    };
+
+    return { sousTotal, totalDepenses, totalAccomp: Da, coutTotal, totalSubventions,
+      subvPourAccomp, accompResteEtab, subvResteEleves, resteEleves,
+      partEtabEleves, partEtabTotal, partFamillesTotal, partParEleve,
+      totalRecettes, resteAFinancer, depParCategorie, financement, erreurs };
+  }, [state.sortie]);
+
+  /* ============================================================
+     CALCULS — MODULE 2 (Erasmus)
+     - Budget total = postes + accompagnateurs
+     - Financé par bourse Erasmus / établissement / autres subv. / familles
+     ============================================================ */
+  const calcErasmus = useMemo(() => {
+    const e = state.erasmus;
+    const Da = totalDepensesAccomp(e.depensesAccomp);      // accompagnateurs propres au projet Erasmus
+    const totalCalcule = e.postes.reduce((t, p) => t + num(p.participants) * num(p.forfait), 0);
+    const budgetTotal = totalCalcule + Da;
+    const bourse = num(e.subventionRecue);
+    const cofi = num(e.cofinancementEtab);
+    const autres = num(e.autresSubventions);
+    const nbEleves = num(e.nbEleves);
+
+    /* Financements (bourse + cofinancement + autres) affectés EN PRIORITÉ
+       aux frais d'accompagnateurs, qui ne tombent JAMAIS sur les familles. */
+    const financements = bourse + cofi + autres;
+    const financPourAccomp = Math.min(financements, Da);
+    const financPourPostes = financements - financPourAccomp;
+    /* Reste à financer sur les postes (volet élèves) après financements */
+    const restePostes = Math.max(0, totalCalcule - financPourPostes);
+
+    let partFamillesTotal;
+    if (e.famillesMode === "connu") {
+      /* Montant connu, plafonné au reste des postes (jamais les accompagnateurs) */
+      partFamillesTotal = Math.min(num(e.famillesMontantParEleve) * nbEleves, restePostes);
+    } else {
+      /* Calcul automatique : familles = 0, l'établissement/bourse couvre tout */
+      partFamillesTotal = 0;
+    }
+    const partParEleve = nbEleves > 0 ? partFamillesTotal / nbEleves : 0;
+
+    const couverture = budgetTotal > 0 ? (bourse / budgetTotal) * 100 : 0;
+    /* Reste à financer = ce que ni les financements ni les familles ne couvrent */
+    const resteAFinancer = Math.max(0, budgetTotal - financements - partFamillesTotal);
+    const accompCouvertParFinanc = financPourAccomp;
+
+    const barresFinancement = [
+      { name: "Budget total", value: budgetTotal, couleur: "#546e7a" },
+      { name: "Bourse Erasmus+", value: bourse, couleur: "#2e7d32" },
+      { name: "Cofinancement étab.", value: cofi, couleur: "#1976d2" },
+      { name: "Autres subventions", value: autres, couleur: "#7b1fa2" },
+      { name: "Part familles", value: partFamillesTotal, couleur: "#f57c00" },
+    ].filter(b => b.value > 0);
+
+    return { totalCalcule, totalAccomp: Da, budgetTotal, couverture, resteAFinancer,
+      partFamillesTotal, partParEleve, barresFinancement, accompCouvertParFinanc };
+  }, [state.erasmus]);
+
+  /* ============================================================
+     ACTIONS GLOBALES
+     ============================================================ */
+  const nouveauBudget = () => {
+    if (window.confirm("Créer un nouveau budget ? Les données actuelles seront effacées (la sauvegarde locale aussi).")) {
+      localStorage.removeItem(CLE_STOCKAGE);
+      dispatch({ type: "RESET" });
+      setOnglet("sortie");
+    }
+  };
+  /* Réinitialisation : efface toutes les données saisies (les deux modules)
+     et la sauvegarde locale, puis repart d'un budget vierge */
+  const reinitialiser = () => {
+    if (window.confirm("Réinitialiser : effacer toutes les données saisies (Sortie ET Erasmus) ? Cette action est irréversible.")) {
+      localStorage.removeItem(CLE_STOCKAGE);
+      dispatch({ type: "RESET" });
+    }
+  };
+  /* Transmission par courriel à l'établissement.
+     Le PDF ne peut pas être joint automatiquement par le navigateur :
+     on pré-remplit le courriel et on rappelle de joindre le PDF généré. */
+  const COURRIEL_ETAB = "ce.9730421v@ac-guyane.fr";
+  const envoyerParCourriel = () => {
+    const estSortie = onglet === "sortie";
+    const titre = estSortie
+      ? (state.sortie.nom || "Sortie / Voyage scolaire")
+      : (state.erasmus.intitule || "Projet Erasmus+");
+    const responsable = estSortie ? state.sortie.enseignant : state.erasmus.coordinateur;
+    const sujet = "Budget prévisionnel — " + titre + " — Lycée Léopold ELFORT (Mana)";
+    const corps =
+      "Bonjour,\n\n" +
+      "Veuillez trouver ci-joint le budget prévisionnel pour : " + titre + ".\n" +
+      (responsable ? ("Responsable : " + responsable + "\n") : "") +
+      "Module : " + (estSortie ? "Sortie / Voyage scolaire" : "Projet Erasmus+") + "\n" +
+      "Date de génération : " + auj() + "\n\n" +
+      "⚠️ Pensez à joindre le PDF :\n" +
+      "1) Cliquez sur « Générer le récapitulatif PDF » puis enregistrez le document en PDF.\n" +
+      "2) Joignez ce PDF à ce courriel avant de l'envoyer.\n\n" +
+      "Cordialement,\n" + (responsable || "");
+    /* Propose d'abord de générer le PDF, puis ouvre le client de messagerie */
+    if (window.confirm("Voulez-vous d'abord générer le PDF à joindre ?\n\nOK = ouvrir l'aperçu PDF, puis revenez cliquer à nouveau pour le courriel.\nAnnuler = ouvrir directement le courriel.")) {
+      window.print();
+      return;
+    }
+    window.location.href = "mailto:" + COURRIEL_ETAB +
+      "?subject=" + encodeURIComponent(sujet) +
+      "&body=" + encodeURIComponent(corps);
+  };
+  const dupliquerBudget = () => {
+    const copie = JSON.parse(JSON.stringify(state));
+    copie.sortie.nom = (copie.sortie.nom || "Sortie") + " (copie)";
+    copie.erasmus.intitule = (copie.erasmus.intitule || "Projet") + " (copie)";
+    copie.meta = { creeLe: auj(), version: 3 };
+    dispatch({ type: "REMPLACER", payload: copie });
+    window.alert("Budget dupliqué. Vous pouvez maintenant le modifier — pensez à l'imprimer ou l'exporter.");
+  };
+  const exporter = () => {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const nom = (state.sortie.nom || "budget").replace(/[^a-z0-9]/gi, "_").toLowerCase();
+    a.href = url; a.download = "budget_" + nom + ".json"; a.click();
+    URL.revokeObjectURL(url);
+  };
+  const importerRef = useRef();
+  const importer = (ev) => {
+    const f = ev.target.files[0];
+    if (!f) return;
+    const lecteur = new FileReader();
+    lecteur.onload = () => {
+      try {
+        const data = JSON.parse(lecteur.result);
+        const base = etatInitial();
+        dispatch({ type: "REMPLACER", payload: {
+          ...base, ...data,
+          sortie: { ...base.sortie, ...(data.sortie||{}) },
+          erasmus: { ...base.erasmus, ...(data.erasmus||{}) },
+        }});
+        window.alert("Budget importé avec succès.");
+      } catch (e) { window.alert("Fichier invalide : impossible de l'importer."); }
+    };
+    lecteur.readAsText(f);
+    ev.target.value = "";
+  };
+
+  const moduleNom = onglet === "sortie" ? "Sortie / Voyage scolaire" : "Projet Erasmus+";
+
+  return (
+    <div>
+      {/* ====================== EN-TÊTE ====================== */}
+      <header className="app-header">
+        <div className="logo-badge">LE</div>
+        <div>
+          <h1>Lycée Léopold ELFORT — Mana</h1>
+          <div className="sub">Outil de budget prévisionnel des sorties & voyages scolaires · Guyane Française</div>
+        </div>
+        <div className="header-spacer"></div>
+        <div className="save-state no-print">
+          {sauveLe ? <span>💾 Enregistré <b>{sauveLe}</b></span> : <span>💾 Sauvegarde auto activée</span>}
+        </div>
+      </header>
+
+      {/* ====================== BARRE D'OUTILS ====================== */}
+      <div className="toolbar no-print">
+        <button className="btn-bleu" onClick={() => window.print()}>🖨️ Générer le récapitulatif PDF</button>
+        <button className="btn-vert" onClick={envoyerParCourriel}>✉️ Transmettre par courriel</button>
+        <button className="btn-gris" onClick={dupliquerBudget}>📑 Dupliquer</button>
+        <button className="btn-gris" onClick={exporter}>💾 Sauvegarder mon travail</button>
+        <button className="btn-gris" onClick={() => importerRef.current.click()}>📂 Ouvrir mon travail</button>
+        <input ref={importerRef} type="file" accept="application/json,.json" style={{ display: "none" }} onChange={importer} />
+        <button className="btn-orange" style={{ marginLeft: "auto" }} onClick={reinitialiser}>🧹 Réinitialiser</button>
+        <button className="btn-rouge" onClick={nouveauBudget}>🗑️ Nouveau budget</button>
+      </div>
+
+      <main>
+        {/* ====================== GUIDE ====================== */}
+        <div className="guide-banner no-print">
+          <h3>👋 Bienvenue — comment ça marche&nbsp;?</h3>
+          <ol>
+            <li>Choisissez le <b>type de projet</b> ci-dessous (sortie classique ou Erasmus+).</li>
+            <li>Remplissez les informations puis les <b>dépenses</b> : les totaux se calculent automatiquement.</li>
+            <li>Renseignez la section <b>Accompagnateurs</b> (dépenses du personnel encadrant).</li>
+            <li>Indiquez les <b>subventions</b> : l'outil calcule <b>ce que paiera chaque famille</b> (ou utilisez le montant que vous connaissez déjà).</li>
+            <li>Cliquez sur <b>🖨️ Générer le récapitulatif PDF</b> pour imprimer ou enregistrer en PDF.</li>
+          </ol>
+        </div>
+
+        {/* ====================== ONGLETS ====================== */}
+        <div className="tabs no-print">
+          <button className={"tab" + (onglet === "sortie" ? " actif" : "")} onClick={() => setOnglet("sortie")}>
+            <span className="num">1</span> Sortie / Voyage
+          </button>
+          <button className={"tab tab-bleu" + (onglet === "erasmus" ? " actif" : "")} onClick={() => setOnglet("erasmus")}>
+            <span className="num">2</span> Projet Erasmus+
+          </button>
+        </div>
+
+        <EnteteImpression moduleNom={moduleNom} />
+
+        {/* ====================== CONTENU ====================== */}
+        {onglet === "sortie"  && <ModuleSortie  state={state} dispatch={dispatch} calc={calcSortie} />}
+        {onglet === "erasmus" && <ModuleErasmus state={state} dispatch={dispatch} calc={calcErasmus} />}
+
+        <div className="footer-note print-only">Document généré par l'outil de budget scolaire – usage interne.</div>
+        <div className="footer-note no-print">
+          Lycée Polyvalent Léopold ELFORT · Mana · Guyane Française — Outil interne. Vos données restent sur cet ordinateur (sauvegarde locale).
+        </div>
+      </main>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+//]]>
+  </script>
+</body>
+</html>
