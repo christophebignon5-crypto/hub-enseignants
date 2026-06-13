@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRONOTE — Enseignants · Lycée Léopold Elfort</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f4f7f4;color:#1a1a1a;min-height:100vh}
+
+/* NAV TABS */
+.topbar{background:#1B4332;color:#fff;padding:1.25rem 2rem .5rem}
+.topbar h1{font-family:Georgia,serif;font-size:20px;margin-bottom:2px}
+.topbar p{font-size:12px;opacity:.7}
+.tabs{display:flex;gap:0;border-bottom:none;padding:0 2rem;background:#1B4332}
+.tab{padding:10px 24px;font-size:14px;font-weight:bold;color:rgba(255,255,255,.6);cursor:pointer;border-bottom:3px solid transparent;transition:all .2s;user-select:none}
+.tab:hover{color:#fff}
+.tab.active{color:#74C69D;border-bottom-color:#74C69D}
+
+/* LAYOUT */
+.app{display:flex;min-height:calc(100vh - 100px)}
+.view{display:none;width:100%;padding:1.5rem 2rem}
+.view.active{display:flex;gap:1.5rem}
+
+/* ========== TODO ========== */
+.todo-wrap{max-width:760px;width:100%;margin:0 auto}
+
+.todo-header{background:#2D6A4F;color:#fff;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+.todo-header h2{font-family:Georgia,serif;font-size:17px;margin-bottom:.25rem}
+.todo-header p{font-size:12px;opacity:.75;margin-bottom:.75rem}
+.progress-bar-wrap{background:rgba(255,255,255,.2);border-radius:99px;height:7px}
+.progress-bar{background:#74C69D;border-radius:99px;height:7px;transition:width .4s;width:0%}
+.progress-label{font-size:11px;opacity:.75;margin-top:5px}
+
+.tsection{background:#fff;border-radius:10px;border:1px solid #d8f3dc;margin-bottom:1rem;overflow:hidden}
+.tsection-header{background:#2D6A4F;color:#fff;padding:9px 14px;font-size:13px;font-weight:bold;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.tsection-header .tbadge{background:rgba(255,255,255,.2);border-radius:99px;font-size:10px;padding:2px 7px;font-weight:normal;margin-left:auto}
+.tsection-header .arrow{font-size:11px;transition:transform .2s}
+.tsection-header.collapsed .arrow{transform:rotate(-90deg)}
+.tsection-body.hidden{display:none}
+
+.task{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background .15s}
+.task:last-child{border-bottom:none}
+.task:hover{background:#f9fdf9}
+.task.done{background:#f0faf4}
+.task.done .task-label{text-decoration:line-through;color:#888}
+.checkbox{width:17px;height:17px;border:2px solid #40916C;border-radius:4px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.checkbox.checked{background:#40916C;border-color:#40916C}
+.checkbox.checked::after{content:"✓";color:#fff;font-size:11px;font-weight:bold}
+.task-body{flex:1}
+.task-label{font-size:13px;line-height:1.4}
+.task-sub{font-size:11px;color:#666;margin-top:2px;line-height:1.5}
+
+.tag{display:inline-block;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:99px;margin-left:5px;vertical-align:middle}
+.tag-trim{background:#D8F3DC;color:#1B4332}
+.tag-annuel{background:#FFF3CD;color:#7A5200}
+.tag-quotidien{background:#E8F4FD;color:#0C4A6E}
+.tag-pp{background:#40916C;color:#fff}
+
+.reset-btn{display:block;margin:1rem auto 0;padding:7px 20px;background:#fff;border:1.5px solid #2D6A4F;color:#2D6A4F;border-radius:8px;font-size:12px;cursor:pointer;font-family:Arial,sans-serif}
+.reset-btn:hover{background:#f0faf4}
+
+/* ========== GUIDE ========== */
+.guide-nav{width:200px;flex-shrink:0;background:#fff;border-radius:10px;border:1px solid #d8f3dc;padding:.75rem 0;align-self:flex-start;position:sticky;top:1rem}
+.guide-nav-title{font-size:10px;font-weight:bold;color:#888;text-transform:uppercase;letter-spacing:.06em;padding:0 1rem .5rem}
+.guide-nav a{display:block;padding:6px 1rem;font-size:12px;color:#555;text-decoration:none;border-left:2px solid transparent;transition:all .15s}
+.guide-nav a:hover{color:#1B4332;background:#f4f7f4}
+.guide-nav a.active{color:#2D6A4F;border-left-color:#2D6A4F;background:rgba(45,106,79,.07);font-weight:bold}
+
+.guide-content{flex:1;min-width:0}
+.gsection{display:none;background:#fff;border-radius:10px;border:1px solid #d8f3dc;padding:1.5rem}
+.gsection.active{display:block}
+
+.gsection-title{font-size:17px;font-weight:bold;color:#1B4332;margin-bottom:.2rem;font-family:Georgia,serif}
+.gsection-sub{font-size:12px;color:#666;margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid #eee}
+
+.gbadge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:bold;padding:3px 9px;border-radius:99px;margin-bottom:.75rem}
+.gbadge-green{background:#D8F3DC;color:#1B4332}
+.gbadge-blue{background:#E8F4FD;color:#0C4A6E}
+.gbadge-amber{background:#FFF3CD;color:#7A5200}
+
+.gstep{display:flex;gap:10px;margin-bottom:.75rem;padding:12px;border-radius:8px;border:1px solid #eee;background:#fff}
+.gstep-num{width:26px;height:26px;border-radius:50%;background:#2D6A4F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;flex-shrink:0;margin-top:1px}
+.gstep-body{flex:1}
+.gstep-title{font-size:13px;font-weight:bold;margin-bottom:3px;color:#1a1a1a}
+.gstep-desc{font-size:12px;color:#555;line-height:1.6}
+
+.tip{background:rgba(45,106,79,.06);border-left:3px solid #2D6A4F;border-radius:0 8px 8px 0;padding:9px 12px;margin:.75rem 0;font-size:12px;color:#444;line-height:1.6}
+.tip strong{color:#2D6A4F}
+.warn{background:#FFF8E1;border-left:3px solid #F9A825;border-radius:0 8px 8px 0;padding:9px 12px;margin:.75rem 0;font-size:12px;color:#7A5200;line-height:1.6}
+
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:.75rem 0}
+.info-card{padding:10px;border-radius:7px;border:1px solid #eee;background:#f9fdf9}
+.info-card .ilabel{font-size:10px;color:#888;margin-bottom:3px;font-weight:bold;text-transform:uppercase;letter-spacing:.05em}
+.info-card .ival{font-size:13px;font-weight:bold;color:#1B4332}
+
+.pp-tag{display:inline-flex;align-items:center;background:#40916C;color:#fff;font-size:10px;font-weight:bold;padding:2px 8px;border-radius:99px;margin-left:5px;vertical-align:middle}
+
+h3{font-size:13px;font-weight:bold;margin:1rem 0 .6rem;color:#2D6A4F;text-transform:uppercase;letter-spacing:.04em}
+hr{border:none;border-top:1px solid #eee;margin:1rem 0}
+
+/* Footer */
+.page-footer{text-align:center;font-size:11px;color:#aaa;padding:1rem 2rem 1.5rem}
+
+@media print{
+  .tabs,.guide-nav,.reset-btn{display:none!important}
+  .view.active{display:block!important}
+  .gsection{display:block!important;margin-bottom:1rem}
+  body{background:#fff}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>PRONOTE — Enseignants</h1>
+  <p>Lycée Polyvalent Léopold Elfort · Mana, Guyane · Année scolaire 2024–2025</p>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('todo',this)">✅ To-do list</div>
+  <div class="tab" onclick="switchTab('guide',this)">📖 Guide pratique</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  VUE 1 : TODO                                                -->
+<!-- ============================================================ -->
+<div class="view active" id="view-todo">
+<div class="todo-wrap">
+
+  <div class="todo-header">
+    <h2>Mes tâches PRONOTE</h2>
+    <p>Cochez chaque tâche au fur et à mesure — votre progression est mémorisée</p>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="progress-label" id="progressLabel">0 tâche accomplie</div>
+  </div>
+
+  <!-- Absences -->
+  <div class="tsection">
+    <div class="tsection-header" onclick="toggleTSection(this)">
+      📅 Appel &amp; absences <span class="tbadge">Chaque cours</span><span class="arrow">▼</span>
+    </div>
+    <div class="tsection-body">
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Faire l'appel dans les 5 premières minutes <span class="tag tag-quotidien">Quotidien</span></div><div class="task-sub">Menu Vie scolaire → Faire l'appel → sélectionner classe et plage horaire</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Cocher les élèves absents</div><div class="task-sub">Clic sur le nom → "A" orange. Si tous présents : "Aucune absence"</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Signaler les retards</div><div class="task-sub">Clic sur "A" → Retard → renseigner l'heure d'arrivée réelle</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Valider et enregistrer l'appel</div><div class="task-sub">Bouton "Enregistrer l'appel" — vie scolaire notifiée automatiquement</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Ajouter une observation si nécessaire</div><div class="task-sub">Clic droit sur l'élève → Ajouter une observation</div></div></div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="tsection">
+    <div class="tsection-header" onclick="toggleTSection(this)">
+      ✏️ Saisie des notes <span class="tbadge">Au fil de l'eau</span><span class="arrow">▼</span>
+    </div>
+    <div class="tsection-body">
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Créer le devoir dans PRONOTE</div><div class="task-sub">Menu Notes → + Nouveau devoir → intitulé, date, note sur, coefficient</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Paramétrer le type de devoir</div><div class="task-sub">Devoir en classe / Travail maison / Oral / Projet… + publier pour les familles</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Saisir les notes élève par élève</div><div class="task-sub">Entrée ou Tab pour naviguer. Codes spéciaux : ABS · NR · DISP · EXE</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Enregistrer la saisie</div><div class="task-sub">Icône disquette — la moyenne se recalcule automatiquement</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Saisir les notes dans les 48h après correction</div><div class="task-sub">Ne pas accumuler en fin de trimestre</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Évaluation par compétences (si applicable)</div><div class="task-sub">Dans le devoir → "Évaluation par compétences" → niveaux MI / MF / MS / TBM</div></div></div>
+    </div>
+  </div>
+
+  <!-- Appréciations -->
+  <div class="tsection">
+    <div class="tsection-header" onclick="toggleTSection(this)">
+      💬 Appréciations par matière <span class="tbadge">× 3 trimestres</span><span class="arrow">▼</span>
+    </div>
+    <div class="tsection-body">
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Accéder au module appréciations <span class="tag tag-trim">T1</span><span class="tag tag-trim">T2</span><span class="tag tag-trim">T3</span></div><div class="task-sub">Menu Bulletins → Saisie des appréciations → classe, période, matière</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Rédiger l'appréciation pour chaque élève — Trimestre 1</div><div class="task-sub">Résultats + comportement + points forts + axes de progrès. Min. 3 lignes personnalisées.</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Rédiger l'appréciation pour chaque élève — Trimestre 2</div><div class="task-sub">Mentionner l'évolution par rapport au T1 si pertinent</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Rédiger l'appréciation pour chaque élève — Trimestre 3</div><div class="task-sub">Bilan de fin d'année, encouragements ou mise en garde pour la suite</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Vérifier la saisie avant la date limite</div><div class="task-sub">Toute appréciation manquante bloque l'édition du bulletin</div></div></div>
+    </div>
+  </div>
+
+  <!-- Livret -->
+  <div class="tsection">
+    <div class="tsection-header" onclick="toggleTSection(this)">
+      📘 Livret scolaire du baccalauréat <span class="tbadge">Annuel · 2nde · 1re · Tle</span><span class="arrow">▼</span>
+    </div>
+    <div class="tsection-body">
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Accéder au livret scolaire lycée <span class="tag tag-annuel">Annuel</span></div><div class="task-sub">Menu Bulletins → Livret scolaire lycée → classe et année</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Évaluer les compétences pour chaque élève</div><div class="task-sub">Onglet Compétences → Insuffisant / Fragile / Satisfaisant / Très bien</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Vérifier la cohérence niveaux / moyenne annuelle</div><div class="task-sub">Les niveaux doivent être cohérents avec la moyenne dans la matière</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Rédiger l'appréciation annuelle pour chaque élève</div><div class="task-sub">3 à 6 lignes · 2nde : orientation / 1re : attendus / Tle : épreuves bac</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Enregistrer avant validation définitive</div><div class="task-sub">Aucune modification possible après transmission à l'académie</div></div></div>
+    </div>
+  </div>
+
+  <!-- PP -->
+  <div class="tsection">
+    <div class="tsection-header" onclick="toggleTSection(this)">
+      👥 Professeur principal <span class="tbadge">PP uniquement</span><span class="arrow">▼</span>
+    </div>
+    <div class="tsection-body">
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Appréciation de pied de bulletin — T1 <span class="tag tag-pp">PP</span></div><div class="task-sub">Menu Bulletins → Appréciation générale → T1 → rédiger pour chaque élève</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Appréciation de pied de bulletin — T2 <span class="tag tag-pp">PP</span></div><div class="task-sub">Bilan scolaire, assiduité, comportement, orientation si pertinent</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Appréciation de pied de bulletin — T3 <span class="tag tag-pp">PP</span></div><div class="task-sub">Bilan de fin d'année, mention du passage / redoublement / orientation</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Consulter les notes de toutes les matières avant le conseil <span class="tag tag-pp">PP</span></div><div class="task-sub">Accès en lecture à l'ensemble des résultats de la classe</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Établir le bilan d'assiduité avant chaque conseil <span class="tag tag-pp">PP</span></div><div class="task-sub">Menu Vie scolaire → Bilan des absences → filtrer sur la classe</div></div></div>
+      <div class="task" onclick="toggleTask(this)"><div class="checkbox"></div><div class="task-body"><div class="task-label">Saisir les décisions du conseil de classe <span class="tag tag-pp">PP</span></div><div class="task-sub">Passage, redoublement, mentions, encouragements, félicitations</div></div></div>
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">↺ Réinitialiser toutes les cases</button>
+</div>
+</div>
+
+<!-- ============================================================ -->
+<!--  VUE 2 : GUIDE                                               -->
+<!-- ============================================================ -->
+<div class="view" id="view-guide">
+
+  <nav class="guide-nav">
+    <div class="guide-nav-title">Rubriques</div>
+    <a href="#" class="active" data-sec="g-accueil">🏠 Accueil</a>
+    <a href="#" data-sec="g-absences">📅 Appel &amp; absences</a>
+    <a href="#" data-sec="g-notes">✏️ Saisie des notes</a>
+    <a href="#" data-sec="g-appréciations">💬 Appréciations</a>
+    <a href="#" data-sec="g-livret">📘 Livret bac</a>
+    <a href="#" data-sec="g-pp">👥 Prof. principal</a>
+    <a href="#" data-sec="g-conseils">💡 Conseils</a>
+  </nav>
+
+  <div class="guide-content">
+
+    <div class="gsection active" id="g-accueil">
+      <div class="gsection-title">Bienvenue dans ce guide PRONOTE</div>
+      <div class="gsection-sub">Retrouvez ici toutes les procédures pas à pas pour chaque action à réaliser dans PRONOTE au fil de l'année scolaire.</div>
+      <div class="info-grid">
+        <div class="info-card"><div class="ilabel">Connexion</div><div class="ival">Via ENT ou URL directe</div></div>
+        <div class="info-card"><div class="ilabel">Navigateur</div><div class="ival">Chrome ou Firefox</div></div>
+        <div class="info-card"><div class="ilabel">Application mobile</div><div class="ival">PRONOTE (iOS / Android)</div></div>
+        <div class="info-card"><div class="ilabel">Support</div><div class="ival">Secrétariat / réf. numérique</div></div>
+      </div>
+      <div class="tip"><strong>Conseil général :</strong> Enregistrez systématiquement vos saisies avant de changer de page. Un délai d'inactivité peut déconnecter la session.</div>
+      <hr>
+      <h3>Sommaire</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Appel &amp; gestion des absences</div><div class="gstep-desc">Faire l'appel en début de cours, signaler retards et absences.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Saisie des notes au fil de l'eau</div><div class="gstep-desc">Renseigner les notes après chaque correction, paramétrer les devoirs.</div></div></div>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Appréciations par matière</div><div class="gstep-desc">Rédiger l'appréciation trimestrielle pour chaque élève.</div></div></div>
+      <div class="gstep"><div class="gstep-num">4</div><div class="gstep-body"><div class="gstep-title">Livret scolaire du baccalauréat</div><div class="gstep-desc">Évaluer les compétences et rédiger les appréciations annuelles.</div></div></div>
+      <div class="gstep"><div class="gstep-num">5</div><div class="gstep-body"><div class="gstep-title">Rôle du professeur principal <span class="pp-tag">PP</span></div><div class="gstep-desc">Appréciation de pied de bulletin, bilan d'assiduité, conseil de classe.</div></div></div>
+    </div>
+
+    <div class="gsection" id="g-absences">
+      <div class="gbadge gbadge-blue">📅 Quotidien</div>
+      <div class="gsection-title">Appel &amp; gestion des absences</div>
+      <div class="gsection-sub">À réaliser dès le début de chaque cours, dans les 5 premières minutes.</div>
+      <h3>Faire l'appel</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Accéder au module appel</div><div class="gstep-desc">Menu <strong>Vie scolaire</strong> → <strong>Faire l'appel</strong>. Sélectionnez votre classe et la plage horaire en cours.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Cocher les élèves absents</div><div class="gstep-desc">Cliquez sur le nom de chaque élève absent → "A" orange. Les élèves présents restent en vert.</div></div></div>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Signaler un retard</div><div class="gstep-desc">Cliquez sur le "A" de l'élève → <strong>Retard</strong> → renseignez l'heure d'arrivée réelle.</div></div></div>
+      <div class="gstep"><div class="gstep-num">4</div><div class="gstep-body"><div class="gstep-title">Valider et enregistrer</div><div class="gstep-desc">Cliquez sur <strong>Enregistrer l'appel</strong>. La vie scolaire est notifiée automatiquement en temps réel.</div></div></div>
+      <div class="tip"><strong>Astuce :</strong> Si tous les élèves sont présents, cliquez sur <strong>Appel fait, aucune absence</strong> pour valider rapidement.</div>
+      <h3>Observations et historique</h3>
+      <div class="gstep"><div class="gstep-num">5</div><div class="gstep-body"><div class="gstep-title">Ajouter une observation</div><div class="gstep-desc">Clic droit sur l'élève → <strong>Ajouter une observation</strong> (départ anticipé, motif connu…).</div></div></div>
+      <div class="gstep"><div class="gstep-num">6</div><div class="gstep-body"><div class="gstep-title">Consulter l'historique</div><div class="gstep-desc">Menu <strong>Vie scolaire</strong> → <strong>Absences</strong> → sélectionnez l'élève pour voir l'historique complet et les justificatifs.</div></div></div>
+      <div class="warn">⚠️ Ne pas oublier de faire l'appel même lors d'une sortie scolaire. Utiliser le code "Sortie pédagogique" pour les absences liées.</div>
+    </div>
+
+    <div class="gsection" id="g-notes">
+      <div class="gbadge gbadge-blue">✏️ Au fil de l'eau</div>
+      <div class="gsection-title">Saisie des notes</div>
+      <div class="gsection-sub">À renseigner dès que les copies sont corrigées, sans attendre la fin du trimestre.</div>
+      <h3>Créer un devoir et saisir les notes</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Accéder au module Notes</div><div class="gstep-desc">Menu <strong>Notes</strong> → <strong>Saisie des notes</strong>. Sélectionnez la classe et la matière.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Créer un nouveau devoir</div><div class="gstep-desc">Cliquez sur <strong>+ Nouveau devoir</strong>. Renseignez : intitulé, date de passation, note sur (20 par défaut), coefficient.</div></div></div>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Paramétrer le devoir</div><div class="gstep-desc">Type : Devoir en classe / Travail maison / Oral / Projet… Cochez <strong>Publier</strong> pour rendre visible aux familles.</div></div></div>
+      <div class="gstep"><div class="gstep-num">4</div><div class="gstep-body"><div class="gstep-title">Saisir les notes</div><div class="gstep-desc">Cliquez sur chaque cellule et entrez la note. Utilisez <strong>Entrée</strong> ou <strong>Tab</strong> pour passer à l'élève suivant.</div></div></div>
+      <div class="gstep"><div class="gstep-num">5</div><div class="gstep-body"><div class="gstep-title">Codes spéciaux</div><div class="gstep-desc"><strong>ABS</strong> : absent · <strong>NR</strong> : non rendu · <strong>DISP</strong> : dispensé · <strong>EXE</strong> : exempté</div></div></div>
+      <div class="gstep"><div class="gstep-num">6</div><div class="gstep-body"><div class="gstep-title">Enregistrer</div><div class="gstep-desc">Cliquez sur <strong>Enregistrer</strong> (icône disquette). La moyenne de la classe se recalcule automatiquement.</div></div></div>
+      <div class="tip"><strong>Bonne pratique :</strong> Saisissez les notes dans les 48h suivant la remise des copies pour permettre un suivi régulier des familles.</div>
+      <h3>Évaluation par compétences</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Activer dans le devoir</div><div class="gstep-desc">Cocher <strong>Évaluation par compétences</strong>. Associez les compétences du programme.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Attribuer les niveaux</div><div class="gstep-desc">Maîtrise insuffisante (MI) · Fragile (MF) · Satisfaisante (MS) · Très bonne maîtrise (TBM)</div></div></div>
+      <div class="warn">⚠️ Un élève absent lors d'un contrôle doit recevoir le code "ABS" et non une note de 0, pour ne pas pénaliser injustement sa moyenne.</div>
+    </div>
+
+    <div class="gsection" id="g-appréciations">
+      <div class="gbadge gbadge-amber">💬 Trimestriel</div>
+      <div class="gsection-title">Appréciations par matière</div>
+      <div class="gsection-sub">À renseigner pour chaque élève à la clôture de chaque trimestre, avant le conseil de classe.</div>
+      <h3>Accès et saisie</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Accéder au module</div><div class="gstep-desc">Menu <strong>Bulletins</strong> → <strong>Saisie des appréciations</strong> → sélectionnez classe, période (T1/T2/T3) et matière.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Choisir l'élève</div><div class="gstep-desc">Cliquez sur un élève dans la liste à gauche. La zone de saisie apparaît à droite.</div></div></div>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Rédiger l'appréciation</div><div class="gstep-desc">3 à 5 lignes personnalisées. Mentionnez : résultats, comportement scolaire, points forts, axes de progrès.</div></div></div>
+      <div class="gstep"><div class="gstep-num">4</div><div class="gstep-body"><div class="gstep-title">Utiliser les appréciations types</div><div class="gstep-desc">Bouton <strong>Modèles</strong> pour accéder au dictionnaire d'appréciations. Vous pouvez y enregistrer vos formules récurrentes.</div></div></div>
+      <div class="gstep"><div class="gstep-num">5</div><div class="gstep-body"><div class="gstep-title">Passer à l'élève suivant</div><div class="gstep-desc">Bouton <strong>Suivant</strong> ou flèches. L'appréciation est auto-sauvegardée à chaque changement d'élève.</div></div></div>
+      <div class="tip"><strong>Qualité attendue :</strong> L'appréciation est lue par l'élève, ses parents et le conseil de classe. Elle doit être factuelle, bienveillante et constructive.</div>
+      <h3>Exemples de formulations</h3>
+      <div class="gstep"><div class="gstep-num">✓</div><div class="gstep-body"><div class="gstep-title">Élève en réussite</div><div class="gstep-desc">"Excellent trimestre. [Prénom] fait preuve d'une grande rigueur et d'une participation active. Les résultats sont très satisfaisants. Félicitations."</div></div></div>
+      <div class="gstep"><div class="gstep-num">✓</div><div class="gstep-body"><div class="gstep-title">Élève en difficulté</div><div class="gstep-desc">"Les résultats restent insuffisants malgré quelques progrès. Il est important de consolider les bases et de solliciter davantage l'aide proposée."</div></div></div>
+      <div class="gstep"><div class="gstep-num">✓</div><div class="gstep-body"><div class="gstep-title">Élève irrégulier</div><div class="gstep-desc">"Des capacités certaines mais un investissement trop inégal. La régularité dans le travail personnel permettrait d'améliorer significativement les résultats."</div></div></div>
+      <div class="warn">⚠️ Respectez impérativement la date limite fixée par la direction. Toute appréciation manquante bloque l'édition du bulletin.</div>
+    </div>
+
+    <div class="gsection" id="g-livret">
+      <div class="gbadge gbadge-green">📘 Annuel — 2nde · 1re · Terminale</div>
+      <div class="gsection-title">Livret scolaire du baccalauréat</div>
+      <div class="gsection-sub">Concerne toutes les classes de la voie générale et technologique. À compléter selon le calendrier académique.</div>
+      <h3>Accès au livret</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Menu Livret scolaire</div><div class="gstep-desc">Menu <strong>Bulletins</strong> → <strong>Livret scolaire lycée</strong> → sélectionner la classe et l'année.</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Choisir l'élève</div><div class="gstep-desc">Liste à gauche → cliquez sur un élève pour accéder à sa fiche livret.</div></div></div>
+      <h3>Évaluation des compétences</h3>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Onglet Compétences</div><div class="gstep-desc">Pour chaque compétence du programme, attribuez : <strong>Insuffisant · Fragile · Satisfaisant · Très bien</strong>.</div></div></div>
+      <div class="gstep"><div class="gstep-num">4</div><div class="gstep-body"><div class="gstep-title">Évaluation sur l'année entière</div><div class="gstep-desc">Basez-vous sur l'ensemble des travaux de l'année, pas uniquement sur un trimestre.</div></div></div>
+      <div class="gstep"><div class="gstep-num">5</div><div class="gstep-body"><div class="gstep-title">Cohérence avec les notes</div><div class="gstep-desc">Vérifiez la cohérence entre les niveaux de compétences et la moyenne annuelle de l'élève.</div></div></div>
+      <h3>Appréciation annuelle</h3>
+      <div class="gstep"><div class="gstep-num">6</div><div class="gstep-body"><div class="gstep-title">Rédiger la synthèse annuelle</div><div class="gstep-desc">3 à 6 lignes : progression, points forts, investissement, résultats. <strong>2nde :</strong> aptitudes / orientation. <strong>1re :</strong> maîtrise des attendus. <strong>Tle :</strong> préparation aux épreuves.</div></div></div>
+      <div class="gstep"><div class="gstep-num">7</div><div class="gstep-body"><div class="gstep-title">Enregistrer et valider</div><div class="gstep-desc">Cliquez sur <strong>Enregistrer</strong>. Vérifiez attentivement avant la validation définitive — transmise au jury du baccalauréat.</div></div></div>
+      <div class="tip"><strong>Important :</strong> L'appréciation du livret est transmise aux jurys et peut influer positivement sur la délibération. Soignez la rédaction.</div>
+      <div class="warn">⚠️ Une fois validé et transmis à l'académie, le livret ne peut plus être modifié.</div>
+    </div>
+
+    <div class="gsection" id="g-pp">
+      <span class="pp-tag" style="font-size:12px;padding:3px 10px;margin-bottom:.75rem;display:inline-flex">PP — Professeur Principal</span>
+      <div class="gsection-title" style="margin-top:.5rem">Saisies spécifiques au professeur principal</div>
+      <div class="gsection-sub">En tant que PP, vous disposez de droits et responsabilités de saisie supplémentaires.</div>
+      <h3>Appréciation de pied de bulletin (× 3 trimestres)</h3>
+      <div class="gstep"><div class="gstep-num">1</div><div class="gstep-body"><div class="gstep-title">Accéder à l'appréciation générale</div><div class="gstep-desc">Menu <strong>Bulletins</strong> → <strong>Saisie des appréciations</strong> → onglet <strong>Appréciation générale</strong> (pied de bulletin).</div></div></div>
+      <div class="gstep"><div class="gstep-num">2</div><div class="gstep-body"><div class="gstep-title">Rédiger pour chaque élève</div><div class="gstep-desc">Synthèse globale du trimestre : ensemble des matières, comportement, assiduité, vie scolaire, orientation.</div></div></div>
+      <div class="gstep"><div class="gstep-num">3</div><div class="gstep-body"><div class="gstep-title">Éléments à mentionner</div><div class="gstep-desc">Moyenne générale et évolution · Assiduité · Comportement · Orientation (2nde/1re) · Encouragements ou mises en garde</div></div></div>
+      <div class="tip"><strong>Structure conseillée :</strong> [Bilan scolaire] + [Assiduité si nécessaire] + [Comportement] + [Encouragement / mise en garde] + [Orientation si pertinent]</div>
+      <h3>Autres rôles du PP</h3>
+      <div class="gstep"><div class="gstep-num">👁</div><div class="gstep-body"><div class="gstep-title">Consulter toutes les matières</div><div class="gstep-desc">Accès en lecture aux résultats de toutes les disciplines pour préparer le conseil de classe.</div></div></div>
+      <div class="gstep"><div class="gstep-num">📋</div><div class="gstep-body"><div class="gstep-title">Saisir les décisions du conseil</div><div class="gstep-desc">Menu <strong>Conseils de classe</strong> → passage, redoublement, mentions, encouragements, félicitations.</div></div></div>
+      <div class="gstep"><div class="gstep-num">📊</div><div class="gstep-body"><div class="gstep-title">Bilan d'assiduité de la classe</div><div class="gstep-desc">Menu <strong>Vie scolaire</strong> → <strong>Bilan des absences</strong> → filtrer sur votre classe avant chaque conseil.</div></div></div>
+      <div class="gstep"><div class="gstep-num">✉</div><div class="gstep-body"><div class="gstep-title">Messagerie parents / élèves</div><div class="gstep-desc">Module <strong>Messagerie</strong> → convocations, informations ciblées (entretiens PP, réunions parents…).</div></div></div>
+    </div>
+
+    <div class="gsection" id="g-conseils">
+      <div class="gbadge gbadge-green">💡 Bonnes pratiques</div>
+      <div class="gsection-title">Conseils &amp; erreurs fréquentes</div>
+      <div class="gsection-sub">Points de vigilance pour éviter les problèmes courants.</div>
+      <h3>Erreurs fréquentes à éviter</h3>
+      <div class="gstep"><div class="gstep-num">✗</div><div class="gstep-body"><div class="gstep-title">Oublier d'enregistrer</div><div class="gstep-desc">PRONOTE ne sauvegarde pas toutes les saisies automatiquement. Cliquez toujours sur "Enregistrer" avant de fermer un onglet.</div></div></div>
+      <div class="gstep"><div class="gstep-num">✗</div><div class="gstep-body"><div class="gstep-title">Appréciation trop courte ou générique</div><div class="gstep-desc">"Bon trimestre." ou "Peut mieux faire." ne sont pas recevables. L'appréciation doit être personnalisée.</div></div></div>
+      <div class="gstep"><div class="gstep-num">✗</div><div class="gstep-body"><div class="gstep-title">Saisir les notes trop tard</div><div class="gstep-desc">Des notes saisies la veille du conseil ne permettent pas aux familles de suivre la progression.</div></div></div>
+      <div class="gstep"><div class="gstep-num">✗</div><div class="gstep-body"><div class="gstep-title">Confondre période et année scolaire</div><div class="gstep-desc">Vérifiez toujours que la période sélectionnée (T1 / T2 / T3 / Année) correspond à votre intention.</div></div></div>
+      <div class="gstep"><div class="gstep-num">✗</div><div class="gstep-body"><div class="gstep-title">Mettre 0 à la place de ABS</div><div class="gstep-desc">Un élève absent lors d'un contrôle doit recevoir le code "ABS" et non une note de 0.</div></div></div>
+      <h3>Rappel des échéances</h3>
+      <div class="info-grid">
+        <div class="info-card"><div class="ilabel">Conseil T1</div><div class="ival">Mi-novembre</div></div>
+        <div class="info-card"><div class="ilabel">Conseil T2</div><div class="ival">Fin mars / début avril</div></div>
+        <div class="info-card"><div class="ilabel">Conseil T3</div><div class="ival">Fin juin</div></div>
+        <div class="info-card"><div class="ilabel">Livret bac (LSL)</div><div class="ival">Calendrier Rectorat</div></div>
+      </div>
+      <h3>Application mobile PRONOTE</h3>
+      <div class="gstep"><div class="gstep-num">📱</div><div class="gstep-body"><div class="gstep-title">Faire l'appel depuis son téléphone</div><div class="gstep-desc">L'appli PRONOTE permet de faire l'appel directement depuis votre smartphone. Mêmes identifiants que sur PC.</div></div></div>
+      <div class="gstep"><div class="gstep-num">📱</div><div class="gstep-body"><div class="gstep-title">Saisir des notes depuis l'appli</div><div class="gstep-desc">Pratique lors de corrections à domicile. Synchronisation automatique avec le serveur de l'établissement.</div></div></div>
+      <div class="tip"><strong>En cas de problème technique :</strong> contactez le secrétariat ou le référent numérique. Ne tentez pas de modifier des saisies verrouillées sans autorisation de l'administration.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-footer">Lycée Polyvalent Léopold Elfort · Mana, Guyane · Document interne</div>
+
+<script>
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
+}
+
+function toggleTSection(header) {
+  header.classList.toggle('collapsed');
+  header.nextElementSibling.classList.toggle('hidden');
+}
+
+function toggleTask(el) {
+  el.classList.toggle('done');
+  el.querySelector('.checkbox').classList.toggle('checked');
+  updateProgress();
+  saveState();
+}
+
+function updateProgress() {
+  const all = document.querySelectorAll('.task');
+  const done = document.querySelectorAll('.task.done');
+  const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent =
+    done.length + ' / ' + all.length + ' tâche' + (all.length > 1 ? 's' : '') +
+    ' accomplie' + (done.length > 1 ? 's' : '') + ' (' + pct + '%)';
+}
+
+function saveState() {
+  const state = Array.from(document.querySelectorAll('.task')).map(t => t.classList.contains('done'));
+  localStorage.setItem('pronote_todo_v2', JSON.stringify(state));
+}
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('pronote_todo_v2');
+    if (!saved) return;
+    JSON.parse(saved).forEach((done, i) => {
+      const tasks = document.querySelectorAll('.task');
+      if (done && tasks[i]) {
+        tasks[i].classList.add('done');
+        tasks[i].querySelector('.checkbox').classList.add('checked');
+      }
+    });
+  } catch(e) {}
+  updateProgress();
+}
+
+function resetAll() {
+  if (!confirm('Réinitialiser toutes les cases à cocher ?')) return;
+  document.querySelectorAll('.task').forEach(t => {
+    t.classList.remove('done');
+    t.querySelector('.checkbox').classList.remove('checked');
+  });
+  localStorage.removeItem('pronote_todo_v2');
+  updateProgress();
+}
+
+// Guide nav
+document.querySelectorAll('.guide-nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const sec = link.dataset.sec;
+    document.querySelectorAll('.guide-nav a').forEach(l => l.classList.remove('active'));
+    document.querySelectorAll('.gsection').forEach(s => s.classList.remove('active'));
+    link.classList.add('active');
+    document.getElementById(sec).classList.add('active');
+  });
+});
+
+loadState();
+</script>
+</body>
+</html>
