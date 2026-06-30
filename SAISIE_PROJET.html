@@ -254,13 +254,9 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
     <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
     Réinitialiser
   </button>
-  <button class="tb tb-w" onclick="doSave()">
+  <button class="tb tb-w" onclick="doExport()">
     <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
-    Sauvegarder
-  </button>
-  <button class="tb tb-g" onclick="doExport()">
-    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-    Exporter
+    Enregistrer
   </button>
   <button class="tb tb-g" onclick="document.getElementById('fl').click()">
     <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
@@ -292,7 +288,7 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
 <!-- INFOBOX -->
 <div class="ib">
   <b>📋 Mode d'emploi</b>
-  <strong>Sauvegarder</strong> conserve la saisie dans ce navigateur. <strong>Exporter</strong> télécharge un fichier .json pour reprendre sur un autre ordinateur (<strong>Charger</strong> pour le rouvrir). <strong>Imprimer/PDF</strong> génère uniquement les rubriques renseignées (titre, référent et email obligatoires). <strong>Aide</strong> ci-dessous pour le guide.
+  <strong>Enregistrer</strong> télécharge un fichier .json de votre saisie (à reprendre via <strong>Charger</strong>, même sur un autre ordinateur). <strong>Imprimer/PDF</strong> génère uniquement les rubriques renseignées (titre, référent et email obligatoires). <strong>Aide</strong> ci-dessous pour le guide.
 </div>
 
 <!-- AIDE -->
@@ -311,7 +307,7 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
       <div class="ac"><h4>🌱 ODD</h4><p>Les 17 Objectifs de Développement Durable de l'ONU. Cochez ceux auxquels contribue votre projet.</p></div>
       <div class="ac"><h4>📅 Organisation</h4><p>Ajoutez autant de dates, lieux et durées que nécessaire. Pour le matériel, un item par ligne.</p></div>
       <div class="ac"><h4>💶 Budget</h4><p>Une ligne par dépense : choisissez le type, ajoutez un libellé, saisissez le montant. Total calculé automatiquement.</p></div>
-      <div class="ac"><h4>💾 Portabilité</h4><p>« Exporter » télécharge un .json. Sur un autre ordinateur, « Charger » pour reprendre la saisie.</p></div>
+      <div class="ac"><h4>💾 Portabilité</h4><p>« Enregistrer » télécharge un .json. Sur un autre ordinateur, « Charger » pour reprendre la saisie.</p></div>
       <div class="ac"><h4>🖨️ Impression</h4><p>Seules les rubriques renseignées s'impriment. Choisissez « Enregistrer en PDF » dans les options du navigateur.</p></div>
       <div class="ac"><h4>📤 Envoi</h4><p>« Envoyer » ouvre la messagerie pré-remplie. Joignez le fichier exporté (.json) manuellement à l'e-mail.</p></div>
       <div class="ac"><h4>✅ Avis direction</h4><p>La rubrique « Avis chef d'établissement » est toujours imprimée — elle sera complétée par la direction.</p></div>
@@ -757,12 +753,8 @@ function doReset(){
   flash('↺ Formulaire réinitialisé');
 }
 
-/* ── SAUVEGARDE ── */
+/* ── SAUVEGARDE AUTO (navigateur) ── */
 var LSKEY='fiche_edd_v5';
-function doSave(){
-  localStorage.setItem(LSKEY,JSON.stringify(getData()));
-  flash('✅ Sauvegardé !');
-}
 function flash(msg){
   var el=document.getElementById('badge');
   el.innerHTML='<span class="dot"></span> '+msg;
@@ -770,16 +762,17 @@ function flash(msg){
 }
 setInterval(function(){ localStorage.setItem(LSKEY,JSON.stringify(getData())); },30000);
 
-/* ── EXPORT ── */
+/* ── ENREGISTRER (fichier .json) ── */
 function doExport(){
   var data=getData();
-  var fname='projet_'+safeName(data.titre)+'_'+todayStr()+'.json';
+  localStorage.setItem(LSKEY,JSON.stringify(data));
+  var fname='projet_'+safeName(data.titre)+'.json';
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var url=URL.createObjectURL(blob);
   var a=document.createElement('a'); a.href=url; a.download=fname;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  flash('💾 Fichier exporté !');
+  flash('✅ Enregistré !');
 }
 
 /* ── IMPORT ── */

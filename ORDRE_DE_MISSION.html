@@ -262,13 +262,9 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
     <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
     Réinitialiser
   </button>
-  <button class="tb tb-w" onclick="doSave()">
+  <button class="tb tb-w" onclick="doExport()">
     <svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>
-    Sauvegarder
-  </button>
-  <button class="tb tb-g" onclick="doExport()">
-    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-    Exporter
+    Enregistrer
   </button>
   <button class="tb tb-g" onclick="document.getElementById('fl').click()">
     <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
@@ -300,7 +296,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
 <!-- INFOBOX -->
 <div class="ib">
   <b>📋 Mode d'emploi</b>
-  <strong>Sauvegarder</strong> conserve la saisie dans ce navigateur. <strong>Exporter</strong> télécharge un fichier .json. <strong>Charger</strong> pour reprendre sur un autre ordinateur. <strong>Imprimer/PDF</strong> : recto = ordre de mission, verso = liste des élèves. Titre et responsable obligatoires pour imprimer.
+  <strong>Enregistrer</strong> télécharge un fichier .json de votre saisie. <strong>Charger</strong> pour le reprendre, même sur un autre ordinateur. <strong>Imprimer/PDF</strong> : recto = ordre de mission, verso = liste des élèves. Titre et responsable obligatoires pour imprimer.
 </div>
 
 <!-- AIDE -->
@@ -320,7 +316,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
       <div class="ac"><h4>👤 Responsable et accompagnateurs</h4><p>Le responsable informe les collègues des absences. Minimum 1 accompagnateur pour 15 élèves.</p></div>
       <div class="ac"><h4>✅ Décision chef d'établissement</h4><p>Cette rubrique sera complétée par la direction. Elle apparaît sur le recto du document imprimé, avant la liste des élèves (verso).</p></div>
       <div class="ac"><h4>📝 Liste des élèves (verso)</h4><p>Saisissez la liste ou collez-la depuis PRONOTE. Elle s'imprime automatiquement au verso de la feuille A4.</p></div>
-      <div class="ac"><h4>💾 Sauvegarde</h4><p>« Sauvegarder » enregistre dans ce navigateur. « Exporter » crée un fichier .json. Sur un autre PC, « Charger » pour reprendre.</p></div>
+      <div class="ac"><h4>💾 Sauvegarde</h4><p>« Enregistrer » crée un fichier .json. Sur un autre PC, « Charger » pour reprendre la saisie.</p></div>
     </div>
   </div>
 </div>
@@ -838,12 +834,8 @@ function doReset(){
   flash('↺ Formulaire réinitialisé');
 }
 
-/* ── SAUVEGARDE ── */
+/* ── SAUVEGARDE AUTO (navigateur) ── */
 var KEY = 'om_v2';
-function doSave(){
-  localStorage.setItem(KEY, JSON.stringify(getData()));
-  flash('✅ Sauvegardé !');
-}
 function flash(msg){
   var el = document.getElementById('badge');
   el.innerHTML = '<span class="dot"></span> ' + msg;
@@ -851,10 +843,11 @@ function flash(msg){
 }
 setInterval(function(){ localStorage.setItem(KEY, JSON.stringify(getData())); }, 30000);
 
-/* ── EXPORT ── */
+/* ── ENREGISTRER (fichier .json) ── */
 function doExport(){
   var data = getData();
-  var fname = 'OM_' + safeName(data.titre || 'Ordre_Mission') + '_' + todayStr() + '.json';
+  localStorage.setItem(KEY, JSON.stringify(data));
+  var fname = 'OM_' + safeName(data.titre || 'Ordre_Mission') + '.json';
   var json = JSON.stringify(data, null, 2);
   var blob = new Blob([json], {type: 'application/json'});
   var url = URL.createObjectURL(blob);
@@ -865,7 +858,7 @@ function doExport(){
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  flash('💾 Fichier exporté : ' + fname);
+  flash('✅ Enregistré : ' + fname);
 }
 
 /* ── IMPORT ── */
