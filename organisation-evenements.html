@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Organisation d'Événements — LPO Léopold Elfort</title>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 /* ════ VARIABLES ════════════════════════════════════════════════════ */
 :root{
@@ -814,11 +812,11 @@ input:focus,select:focus,textarea:focus{
     <div class="modal-body">
       <div class="send-step">
         <div class="s-num s1">1</div>
-        <p>Cliquez sur <strong>Télécharger le PDF</strong> pour générer et enregistrer la fiche remplie sur votre appareil.</p>
+        <p>Cliquez sur <strong>🖨 Imprimer / PDF</strong> — votre navigateur ouvre la fenêtre d'impression. Choisissez <strong>Enregistrer en PDF</strong> pour obtenir le fichier à joindre.</p>
       </div>
       <div class="send-step">
         <div class="s-num s2">2</div>
-        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF téléchargé</strong> avant d'envoyer.<br>
+        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF généré</strong> avant d'envoyer.<br>
         <span style="color:var(--mu);font-size:11.5px;margin-top:4px;display:block">
           Destinataire : <strong>tatiana.agesilas@ac-guyane.fr</strong>
         </span>
@@ -827,7 +825,7 @@ input:focus,select:focus,textarea:focus{
     </div>
     <div class="modal-foot">
       <button class="btn" onclick="closeModal('modal-send')" style="background:#eee;color:var(--tx)">Annuler</button>
-      <button class="btn bi" onclick="downloadPDF()">Télécharger le PDF</button>
+      <button class="btn bi" onclick="window.print()">🖨 Imprimer / PDF</button>
       <button class="btn bg2" onclick="doEmail()">Ouvrir la messagerie</button>
     </div>
   </div>
@@ -1013,44 +1011,6 @@ function populate(d){
   });
 
   updateSigName();
-}
-
-/* ── Génération PDF ── */
-async function downloadPDF(){
-  if(!window.html2canvas||!window.jspdf){
-    alert('Librairies PDF non chargées — vérifiez votre connexion Internet et rechargez la page.'); return;
-  }
-  toast('Génération du PDF…');
-  const toolbar = document.querySelector('.toolbar');
-  const footer  = document.querySelector('.footer');
-  const noPrint = document.querySelectorAll('.no-print');
-  toolbar.style.display='none'; footer.style.display='none';
-  noPrint.forEach(e=>e.style.visibility='hidden');
-  const scrollY = window.scrollY; window.scrollTo(0,0);
-  try{
-    const canvas = await html2canvas(document.body,{
-      scale:1.8, useCORS:true, backgroundColor:'#eef2f7', logging:false,
-      ignoreElements: e => e.classList.contains('modal-ov') || e.id==='toast',
-    });
-    const{jsPDF} = window.jspdf;
-    const pdf = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
-    const pW=210, pH=297;
-    const ratio = pW/canvas.width;
-    const imgH  = canvas.height*ratio;
-    let pos=0;
-    while(pos<imgH){
-      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-pos,pW,imgH);
-      pos+=pH; if(pos<imgH) pdf.addPage();
-    }
-    const d = collectData();
-    const nom = (d.org_nom||'evenement').replace(/\s+/g,'-').toLowerCase();
-    pdf.save(`organisation-evenement-${nom}-${d.date_evenement||today()}.pdf`);
-    toast('PDF téléchargé','ok');
-  }finally{
-    toolbar.style.display=''; footer.style.display='';
-    noPrint.forEach(e=>e.style.visibility='');
-    window.scrollTo(0,scrollY);
-  }
 }
 
 /* ── Email ── */
