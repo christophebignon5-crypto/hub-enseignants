@@ -288,6 +288,13 @@ footer{text-align:center;padding:22px;font-size:11px;color:var(--mu);border-top:
         <label class="lb">Localisation (ville, académie)</label>
         <input type="text" id="set-ville" placeholder="Mana, Guyane">
       </div>
+      <div class="fg">
+        <label class="lb">Année scolaire</label>
+        <input type="text" id="set-annee" placeholder="2025-2026" maxlength="9"
+          style="max-width:160px;"
+          title="Format : AAAA-AAAA — sera pré-remplie dans toutes les applications">
+        <p style="font-size:11px;color:var(--mu);margin-top:5px;">Pré-remplie automatiquement dans toutes les applications (autorisation d'absence, changement d'EDT, fiche projet…)</p>
+      </div>
       <div class="btn-row">
         <button class="btn btn-gr" onclick="saveEcole()">💾 Enregistrer</button>
       </div>
@@ -497,6 +504,7 @@ function loadCfg(){
   cfg.ville      = cfg.ville      || 'Mana, Guyane';
   cfg.login      = cfg.login      || 'proviseur';
   cfg.customApps = cfg.customApps || [];
+  cfg.annee      = cfg.annee      || '';
 }
 
 function saveCfg(){ localStorage.setItem(LSKEY, JSON.stringify(cfg)); }
@@ -631,6 +639,7 @@ function doLogout(){ authOk = false; closeSet(); showToast('Déconnexion effectu
 function openSet(){
   document.getElementById('set-nom').value   = cfg.ecole || '';
   document.getElementById('set-ville').value = cfg.ville || '';
+  document.getElementById('set-annee').value = cfg.annee || '';
   var gp = document.getElementById('gen-pwd'); if(gp) gp.value='';
   var gr = document.getElementById('gen-result-row'); if(gr) gr.style.display='none';
   renderSetApps();
@@ -653,8 +662,11 @@ function showTab(el){
 function saveEcole(){
   var n = document.getElementById('set-nom').value.trim();
   var v = document.getElementById('set-ville').value.trim();
+  var a = document.getElementById('set-annee').value.trim();
   if(!n){ showToast('Le nom est obligatoire.', 'red'); return; }
-  cfg.ecole = n; cfg.ville = v;
+  cfg.ecole = n; cfg.ville = v; cfg.annee = a;
+  if(a) localStorage.setItem('elfort_annee_scolaire', a);
+  else  localStorage.removeItem('elfort_annee_scolaire');
   saveCfg(); applyEcole();
   showToast('✅ Établissement mis à jour !', 'green');
 }

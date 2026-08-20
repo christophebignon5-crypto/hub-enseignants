@@ -735,8 +735,12 @@ function doReset(){
   if(!confirm('Réinitialiser tous les champs ?\nLes données non sauvegardées seront perdues.')) return;
   // Vider tous les champs texte / email / date / number / textarea
   document.querySelectorAll('input[type=text],input[type=email],input[type=date],input[type=number],textarea').forEach(function(e){ e.value=''; });
-  // Remettre le select année à sa première valeur
-  var anneeEl=document.getElementById('annee'); if(anneeEl) anneeEl.selectedIndex=0;
+  // Remettre le select année à l'année du hub (ou première valeur)
+  var anneeEl=document.getElementById('annee');
+  if(anneeEl){
+    var _ha=localStorage.getItem('elfort_annee_scolaire');
+    if(_ha&&_ha.trim()) anneeEl.value=_ha; else anneeEl.selectedIndex=0;
+  }
   // Décocher toutes les cases et radios
   document.querySelectorAll('input[type=checkbox],input[type=radio]').forEach(function(e){ e.checked=false; });
   // Vider les listes dynamiques
@@ -928,6 +932,18 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
     renderDyn('l-dates'); renderDyn('l-lieux');
     renderDyn('l-durees'); renderDyn('l-mat');
     renderDep(); calcTotal();
+  }
+  // Pré-sélectionner l'année scolaire définie dans le hub (Paramètres)
+  var _ha = localStorage.getItem('elfort_annee_scolaire');
+  if(_ha && _ha.trim()){
+    var sel = document.getElementById('annee');
+    if(sel && !sel.value){
+      // Si l'option n'existe pas dans le select, on l'ajoute
+      var found = false;
+      for(var i=0;i<sel.options.length;i++){ if(sel.options[i].value===_ha){found=true;break;} }
+      if(!found){ var opt=document.createElement('option'); opt.value=_ha; opt.textContent=_ha; sel.insertBefore(opt,sel.firstChild); }
+      sel.value = _ha;
+    }
   }
 })();
 </script>

@@ -273,25 +273,28 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 
 /* ════ PRINT ════════════════════════════════════════════════════ */
 @media print{
-  @page{size:A4;margin:8mm 10mm}
-  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  @page{size:A4;margin:10mm 12mm}
   .toolbar,.modal-ov,.footer,.no-print{display:none!important}
   body{background:#fff;font-size:9pt;line-height:1.35;color:#000;font-family:Arial,sans-serif}
   .main{margin:0;padding:0;max-width:100%}
   .page-header{
-    background:#f5f5f5!important;color:#000!important;
-    padding:8px 14px;gap:10px;border-bottom:2px solid #aaa!important;
+    background:none!important;color:#000!important;
+    padding:6px 0 8px;gap:10px;border-bottom:2px solid #333!important;margin-bottom:6px;
   }
-  .page-header .htitle h1{color:#000!important;}
-  .page-header .htitle p{color:#444!important;opacity:1!important;}
-  .hlogo{width:44px;height:44px;font-size:20px;background:#ddd!important;border-color:#bbb!important;}
-  .htitle h1{font-size:12pt}
-  .htitle p{font-size:8pt}
+  .hlogo{width:38px;height:38px;font-size:18px;background:#eee!important;border:1px solid #ccc!important;}
+  .htitle h1{font-size:12pt;color:#000!important;}
+  .htitle p{font-size:8pt;color:#444!important;opacity:1!important;}
+  .hinfo{margin-left:auto;}
   .hinfo-field{color:#333!important;}
-  .hinfo-field input{font-size:9pt;padding:1px 5px;background:#fff!important;border-color:#bbb!important;color:#000!important;}
+  .hinfo-field input{font-size:9pt;padding:1px 4px;color:#000!important;
+    background:transparent!important;border:none!important;border-bottom:1px solid #999!important;}
   .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:6px;break-inside:avoid}
-  .sh{padding:5px 10px;font-size:10pt;background:#e8e8e8!important;color:#000!important;}
-  .sh-num{width:17px;height:17px;font-size:8pt;background:#999!important;color:#fff!important;}
+  .sh{padding:5px 10px;font-size:10pt;
+    background:#e0e0e0!important;color:#000!important;
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+  .sh-num{width:17px;height:17px;font-size:8pt;
+    background:#666!important;color:#fff!important;
+    -webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
   .sb{padding:8px 10px}
   .fg{gap:8px}
   .fgr{gap:2px}
@@ -633,7 +636,8 @@ const EMAIL_DESTINATAIRES = "tatiana.agesilas@ac-guyane.fr";
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('annee-scolaire').value = schoolYear();
+  var _hubAnnee = localStorage.getItem('elfort_annee_scolaire');
+  document.getElementById('annee-scolaire').value = (_hubAnnee && _hubAnnee.trim()) ? _hubAnnee : schoolYear();
   document.getElementById('date-demande').value   = today();
   document.getElementById('date-signature').value = today();
   const dd = document.getElementById('dest-display');
@@ -803,7 +807,8 @@ ${nom}`);
 function resetForm(){
   if(!confirm('Réinitialiser tous les champs ?'))return;
   document.querySelectorAll('input[type=text],input[type=date],input[type=time],input[type=number],textarea').forEach(e=>e.value='');
-  document.getElementById('annee-scolaire').value=schoolYear();
+  var _ha=localStorage.getItem('elfort_annee_scolaire');
+  document.getElementById('annee-scolaire').value=(_ha&&_ha.trim())?_ha:schoolYear();
   document.getElementById('date-demande').value=today();
   document.getElementById('date-signature').value=today();
   document.getElementById('sig-name').textContent='';
