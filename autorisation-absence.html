@@ -364,16 +364,19 @@ input[type=text]{text-transform:inherit}
   body{background:#fff;font-size:8.5pt;line-height:1.3;color:#000;font-family:Arial,sans-serif}
   .main{margin:0;padding:0;max-width:100%}
   .page-header{
-    background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%)!important;
-    padding:8px 14px;gap:10px;border-bottom:2px solid var(--a)!important;
+    background:#f5f5f5!important;color:#000!important;
+    padding:8px 14px;gap:10px;border-bottom:2px solid #aaa!important;
   }
-  .hlogo{width:44px;height:44px}
+  .page-header .htitle h1{color:#000!important;}
+  .page-header .htitle p{color:#444!important;opacity:1!important;}
+  .hlogo{width:44px;height:44px;background:#ddd!important;border-color:#bbb!important;}
   .htitle h1{font-size:11pt}
   .htitle p{font-size:8pt}
-  .hinfo-field input{font-size:9pt;padding:1px 5px;background:transparent!important;border-color:rgba(255,255,255,.5)!important}
+  .hinfo-field{color:#333!important;}
+  .hinfo-field input{font-size:9pt;padding:1px 5px;background:#fff!important;border-color:#bbb!important;color:#000!important;}
   .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:5px;break-inside:avoid}
-  .sh{padding:4px 10px;font-size:9pt;background:linear-gradient(90deg,var(--p),var(--ps))!important}
-  .sh-num{width:16px;height:16px;font-size:8pt}
+  .sh{padding:4px 10px;font-size:9pt;background:#e8e8e8!important;color:#000!important;}
+  .sh-num{width:16px;height:16px;font-size:8pt;background:#999!important;color:#fff!important;}
   .sb{padding:6px 10px}
   .fg{gap:7px}
   .fgr{gap:2px}
@@ -427,8 +430,6 @@ input[type=text]{text-transform:inherit}
   <button class="btn bo2" onclick="saveJSON()">💾 Sauvegarder</button>
   <div class="toolbar-sep"></div>
   <button class="btn bo2" onclick="openGuide()">Guide</button>
-  <button class="btn bo2" onclick="window.print()">🖨 Imprimer</button>
-  <button class="btn bi" onclick="downloadPDF()">PDF</button>
   <button class="btn bp" onclick="openSendModal()">✉ Envoyer la demande</button>
 </div>
 
@@ -806,7 +807,7 @@ input[type=text]{text-transform:inherit}
       </div>
 
       <div class="guide-tip">
-        💡 <strong>Astuce :</strong> Le bouton <strong>Imprimer</strong> génère une impression A4 optimisée — seul le type d'absence sélectionné apparaît. Vous pouvez aussi utiliser <strong>PDF</strong> pour une capture directe via les librairies intégrées.
+        💡 <strong>Astuce :</strong> Utilisez <strong>Ctrl+P</strong> (ou Cmd+P sur Mac) pour imprimer ou générer un PDF — seul le type d'absence sélectionné apparaît à l'impression.
       </div>
     </div>
     <div class="modal-foot">

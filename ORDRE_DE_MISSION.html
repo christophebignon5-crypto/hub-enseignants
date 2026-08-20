@@ -191,7 +191,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
   /* Toutes les sections par défaut */
   .sec{box-shadow:none;border:1px solid #ccc;border-radius:3px;margin-bottom:5px;break-inside:avoid;}
   .sec.np{display:none!important;}
-  .sh{background:#1a6b4a!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:5px 10px;font-size:7.5pt;}
+  .sh{background:#e8e8e8!important;color:#000!important;border-bottom:1px solid #bbb!important;padding:5px 10px;font-size:7.5pt;}
   .sb{padding:6px 10px;}
   .ph{box-shadow:none;border:1px solid #ccc;padding:9px 12px;margin-bottom:5px;border-radius:3px;}
   .ph-txt h1{font-size:13pt;} .ph-txt p{font-size:8pt;}
@@ -218,7 +218,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
   #bus-box.show{display:block;}
 
   /* Tables */
-  .gtbl thead th{background:#1a6b4a!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:4px 8px;font-size:7.5pt;}
+  .gtbl thead th{background:#e8e8e8!important;color:#000!important;padding:4px 8px;font-size:7.5pt;}
   .gtbl td{padding:3px 8px;font-size:8.5pt;}
   .gtbl tbody tr.np{display:none!important;}
   .gtbl tbody tr:nth-child(even){background:transparent;}
@@ -271,10 +271,6 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
     Charger
   </button>
   <input type="file" id="fl" accept=".json" onchange="doImport(event)">
-  <button class="tb tb-g" onclick="doPrint()">
-    <svg viewBox="0 0 24 24"><path d="M19 8H5a3 3 0 00-3 3v6h4v4h12v-4h4v-6a3 3 0 00-3-3zm-3 11H8v-5h8v5zm3-7a1 1 0 110-2 1 1 0 010 2zm-1-7H6V2h12v3z"/></svg>
-    Imprimer / PDF
-  </button>
   <button class="tb tb-o" onclick="openMod()">
     <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     Envoyer
@@ -296,7 +292,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
 <!-- INFOBOX -->
 <div class="ib">
   <b>📋 Mode d'emploi</b>
-  <strong>Enregistrer</strong> télécharge un fichier .json de votre saisie. <strong>Charger</strong> pour le reprendre, même sur un autre ordinateur. <strong>Imprimer/PDF</strong> : recto = ordre de mission, verso = liste des élèves. Titre et responsable obligatoires pour imprimer.
+  <strong>Enregistrer</strong> télécharge un fichier .json de votre saisie. <strong>Charger</strong> pour le reprendre, même sur un autre ordinateur. Utilisez <strong>Ctrl+P</strong> (ou Cmd+P) pour imprimer / générer un PDF — recto = ordre de mission, verso = liste des élèves. Titre et responsable obligatoires.
 </div>
 
 <!-- AIDE -->
@@ -881,7 +877,7 @@ function doImport(evt){
 }
 
 /* ── IMPRESSION ── */
-function doPrint(){
+function prepPrint(){
   var titre = gv('titre'), resp = gv('resp-nom');
   if(!titre || !resp){
     var msg = '⚠️ Champs obligatoires manquants :\n';
@@ -941,13 +937,11 @@ function doPrint(){
     var el = document.getElementById(id);
     if(el) el.classList.remove('np');
   });
-
-  window.print();
-
-  setTimeout(function(){
-    document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); });
-  }, 800);
 }
+window.addEventListener('beforeprint', function(){ prepPrint(); });
+window.addEventListener('afterprint', function(){
+  setTimeout(function(){ document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); }); }, 200);
+});
 
 /* ── EMAIL ── */
 function doMail(){

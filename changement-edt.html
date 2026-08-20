@@ -279,16 +279,19 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   body{background:#fff;font-size:9pt;line-height:1.35;color:#000;font-family:Arial,sans-serif}
   .main{margin:0;padding:0;max-width:100%}
   .page-header{
-    background:linear-gradient(135deg,var(--p) 0%,var(--pd) 100%)!important;
-    padding:8px 14px;gap:10px;border-bottom:2px solid var(--a)!important;
+    background:#f5f5f5!important;color:#000!important;
+    padding:8px 14px;gap:10px;border-bottom:2px solid #aaa!important;
   }
-  .hlogo{width:44px;height:44px;font-size:20px}
+  .page-header .htitle h1{color:#000!important;}
+  .page-header .htitle p{color:#444!important;opacity:1!important;}
+  .hlogo{width:44px;height:44px;font-size:20px;background:#ddd!important;border-color:#bbb!important;}
   .htitle h1{font-size:12pt}
   .htitle p{font-size:8pt}
-  .hinfo-field input{font-size:9pt;padding:1px 5px;background:transparent!important;border-color:rgba(255,255,255,.5)!important}
+  .hinfo-field{color:#333!important;}
+  .hinfo-field input{font-size:9pt;padding:1px 5px;background:#fff!important;border-color:#bbb!important;color:#000!important;}
   .section{box-shadow:none;border:1px solid #bbb;border-radius:4px;margin-bottom:6px;break-inside:avoid}
-  .sh{padding:5px 10px;font-size:10pt;background:linear-gradient(90deg,var(--p),var(--ps))!important}
-  .sh-num{width:17px;height:17px;font-size:8pt}
+  .sh{padding:5px 10px;font-size:10pt;background:#e8e8e8!important;color:#000!important;}
+  .sh-num{width:17px;height:17px;font-size:8pt;background:#999!important;color:#fff!important;}
   .sb{padding:8px 10px}
   .fg{gap:8px}
   .fgr{gap:2px}
@@ -324,8 +327,6 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   <button class="btn bo2" onclick="saveJSON()">💾 Sauvegarder</button>
   <div class="toolbar-sep"></div>
   <button class="btn bo2" onclick="openGuide()">Guide</button>
-  <button class="btn bo2" onclick="window.print()">🖨 Imprimer</button>
-  <button class="btn bi" onclick="downloadPDF()">PDF</button>
   <button class="btn bp" onclick="openSendModal()">✉ Envoyer la demande</button>
 </div>
 
@@ -568,7 +569,7 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       </div>
 
       <div class="guide-tip">
-        💡 <strong>Astuce :</strong> le bouton <strong>🖨 Imprimer</strong> génère une impression A4 propre si vous préférez remettre la demande en main propre à la Direction.
+        💡 <strong>Astuce :</strong> Utilisez <strong>Ctrl+P</strong> (ou Cmd+P sur Mac) pour imprimer ou générer un PDF si vous préférez remettre la demande en main propre à la Direction.
       </div>
     </div>
     <div class="modal-foot">
