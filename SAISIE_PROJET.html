@@ -158,6 +158,7 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
 .mbt:hover{opacity:.87;}
 .mbt-g{background:var(--gr);color:#fff;}
 .mbt-l{background:var(--gr-lt);color:var(--gr);}
+.mbt-b{background:#2980b9;color:#fff;}
 .mbt-c{background:#eee;color:#555;}
 
 @media(max-width:600px){.row{flex-direction:column;}.ph{flex-direction:column;gap:12px;}#bar{padding:8px 12px;}}
@@ -515,14 +516,15 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
   <div class="mb">
     <h2>📤 Envoyer la fiche à la direction</h2>
     <p>
-      <strong>Étape 1 :</strong> Téléchargez le fichier JSON (nommé automatiquement <em>Titre_date.json</em>).<br>
-      <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le fichier manuellement.<br><br>
+      <strong>Étape 1 :</strong> Imprimez / générez le PDF — votre navigateur ouvre la fenêtre d'impression. Choisissez <em>Enregistrer en PDF</em>.<br>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le PDF avant d'envoyer.<br><br>
       📧 <strong>Chef d'établissement :</strong> <span id="mail-chef"></span><br>
       📧 <strong>Secrétariat :</strong> <span id="mail-sec"></span>
     </p>
     <div class="mbs">
-      <button class="mbt mbt-l" onclick="doExport()">💾 Télécharger le fichier</button>
+      <button class="mbt mbt-b" onclick="window.print()">🖨 Imprimer / PDF</button>
       <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
+      <button class="mbt mbt-l" onclick="doExport()">💾 Enregistrer (.json)</button>
       <button class="mbt mbt-c" onclick="closeMod()">Fermer</button>
     </div>
   </div>

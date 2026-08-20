@@ -149,7 +149,7 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
 .mbs{display:flex;gap:9px;flex-wrap:wrap;}
 .mbt{flex:1;padding:10px;border:none;border-radius:7px;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
 .mbt:hover{opacity:.87;}
-.mbt-g{background:var(--gr);color:#fff;} .mbt-l{background:var(--gr-lt);color:var(--gr);} .mbt-c{background:#eee;color:#555;}
+.mbt-g{background:var(--gr);color:#fff;} .mbt-l{background:var(--gr-lt);color:var(--gr);} .mbt-b{background:#2980b9;color:#fff;} .mbt-c{background:#eee;color:#555;}
 
 @media(max-width:600px){.row{flex-direction:column;}.ph{flex-direction:column;gap:12px;}.radio-big{flex-direction:column;}.avis-grid{grid-template-columns:1fr;}}
 /* ── VERROUILLAGE DIRECTION ── */
@@ -594,14 +594,15 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
   <div class="mb">
     <h2>📤 Envoyer l'ordre de mission</h2>
     <p>
-      <strong>Étape 1 :</strong> Téléchargez le fichier JSON.<br>
-      <strong>Étape 2 :</strong> Ouvrez la messagerie pré-remplie et joignez le fichier + la liste des élèves.<br><br>
-      📧 <strong>Chef d'établissement :</strong> <a href="mailto:christophe.bignon@ac-guyane.fr">christophe.bignon@ac-guyane.fr</a><br>
-      📧 <strong>Secrétariat :</strong> <a href="mailto:tatiana.agesilas@ac-guyane.fr">tatiana.agesilas@ac-guyane.fr</a>
+      <strong>Étape 1 :</strong> Imprimez / générez le PDF — votre navigateur ouvre la fenêtre d'impression. Choisissez <em>Enregistrer en PDF</em> (recto = ordre de mission, verso = liste des élèves).<br>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie pré-remplie et joignez le PDF avant d'envoyer.<br><br>
+      📧 <strong>Chef d'établissement :</strong> <span id="mail-chef-om"></span><br>
+      📧 <strong>Secrétariat :</strong> <span id="mail-sec-om"></span>
     </p>
     <div class="mbs">
-      <button class="mbt mbt-l" onclick="doExport()">💾 Télécharger le fichier</button>
+      <button class="mbt mbt-b" onclick="window.print()">🖨 Imprimer / PDF</button>
       <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
+      <button class="mbt mbt-l" onclick="doExport()">💾 Enregistrer (.json)</button>
       <button class="mbt mbt-c" onclick="closeMod()">Fermer</button>
     </div>
   </div>
@@ -963,6 +964,11 @@ function doMail(){
 }
 
 /* ── MODAL ── */
+(function(){
+  var m1='christophe.bignon', m2='tatiana.agesilas', d='ac-guyane.fr';
+  var s1=document.getElementById('mail-chef-om'); if(s1) s1.textContent=m1+'@'+d;
+  var s2=document.getElementById('mail-sec-om');  if(s2) s2.textContent=m2+'@'+d;
+})();
 function openMod(){ localStorage.setItem(KEY, JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
 function closeMod(){ document.getElementById('mod').classList.remove('on'); }
 document.getElementById('mod').addEventListener('click', function(ev){ if(ev.target === this) closeMod(); });
