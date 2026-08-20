@@ -521,8 +521,8 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
     <p>
       <strong>Étape 1 :</strong> Téléchargez le fichier JSON (nommé automatiquement <em>Titre_date.json</em>).<br>
       <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le fichier manuellement.<br><br>
-      📧 <strong>Chef d'établissement :</strong> christophe.bignon@ac-guyane.fr<br>
-      📧 <strong>Secrétariat :</strong> tatiana.agesilas@ac-guyane.fr
+      📧 <strong>Chef d'établissement :</strong> <span id="mail-chef"></span><br>
+      📧 <strong>Secrétariat :</strong> <span id="mail-sec"></span>
     </p>
     <div class="mbs">
       <button class="mbt mbt-l" onclick="doExport()">💾 Télécharger le fichier</button>
@@ -892,6 +892,11 @@ function doMail(){
 }
 
 /* ── MODAL ── */
+(function(){
+  var m1='christophe.bignon',m2='tatiana.agesilas',d='ac-guyane.fr';
+  var s1=document.getElementById('mail-chef'); if(s1) s1.textContent=m1+'@'+d;
+  var s2=document.getElementById('mail-sec');  if(s2) s2.textContent=m2+'@'+d;
+})();
 function openMod(){ localStorage.setItem(LSKEY,JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
 function closeMod(){ document.getElementById('mod').classList.remove('on'); }
 document.getElementById('mod').addEventListener('click',function(e){ if(e.target===this) closeMod(); });
