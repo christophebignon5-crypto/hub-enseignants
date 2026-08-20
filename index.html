@@ -76,6 +76,9 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx);font-s
 .open-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:var(--gr);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none;transition:background .2s,box-shadow .2s;}
 .open-btn:hover{background:var(--gr-md);box-shadow:0 3px 10px rgba(26,107,74,.25);}
 .open-btn svg{width:13px;height:13px;fill:#fff;}
+.apc-paused{opacity:.55;pointer-events:none;}
+.apc-paused:hover{transform:none!important;box-shadow:var(--sh)!important;border-color:transparent!important;}
+.paused-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#e0e0e0;color:#888;border-radius:8px;font-size:12px;font-weight:700;cursor:default;}
 
 /* ── EMPTY STATE ── */
 .empty{text-align:center;padding:70px 20px;color:var(--mu);}
@@ -410,7 +413,8 @@ const DEFAULT_APPS = [
     emoji: '📋',
     url: 'Fiche_Professeur_2026-2027.html',
     description: 'Fiche de préparation de rentrée 2026-2027 pour les professeurs. Renseignez vos informations, classes et emploi du temps avant la rentrée.',
-    builtin: true
+    builtin: true,
+    paused: true
   },
   {
     id: 'autorisation-absence',
@@ -577,7 +581,7 @@ function renderApps(){
 
   var h = '';
   apps.forEach(function(a){
-    h += '<div class="apc">'
+    h += '<div class="apc' + (a.paused ? ' apc-paused' : '') + '">'
       + '<div class="apc-head">'
         + '<div class="apc-ico" style="background:' + a.catBg + '">' + a.emoji + '</div>'
         + '<div class="apc-meta">'
@@ -592,10 +596,12 @@ function renderApps(){
             ? '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Intégré'
             : '<svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg> Personnalisé')
         + '</span>'
-        + '<a class="open-btn" href="' + esc(a.url) + '" target="_blank">'
-          + '<svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>'
-          + 'Ouvrir'
-        + '</a>'
+        + (a.paused
+          ? '<span class="paused-btn">⏸ En pause</span>'
+          : '<a class="open-btn" href="' + esc(a.url) + '" target="_blank">'
+              + '<svg viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 00-2 2v14a2 2 0 002 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>'
+              + 'Ouvrir'
+            + '</a>')
       + '</div>'
       + '</div>';
   });
