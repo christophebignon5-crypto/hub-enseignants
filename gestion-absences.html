@@ -6,7 +6,7 @@
 <title>Gestion Absences Personnel — LPO Léopold Elfort</title>
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -160,6 +160,13 @@ tr:hover td{background:#fafafa}
   .form-grid{grid-template-columns:1fr}
   .rapport-filters{grid-template-columns:1fr}
 }
+@keyframes toast-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toast-out{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(20px)}}
+.toast-rappel{position:fixed;bottom:24px;right:24px;z-index:9999;background:#1a237e;color:#fff;padding:14px 18px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.28);max-width:340px;font-size:13.5px;line-height:1.5;display:flex;gap:12px;align-items:flex-start;animation:toast-in .3s ease;}
+.toast-rappel.out{animation:toast-out .3s ease forwards;}
+.toast-rappel .ti{font-size:22px;flex-shrink:0;}
+.toast-rappel a{color:#90caf9;font-weight:700;text-decoration:underline;cursor:pointer;}
+.toast-rappel button{background:none;border:none;color:#fff;opacity:.7;font-size:16px;cursor:pointer;line-height:1;margin-left:8px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -1635,14 +1642,32 @@ const TABS = [
   {id:'aide',label:'❓ Aide'},
 ];
 
+const ToastRappel = ({onClose, onGoParam}) => {
+  const [out, setOut] = React.useState(false);
+  const close = () => { setOut(true); setTimeout(onClose, 300); };
+  useEffect(()=>{ const t=setTimeout(close, 9000); return ()=>clearTimeout(t); },[]);
+  return (
+    <div className={'toast-rappel'+(out?' out':'')}>
+      <span className="ti">💾</span>
+      <div>
+        <strong>Absence enregistrée.</strong><br/>
+        Pensez à sauvegarder vos données via{' '}
+        <a onClick={()=>{onGoParam();close();}}>Paramètres → Exporter</a>.
+      </div>
+      <button onClick={close} title="Fermer">✕</button>
+    </div>
+  );
+};
+
 const App = () => {
   const [user, setUser] = useState(null);
   const [tab, setTab] = useState('dashboard');
   const [data, setData] = useState(()=>loadData());
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(()=>saveData(data),[data]);
 
-  const addAbsence = a => setData(d=>({...d, absences:[...d.absences, a]}));
+  const addAbsence = a => { setData(d=>({...d, absences:[...d.absences, a]})); setShowToast(true); };
   const editAbsence = a => setData(d=>({...d, absences:d.absences.map(x=>x.id===a.id?a:x)}));
   const delAbsence = id => setData(d=>({...d, absences:d.absences.filter(x=>x.id!==id)}));
 
@@ -1673,6 +1698,7 @@ const App = () => {
       {tab==='rapports' && <RapportsPage personnel={data.personnel} absences={data.absences}/>}
       {tab==='parametres' && <ParametresPage data={data} onRestore={restore}/>}
       {tab==='aide' && <AidePage/>}
+      {showToast && <ToastRappel onClose={()=>setShowToast(false)} onGoParam={()=>setTab('parametres')}/>}
     </>
   );
 };
