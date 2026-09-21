@@ -387,6 +387,8 @@ input[type=text]{text-transform:inherit}
   input[type=text],input[type=date],input[type=number],select{
     border:1px solid #bbb;border-radius:3px;padding:2px 5px;font-size:8pt;background:#fff;color:#1e3a6e!important;
   }
+  input::placeholder,textarea::placeholder{color:transparent!important;opacity:0!important;}
+  ::-webkit-input-placeholder{color:transparent!important;opacity:0!important;}
   .type-cards{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
   .type-card{padding:6px 8px;border-radius:4px}
   .type-card:not(.active){display:none}

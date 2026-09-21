@@ -300,6 +300,8 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   input[type=text],input[type=date],input[type=time],input[type=number],select,textarea{
     border:1px solid #bbb;border-radius:3px;padding:3px 6px;font-size:9pt;background:#fff;color:#1e3a6e!important;
   }
+  input::placeholder,textarea::placeholder{color:transparent!important;opacity:0!important;}
+  ::-webkit-input-placeholder{color:transparent!important;opacity:0!important;}
   textarea{min-height:48px}
   .heure-row{gap:6px}
   .heure-row input[type=time]{flex:0 0 100px}

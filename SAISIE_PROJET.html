@@ -207,6 +207,8 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
   textarea{min-height:unset;overflow:hidden;}
   select{display:none!important;}
   .sp{display:inline!important;color:#1e3a6e!important;} /* sel-print */
+  input::placeholder,textarea::placeholder{color:transparent!important;opacity:0!important;}
+  ::-webkit-input-placeholder{color:transparent!important;opacity:0!important;}
 
   /* lignes dynamiques vides → masquées */
   .dr.np{display:none!important;}
