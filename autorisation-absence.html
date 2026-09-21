@@ -385,7 +385,7 @@ input[type=text]{text-transform:inherit}
   .fgr{gap:2px}
   .fl{font-size:7pt;letter-spacing:0;margin-bottom:2px}
   input[type=text],input[type=date],input[type=number],select{
-    border:1px solid #bbb;border-radius:3px;padding:2px 5px;font-size:8pt;background:#fff;
+    border:1px solid #bbb;border-radius:3px;padding:2px 5px;font-size:8pt;background:#fff;color:#1e3a6e!important;
   }
   .type-cards{grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
   .type-card{padding:6px 8px;border-radius:4px}
@@ -1174,24 +1174,6 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
   document.getElementById('lock-modal').addEventListener('click',function(e){ if(e.target===this) window.closeLock(); });
 })();
 
-/* ── Impression : cases vides ── */
-(function(){
-  var _sv=[];
-  window.addEventListener('beforeprint',function(){
-    _sv=[];
-    document.querySelectorAll('input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],input[type=tel],select,textarea').forEach(function(el){
-      if(el.tagName==='SELECT'){_sv.push({el:el,v:el.selectedIndex});el.selectedIndex=-1;}
-      else{_sv.push({el:el,v:el.value});el.value='';}
-    });
-  });
-  window.addEventListener('afterprint',function(){
-    _sv.forEach(function(o){
-      if(o.el.tagName==='SELECT')o.el.selectedIndex=o.v;
-      else o.el.value=o.v;
-    });
-    _sv=[];
-  });
-})();
 </script>
 </body>
 </html>

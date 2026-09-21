@@ -200,8 +200,9 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
 
   /* Inputs → texte brut */
   input[type=text],input[type=email],input[type=date],input[type=time],input[type=number],textarea{
-    border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;
+    border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;color:#1e3a6e!important;
   }
+  .sp{color:#1e3a6e!important;}
   textarea{min-height:unset;overflow:hidden;}
   select{display:none!important;}
   .sp{display:inline!important;}
@@ -939,26 +940,8 @@ function prepPrint(){
     if(el) el.classList.remove('np');
   });
 }
-var _printSaved=[];
-window.addEventListener('beforeprint', function(){
-  prepPrint();
-  _printSaved=[];
-  document.querySelectorAll('input[type=text],input[type=email],input[type=date],input[type=time],input[type=number],select,textarea').forEach(function(el){
-    if(el.tagName==='SELECT'){_printSaved.push({el:el,v:el.selectedIndex});el.selectedIndex=-1;}
-    else{_printSaved.push({el:el,v:el.value});el.value='';}
-  });
-  document.querySelectorAll('.sp').forEach(function(el){
-    _printSaved.push({el:el,v:el.textContent,isSp:true});
-    el.textContent='';
-  });
-});
+window.addEventListener('beforeprint', function(){ prepPrint(); });
 window.addEventListener('afterprint', function(){
-  _printSaved.forEach(function(o){
-    if(o.isSp) o.el.textContent=o.v;
-    else if(o.el.tagName==='SELECT') o.el.selectedIndex=o.v;
-    else o.el.value=o.v;
-  });
-  _printSaved=[];
   setTimeout(function(){ document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); }); }, 200);
 });
 

@@ -203,10 +203,10 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
   .row{margin-bottom:5px;}
 
   /* inputs → texte brut */
-  input[type=text],input[type=email],input[type=date],input[type=number],textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;}
+  input[type=text],input[type=email],input[type=date],input[type=number],textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;color:#1e3a6e!important;}
   textarea{min-height:unset;overflow:hidden;}
   select{display:none!important;}
-  .sp{display:inline!important;} /* sel-print */
+  .sp{display:inline!important;color:#1e3a6e!important;} /* sel-print */
 
   /* lignes dynamiques vides → masquées */
   .dr.np{display:none!important;}
@@ -797,21 +797,8 @@ function doImport(evt){
 }
 
 /* ── IMPRESSION ── */
-var _printSaved=[];
-window.addEventListener('beforeprint', function(){
-  prepPrint();
-  _printSaved=[];
-  document.querySelectorAll('input[type=text],input[type=email],input[type=date],input[type=number],select,textarea').forEach(function(el){
-    if(el.tagName==='SELECT'){_printSaved.push({el:el,v:el.selectedIndex});el.selectedIndex=-1;}
-    else{_printSaved.push({el:el,v:el.value});el.value='';}
-  });
-});
+window.addEventListener('beforeprint', function(){ prepPrint(); });
 window.addEventListener('afterprint', function(){
-  _printSaved.forEach(function(o){
-    if(o.el.tagName==='SELECT') o.el.selectedIndex=o.v;
-    else o.el.value=o.v;
-  });
-  _printSaved=[];
   setTimeout(function(){ document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); }); },200);
 });
 function prepPrint(){
