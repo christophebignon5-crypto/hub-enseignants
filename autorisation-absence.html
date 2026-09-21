@@ -121,7 +121,7 @@ input[type=text],input[type=date],input[type=number],select{
   padding:9px 12px;font-family:'Outfit',sans-serif;
   font-size:14px;color:var(--tx);
   transition:border-color .2s,box-shadow .2s;
-  background:#fff;width:100%;
+  background:#fffde7;width:100%;
 }
 input:focus,select:focus{
   outline:none;border-color:var(--p);
@@ -252,7 +252,7 @@ input[type=text]{text-transform:inherit}
 .motif-refus-block textarea{
   width:100%;border:1px solid #f5c6c0;border-radius:5px;
   padding:7px 10px;font-family:'Outfit',sans-serif;font-size:13px;
-  color:var(--tx);background:#fff;resize:vertical;min-height:52px;
+  color:var(--tx);background:#fffde7;resize:vertical;min-height:52px;
   line-height:1.5;
 }
 .motif-refus-block textarea:focus{outline:none;border-color:var(--r);box-shadow:0 0 0 3px rgba(192,57,43,.1)}
@@ -1172,6 +1172,25 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
     }
   };
   document.getElementById('lock-modal').addEventListener('click',function(e){ if(e.target===this) window.closeLock(); });
+})();
+
+/* ── Impression : cases vides ── */
+(function(){
+  var _sv=[];
+  window.addEventListener('beforeprint',function(){
+    _sv=[];
+    document.querySelectorAll('input[type=text],input[type=date],input[type=time],input[type=number],input[type=email],input[type=tel],select,textarea').forEach(function(el){
+      if(el.tagName==='SELECT'){_sv.push({el:el,v:el.selectedIndex});el.selectedIndex=-1;}
+      else{_sv.push({el:el,v:el.value});el.value='';}
+    });
+  });
+  window.addEventListener('afterprint',function(){
+    _sv.forEach(function(o){
+      if(o.el.tagName==='SELECT')o.el.selectedIndex=o.v;
+      else o.el.value=o.v;
+    });
+    _sv=[];
+  });
 })();
 </script>
 </body>
