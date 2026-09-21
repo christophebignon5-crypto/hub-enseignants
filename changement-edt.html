@@ -317,6 +317,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
   .decision-opt{font-size:9pt;padding:3px 8px;border-radius:3px}
   .nb-note{font-size:8pt;padding:6px 9px;background:#fef9e7!important;border:1px solid #f0c060!important}
 }
+.send-fallback{background:#f5f7ff;border:1px solid #dde3f5;border-radius:8px;padding:10px 14px;margin-top:10px;}
+.send-fallback>p{font-size:11px;color:#888;margin:0 0 8px;font-style:italic;}
+.copy-row{display:flex;align-items:center;gap:8px;padding:5px 0;}
+.copy-row+.copy-row{border-top:1px solid #e8ecf5;padding-top:8px;}
+.copy-lbl{font-size:10.5px;color:#888;font-weight:700;width:82px;flex-shrink:0;}
+.copy-val{flex:1;font-size:12px;color:#1e3a6e;font-weight:500;word-break:break-all;}
+.copy-btn{background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer;flex-shrink:0;}
+.copy-btn:hover{background:#c8d5f0;}
 </style>
 </head>
 <body>
@@ -595,11 +603,20 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
       </div>
       <div class="send-step">
         <div class="s-num s2">2</div>
-        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF généré</strong> avant d'envoyer.<br>
-        <span style="color:var(--mu);font-size:11.5px;margin-top:4px;display:block">
-          Destinataire : <strong id="dest-display">direction.0973xxxx@ac-guyane.fr</strong>
-        </span>
-        </p>
+        <p>Cliquez sur <strong>Ouvrir la messagerie</strong> : votre messagerie s'ouvre avec le destinataire et l'objet pré-remplis. <strong>Joignez le PDF généré</strong> avant d'envoyer.</p>
+      </div>
+      <div class="send-fallback">
+        <p>📋 Si votre messagerie ne s'ouvre pas, copiez ces informations dans votre webmail :</p>
+        <div class="copy-row">
+          <span class="copy-lbl">Destinataire</span>
+          <span class="copy-val" id="copy-dest"></span>
+          <button class="copy-btn" onclick="copyClip('copy-dest',this)">📋 Copier</button>
+        </div>
+        <div class="copy-row">
+          <span class="copy-lbl">Objet</span>
+          <span class="copy-val" id="copy-subj">—</span>
+          <button class="copy-btn" onclick="copyClip('copy-subj',this)">📋 Copier</button>
+        </div>
       </div>
     </div>
     <div class="modal-foot">
@@ -783,7 +800,23 @@ function resetForm(){
 
 /* ── Modals ── */
 function openGuide()    {document.getElementById('modal-guide').classList.add('open');}
-function openSendModal(){document.getElementById('modal-send').classList.add('open');}
+function copyClip(id,btn){
+  var t=document.getElementById(id).textContent;
+  if(!t||t==='—')return;
+  navigator.clipboard.writeText(t).then(function(){
+    var o=btn.textContent;btn.textContent='✓ Copié';btn.style.color='#2e7d32';
+    setTimeout(function(){btn.textContent=o;btn.style.color='';},2000);
+  });
+}
+function openSendModal(){
+  var d=collectData();
+  var nom=d.nom_prof||'—';
+  var m1='tatiana.agesilas',dom='ac-guyane.fr';
+  var dd=document.getElementById('copy-dest');if(dd)dd.textContent=m1+'@'+dom;
+  var ds=document.getElementById('copy-subj');
+  if(ds)ds.textContent="Demande de changement d’EDT – "+nom+" – cours du "+fmtDate(d.date_cours)+" ("+(d.classe||'—')+")";
+  document.getElementById('modal-send').classList.add('open');
+}
 function closeModal(id) {document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-ov').forEach(m=>{
   m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});

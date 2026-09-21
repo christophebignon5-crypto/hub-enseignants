@@ -519,10 +519,26 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
     <h2>📤 Envoyer la fiche à la direction</h2>
     <p>
       <strong>Étape 1 :</strong> Imprimez / générez le PDF — votre navigateur ouvre la fenêtre d'impression. Choisissez <em>Enregistrer en PDF</em>.<br>
-      <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le PDF avant d'envoyer.<br><br>
-      📧 <strong>Chef d'établissement :</strong> <span id="mail-chef"></span><br>
-      📧 <strong>Secrétariat :</strong> <span id="mail-sec"></span>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie — l'e-mail est pré-rempli. Joignez le PDF avant d'envoyer.<br>
+      <span style="font-size:11.5px;font-style:italic;color:#888">Si votre messagerie ne s'ouvre pas, copiez les informations ci-dessous :</span>
     </p>
+    <div style="background:#f5f7ff;border:1px solid #dde3f5;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12.5px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Destinataire</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-chef"></span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-chef',this)">📋 Copier</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #e8ecf5;margin-top:4px;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Copie (cc)</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-sec"></span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-sec',this)">📋 Copier</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #e8ecf5;margin-top:4px;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Objet</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-subj-proj">—</span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-subj-proj',this)">📋 Copier</button>
+      </div>
+    </div>
     <div class="mbs">
       <button class="mbt mbt-b" onclick="window.print()">🖨 Imprimer / PDF</button>
       <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
@@ -889,7 +905,21 @@ function doMail(){
   var s1=document.getElementById('mail-chef'); if(s1) s1.textContent=m1+'@'+d;
   var s2=document.getElementById('mail-sec');  if(s2) s2.textContent=m2+'@'+d;
 })();
-function openMod(){ localStorage.setItem(LSKEY,JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
+function copyClip(id,btn){
+  var t=document.getElementById(id).textContent;
+  if(!t||t==='—')return;
+  navigator.clipboard.writeText(t).then(function(){
+    var o=btn.textContent;btn.textContent='✓ Copié';btn.style.color='#2e7d32';
+    setTimeout(function(){btn.textContent=o;btn.style.color='';},2000);
+  });
+}
+function openMod(){
+  localStorage.setItem(LSKEY,JSON.stringify(getData()));
+  var d=getData();
+  var subj='[Fiche Projet] '+(d.titre||'Projet');
+  var ss=document.getElementById('mail-subj-proj'); if(ss) ss.textContent=subj;
+  document.getElementById('mod').classList.add('on');
+}
 function closeMod(){ document.getElementById('mod').classList.remove('on'); }
 document.getElementById('mod').addEventListener('click',function(e){ if(e.target===this) closeMod(); });
 

@@ -597,11 +597,27 @@ details.paste-det[open] .paste-arr{transform:rotate(90deg);}
   <div class="mb">
     <h2>📤 Envoyer l'ordre de mission</h2>
     <p>
-      <strong>Étape 1 :</strong> Imprimez / générez le PDF — votre navigateur ouvre la fenêtre d'impression. Choisissez <em>Enregistrer en PDF</em> (recto = ordre de mission, verso = liste des élèves).<br>
-      <strong>Étape 2 :</strong> Ouvrez la messagerie pré-remplie et joignez le PDF avant d'envoyer.<br><br>
-      📧 <strong>Chef d'établissement :</strong> <span id="mail-chef-om"></span><br>
-      📧 <strong>Secrétariat :</strong> <span id="mail-sec-om"></span>
+      <strong>Étape 1 :</strong> Imprimez / générez le PDF. Choisissez <em>Enregistrer en PDF</em> (recto = ordre de mission, verso = liste des élèves).<br>
+      <strong>Étape 2 :</strong> Ouvrez la messagerie pré-remplie et joignez le PDF avant d'envoyer.<br>
+      <span style="font-size:11.5px;font-style:italic;color:#888">Si votre messagerie ne s'ouvre pas, copiez les informations ci-dessous :</span>
     </p>
+    <div style="background:#f5f7ff;border:1px solid #dde3f5;border-radius:8px;padding:10px 14px;margin-bottom:10px;font-size:12.5px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Destinataire</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-chef-om"></span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-chef-om',this)">📋 Copier</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #e8ecf5;margin-top:4px;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Copie (cc)</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-sec-om"></span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-sec-om',this)">📋 Copier</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-top:1px solid #e8ecf5;margin-top:4px;">
+        <span style="width:90px;color:#888;font-size:11px;font-weight:700;flex-shrink:0">Objet</span>
+        <span style="flex:1;color:#1e3a6e;font-weight:500" id="mail-subj-om">—</span>
+        <button style="background:#e3e9f8;border:1px solid #c5cee8;color:#1e3a6e;border-radius:5px;padding:3px 8px;font-size:11px;cursor:pointer" onclick="copyClip('mail-subj-om',this)">📋 Copier</button>
+      </div>
+    </div>
     <div class="mbs">
       <button class="mbt mbt-b" onclick="window.print()">🖨 Imprimer / PDF</button>
       <button class="mbt mbt-g" onclick="doMail()">✉️ Ouvrir la messagerie</button>
@@ -966,13 +982,27 @@ function doMail(){
   window.location.href = 'mailto:christophe.bignon@ac-guyane.fr?cc=tatiana.agesilas@ac-guyane.fr&subject=' + sub + '&body=' + body;
 }
 
+function copyClip(id,btn){
+  var t=document.getElementById(id).textContent;
+  if(!t||t==='—')return;
+  navigator.clipboard.writeText(t).then(function(){
+    var o=btn.textContent;btn.textContent='✓ Copié';btn.style.color='#2e7d32';
+    setTimeout(function(){btn.textContent=o;btn.style.color='';},2000);
+  });
+}
 /* ── MODAL ── */
 (function(){
   var m1='christophe.bignon', m2='tatiana.agesilas', d='ac-guyane.fr';
   var s1=document.getElementById('mail-chef-om'); if(s1) s1.textContent=m1+'@'+d;
   var s2=document.getElementById('mail-sec-om');  if(s2) s2.textContent=m2+'@'+d;
 })();
-function openMod(){ localStorage.setItem(KEY, JSON.stringify(getData())); document.getElementById('mod').classList.add('on'); }
+function openMod(){
+  localStorage.setItem(KEY, JSON.stringify(getData()));
+  var d=getData();
+  var subj='[Ordre de Mission] '+(d.titre||'Ordre de Mission');
+  var ss=document.getElementById('mail-subj-om'); if(ss) ss.textContent=subj;
+  document.getElementById('mod').classList.add('on');
+}
 function closeMod(){ document.getElementById('mod').classList.remove('on'); }
 document.getElementById('mod').addEventListener('click', function(ev){ if(ev.target === this) closeMod(); });
 
