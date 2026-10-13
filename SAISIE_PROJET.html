@@ -97,6 +97,7 @@ input[type=number]{-moz-appearance:textfield;}
 .dt{font-size:10px;font-weight:700;color:var(--gr);text-transform:uppercase;background:var(--gr-lt);padding:2px 7px;border-radius:4px;min-width:60px;text-align:center;flex-shrink:0;white-space:nowrap;}
 .dr input{flex:1;border:none;background:transparent;padding:3px 5px;font-size:13px;}
 .dr input:focus{outline:none;border-bottom:2px solid var(--gr-md);}
+.pv{display:none;}
 
 /* ── DEP TABLE ── */
 .dep-wrap{overflow-x:auto;margin-bottom:8px;}
@@ -205,6 +206,11 @@ table.dt-tbl td input.ra{text-align:right;font-weight:700;color:var(--gr);}
   /* inputs → texte brut */
   input[type=text],input[type=email],input[type=date],input[type=number],textarea{border:none!important;background:transparent!important;box-shadow:none!important;padding:1px 0!important;font-size:8.5pt;min-height:unset;color:#1e3a6e!important;}
   textarea{min-height:unset;overflow:hidden;}
+  /* champs texte → copie imprimable (texte long jamais tronqué) */
+  .pf{display:none!important;}
+  .pv{display:block!important;flex:1;min-width:0;min-height:1.3em;padding:1px 0;font-size:8.5pt;color:#1e3a6e;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
+  .sec{overflow:visible;}
+  #s-pres,#s-orga{break-inside:auto;}
   select{display:none!important;}
   .sp{display:inline!important;color:#1e3a6e!important;} /* sel-print */
   input::placeholder,textarea::placeholder{color:transparent!important;opacity:0!important;}
@@ -817,10 +823,29 @@ function doImport(evt){
 /* ── IMPRESSION ── */
 window.addEventListener('beforeprint', function(){ prepPrint(); });
 window.addEventListener('afterprint', function(){
-  setTimeout(function(){ document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); }); },200);
+  setTimeout(function(){
+    document.querySelectorAll('.np').forEach(function(el){ el.classList.remove('np'); });
+    clearPv();
+  },200);
 });
+function clearPv(){
+  document.querySelectorAll('.pv').forEach(function(el){ el.remove(); });
+  document.querySelectorAll('.pf').forEach(function(el){ el.classList.remove('pf'); });
+}
 function prepPrint(){
   localStorage.setItem(LSKEY,JSON.stringify(getData()));
+
+  // Copie imprimable des champs texte : un textarea/input garde sa taille écran et coupe le texte long
+  clearPv();
+  document.querySelectorAll('.wrap textarea,.wrap input[type=text],.wrap input[type=email]').forEach(function(f){
+    if(!f.value) return; // champ vide : rendu d'origine conservé
+    var pv=document.createElement('div');
+    pv.className='pv';
+    pv.textContent=f.value;
+    if(f.style.textAlign) pv.style.textAlign=f.style.textAlign;
+    f.classList.add('pf');
+    f.parentNode.insertBefore(pv,f.nextSibling);
+  });
 
   // Marquer lignes dynamiques vides
   document.querySelectorAll('.dr').forEach(function(r){

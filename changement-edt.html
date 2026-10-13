@@ -872,5 +872,35 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
 })();
 
 </script>
+<!-- Impression : zones de texte longues jamais tronquées -->
+<style>
+.pv{display:none;}
+@media print{
+  .pf{display:none!important;}
+  .pv{display:block!important;min-height:1.3em;padding:1px 0;font-size:8.5pt;line-height:1.45;color:#1e3a6e;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
+  .sec,.section{overflow:visible!important;}
+}
+</style>
+<script>
+(function(){
+  function clearPv(){
+    document.querySelectorAll('.pv').forEach(function(el){ el.remove(); });
+    document.querySelectorAll('.pf').forEach(function(el){ el.classList.remove('pf'); });
+  }
+  // Un textarea garde sa taille écran à l'impression et coupe le texte long : on imprime une copie en texte simple
+  window.addEventListener('beforeprint',function(){
+    clearPv();
+    document.querySelectorAll('textarea').forEach(function(f){
+      if(!f.value||getComputedStyle(f).display==='none') return;
+      var pv=document.createElement('div');
+      pv.className='pv';
+      pv.textContent=f.value;
+      f.classList.add('pf');
+      f.parentNode.insertBefore(pv,f.nextSibling);
+    });
+  });
+  window.addEventListener('afterprint',function(){ setTimeout(clearPv,200); });
+})();
+</script>
 </body>
 </html>
