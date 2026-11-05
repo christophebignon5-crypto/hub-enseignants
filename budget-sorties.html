@@ -274,32 +274,62 @@
 
     /* ============================ IMPRESSION (PDF) ============================ */
     .print-only { display: none; }
+    /* Valeurs de saisie recopiées en texte pour l'impression (voir App) */
+    .val-impr { display: none; }
     @media print {
-      /* Objectif : tenir sur UN RECTO-VERSO (2 pages A4 maximum) */
-      @page { margin: 10mm; size: A4; }
-      body { background: #fff; font-size: 10px; line-height: 1.25; }
+      /* Récapitulatif PDF : A4 PAYSAGE, UNE PAGE PAR PARTIE */
+      @page { margin: 9mm 10mm; size: A4 landscape; }
+      body { background: #fff; font-size: 10.5px; line-height: 1.3; }
       header.app-header, .toolbar, .tabs, .no-print, .guide-banner,
       .ligne-actions, .delete-x, button,
-      .graphiques, .info-box, .footer-note.no-print { display: none !important; }
-      /* Les graphiques (camemberts / barres) sont masqués pour rester en 2 pages :
-         seuls les tableaux et la synthèse chiffrée sont imprimés. */
+      .info-box, .footer-note.no-print { display: none !important; }
+      /* Encadrés qui contiennent une donnée saisie : conservés */
+      .info-box.imprimer { display: flex !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; padding: 7px 10px; margin: 6px 0; }
       .print-only { display: block; }
-      main { max-width: none; padding: 0; }
-      .carte { box-shadow: none; border: 1px solid #bbb; break-inside: avoid; margin-bottom: 8px; }
-      .carte-corps { padding: 8px 10px; }
-      .carte > .carte-titre { padding: 5px 10px; font-size: 11.5px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .res-carte, .res-carte *, .cascade .ligne { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .res-carte { padding: 8px 10px; }
-      .res-carte .val { font-size: 17px; }
+      main { max-width: none !important; padding: 0 !important; }
+
+      /* Une partie = une page */
+      .partie { break-before: page; page-break-before: always; }
+      .partie.premiere { break-before: auto; page-break-before: auto; }
+      .carte { box-shadow: none; border: 1px solid #bbb; margin-bottom: 0; break-inside: auto; }
+      .carte-corps { padding: 8px 12px; }
+      .carte > .carte-titre { padding: 6px 12px; font-size: 13px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .res-carte, .res-carte *, .cascade .ligne, .bandeau-ctrl, .jauge, .jauge * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .res-carte { padding: 7px 10px; break-inside: avoid; }
+      .res-carte .val { font-size: 16px; }
       .resultats { gap: 6px; break-inside: avoid; }
-      .cascade .ligne { padding: 4px 8px; margin-bottom: 3px; }
-      input, select, textarea { border: none !important; padding: 1px 0 !important; background: transparent !important; font-size: 10px; }
-      .phrase-cle { padding: 8px 10px; font-size: 12px; margin: 8px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      .phrase-cle b { font-size: 15px; }
-      .grille { gap: 5px 14px; }
-      th, td { padding: 2px 5px; font-size: 9.5px; }
-      h4 { margin: 4px 0; }
+      .cascade { break-inside: avoid; }
+      .cascade .ligne { padding: 3px 8px; margin-bottom: 2px; }
+      .phrase-cle { padding: 7px 10px; font-size: 12px; margin: 6px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .phrase-cle b { font-size: 14px; }
+      .grille { gap: 5px 16px; }
+      h4 { margin: 6px 0 4px !important; }
       hr { margin: 6px 0 !important; }
+      .aide { font-size: 9.5px; }
+
+      /* Tableaux : largeur complète, texte qui revient à la ligne (rien n'est coupé) */
+      .tbl-wrap { overflow: visible !important; }
+      table { width: 100% !important; table-layout: auto !important; }
+      th, td { padding: 3px 6px; font-size: 10px; white-space: normal !important; overflow: visible !important; }
+      tr { break-inside: avoid; }
+
+      /* Champs de saisie remplacés par leur valeur en texte */
+      input:not([type=checkbox]):not([type=radio]), select, textarea { display: none !important; }
+      .val-impr { display: inline-block; font-weight: 600; color: #111; white-space: pre-wrap; word-break: break-word; min-height: 1em; }
+      td .val-impr { display: block; }
+      td.montant .val-impr, .num-input + .val-impr { text-align: right; }
+
+      html, body { background: #fff !important; }
+      /* Partie 3 (financement) : deux colonnes pour tenir sur une page */
+      .partie.deux-col > .carte-corps { column-count: 2; column-gap: 18px; }
+      .partie.deux-col > .carte-corps > * { break-inside: avoid; }
+      .partie.deux-col > .carte-corps > h4 { break-after: avoid; }
+      .partie.deux-col .resultats { grid-template-columns: repeat(2, 1fr) !important; display: grid !important; }
+      /* Page Visualisation : graphiques réduits pour tenir sur une page */
+      .partie.visu { zoom: 0.68; }
+      /* Graphiques : sur leur propre page, à taille fixe */
+      .graphiques { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .recharts-wrapper, .recharts-surface { max-width: 100% !important; }
     }
 
     @media (max-width: 640px) {
@@ -370,7 +400,7 @@ function repartirDevis(total, cible, nbEleves, nbAccomp) {
 
 /* ---------------------------------------------------------------
    MODULE ERASMUS — QTE déduite automatiquement de la cible :
-   - "eleves"  => 1 (forfait global élèves, pas de choix)
+   - "eleves"  => 1 (dépense pour UN SEUL élève, non répartie entre tous)
    - "groupe"  => nombre d'élèves
    - "accomp"  => nombre d'accompagnateurs
    Ventilation : "groupe" et "eleves" = 100 % élèves ; "accomp" = 100 % accomp.
@@ -386,7 +416,7 @@ function repartirErasmus(total, cible) {
 }
 const CIBLES_ERASMUS = [
   { id: "groupe", label: "Groupe" },
-  { id: "eleves", label: "Élèves seuls" },
+  { id: "eleves", label: "Un seul élève" },
   { id: "accomp", label: "Accompagnateurs seuls" },
 ];
 
@@ -437,6 +467,10 @@ function etatInitial() {
         ligneSubvention("Co-financement établissement", 0),
       ],
       famillesMontantParEleve: 0,  // montant demandé par élève (0 = aucune participation)
+      /* Caution par élève (information seulement — HORS budget).
+         Demandée en cas de dégradation dans les hébergements,
+         conformément à la charte des sorties et voyages du lycée. */
+      cautionParEleve: 0,
     },
   };
 }
@@ -628,7 +662,7 @@ function CarteGraphique({ titre, nomFichier, children }) {
 /* Choix du mode de calcul de la part familles (commun Sortie / Erasmus) */
 function ChoixPartFamilles({ data, set }) {
   return (
-    <div className="info-box" style={{ flexDirection: "column", alignItems: "stretch" }}>
+    <div className="info-box imprimer" style={{ flexDirection: "column", alignItems: "stretch" }}>
       <div style={{ display: "flex", gap: 10 }}>
         <span className="ico">👪</span>
         <div style={{ flex: 1 }}>
@@ -660,7 +694,7 @@ function ModuleSortie({ state, dispatch, calc }) {
   return (
     <div>
       {/* ---------- ÉTAPE 1 : informations générales ---------- */}
-      <div className="carte">
+      <div className="carte partie premiere">
         <TitreEtape n={1}>Informations sur la sortie</TitreEtape>
         <div className="carte-corps">
           <div className="grille">
@@ -675,7 +709,7 @@ function ModuleSortie({ state, dispatch, calc }) {
       </div>
 
       {/* ---------- ÉTAPE 2 : devis / dépenses ---------- */}
-      <div className="carte">
+      <div className="carte partie">
         <TitreEtape n={2}>Les dépenses (devis)</TitreEtape>
         <div className="carte-corps">
           <div className="info-box">
@@ -759,7 +793,7 @@ function ModuleSortie({ state, dispatch, calc }) {
       </div>
 
       {/* ---------- ÉTAPE 3 : financement ---------- */}
-      <div className="carte">
+      <div className="carte partie deux-col">
         <TitreEtape n={3}>Le financement (recettes)</TitreEtape>
         <div className="carte-corps">
           <div className="info-box">
@@ -841,7 +875,7 @@ function ModuleSortie({ state, dispatch, calc }) {
       </div>
 
       {/* ---------- GRAPHIQUES ---------- */}
-      <div className="carte">
+      <div className="carte partie visu">
         <div className="carte-titre">📊 Visualisation</div>
         <div className="carte-corps">
           <CarteGraphique titre="📊 Équilibre Dépenses / Recettes" nomFichier="equilibre_budget_sortie.png">
@@ -943,7 +977,14 @@ function ModuleErasmus({ state, dispatch, calc }) {
     s1.addShape(pptx.ShapeType.rect, { x: 0, y: 2.3, w: 13.33, h: 2.9, fill: { color: CLAIR } });
     s1.addText("Budget prévisionnel — Projet Erasmus+", { x: 0.5, y: 2.5, w: 12.3, h: 0.5, fontSize: 16, color: O, bold: true, align: "center" });
     s1.addText(e.intitule || "Projet Erasmus+", { x: 0.5, y: 3.0, w: 12.3, h: 1.0, fontSize: 30, color: V, bold: true, align: "center" });
-    const fmtDate = (d) => { if (!d) return "—"; const o = new Date(d); return isNaN(o) ? d : o.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }); };
+    /* Date saisie « AAAA-MM-JJ » lue en heure LOCALE : new Date("AAAA-MM-JJ") la lit en UTC,
+       ce qui affichait la veille en Guyane (UTC-3). */
+    const fmtDate = (d) => {
+      if (!d) return "—";
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(d);
+      const o = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(d);
+      return isNaN(o) ? d : o.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+    };
     const periodeTxt = (e.dateDebut || e.dateFin) ? ("du " + fmtDate(e.dateDebut) + " au " + fmtDate(e.dateFin)) : "—";
     const objLabels = { langues: "Compétences linguistiques & soft-skills", ambitions: "Ambitions professionnelles & géographiques", ecocitoyen: "Pratiques éco-citoyennes", personnel: "Accompagnement du personnel" };
     const objActifs = Object.keys(objLabels).filter(k => e.objectifs && e.objectifs[k]).map(k => objLabels[k]);
@@ -980,6 +1021,21 @@ function ModuleErasmus({ state, dispatch, calc }) {
     ]);
     s2.addTable(rowsDep, { x: 0.5, y: 1.2, w: 12.3, colW: [5.3, 2.33, 2.34, 2.33], border: { type: "solid", color: "DDDDDD", pt: 1 }, valign: "middle", rowH: 0.45 });
 
+    /* Encadré : bourse élève Erasmus+ et caution (si saisie) */
+    const yInfo = Math.min(1.2 + rowsDep.length * 0.45 + 0.35, 5.6);
+    const lignesInfo = [];
+    lignesInfo.push({ text: "Bourse Erasmus+ élève : ", options: { bold: true, color: V } });
+    lignesInfo.push({ text: euro(num(e.bourseParEleve)) + " par élève"
+      + (num(e.nbEleves) > 0 ? "  ·  soit " + euro(calc.boursesEleves) + " pour " + nf(num(e.nbEleves)) + " élève(s)" : ""),
+      options: { color: "333333", breakLine: true } });
+    if (num(e.cautionParEleve) > 0) {
+      lignesInfo.push({ text: "Caution demandée par élève : ", options: { bold: true, color: GRIS } });
+      lignesInfo.push({ text: euro(num(e.cautionParEleve)) + "  (hors budget — en cas de dégradation dans les hébergements, charte des sorties et voyages)",
+        options: { italic: true, color: "555555" } });
+    }
+    s2.addText(lignesInfo, { x: 0.5, y: yInfo, w: 12.3, h: num(e.cautionParEleve) > 0 ? 0.95 : 0.55, fontSize: 13,
+      fill: { color: "F5F7F5" }, line: { color: "C8E6C9", width: 1 }, margin: 8, valign: "middle", lineSpacingMultiple: 1.2 });
+
     /* ---- Slide 3 : recettes ---- */
     const s3 = pptx.addSlide(); s3.background = { color: "FFFFFF" };
     enTete(s3, "Recettes / financement");
@@ -1002,6 +1058,10 @@ function ModuleErasmus({ state, dispatch, calc }) {
     s3.addText(
       calc.equilibre ? "⚖️ Budget équilibré : dépenses = recettes." : (calc.deficit ? "🔴 Budget non équilibré : reste à financer " + euro(-calc.ecart) + "." : "🟠 Budget non équilibré : excédent de recettes " + euro(calc.ecart) + "."),
       { x: 0.5, y: 6.3, w: 9.5, h: 0.4, fontSize: 13, bold: true, color: colEcart });
+    if (num(e.cautionParEleve) > 0) {
+      s3.addText("Caution par élève (hors budget, en cas de dégradation dans les hébergements — charte des sorties et voyages) : " + euro(num(e.cautionParEleve)),
+        { x: 0.5, y: 6.75, w: 12.3, h: 0.4, fontSize: 11, italic: true, color: "555555" });
+    }
 
     /* ---- Slide 4 : vote du budget ---- */
     const s4 = pptx.addSlide(); s4.background = { color: "FFFFFF" };
@@ -1028,7 +1088,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
 
   return (
     <div>
-      <div className="carte">
+      <div className="carte partie premiere">
         <TitreEtape n={1}>Informations sur le projet Erasmus+</TitreEtape>
         <div className="carte-corps">
           <div className="grille">
@@ -1090,7 +1150,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
         </div>
       </div>
 
-      <div className="carte">
+      <div className="carte partie">
         <TitreEtape n={2}>Les dépenses (devis)</TitreEtape>
         <div className="carte-corps">
 
@@ -1132,7 +1192,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
             <span className="ico">💡</span>
             <span>Pour chaque devis, choisissez la <b>catégorie</b> et <b>qui il concerne</b>. La <b>quantité</b> est déduite automatiquement :
               <b style={{color:"var(--vert-fonce)"}}> Groupe</b> → nombre d'élèves ·
-              <b> Élèves seuls</b> → 1 (forfait) ·
+              <b> Un seul élève</b> → 1 (dépense propre à un élève, non répartie) ·
               <b style={{color:"var(--orange-fonce)"}}> Accompagnateurs seuls</b> → nombre d'accompagnateurs.
               Saisissez uniquement le <b>prix unitaire</b>.</span>
           </div>
@@ -1200,14 +1260,14 @@ function ModuleErasmus({ state, dispatch, calc }) {
             )}
           </div>
           <div className="resultats" style={{ marginTop: 16 }}>
-            <ResCarte classe="res-vert"   lbl="🎒 Dépenses ÉLÈVES"        val={euro(calc.depEleves)} note={num(e.nbEleves) > 0 ? euro(calc.depParEleve) + " / élève" : "renseignez le nb d'élèves"} />
+            <ResCarte classe="res-vert"   lbl="🎒 Dépenses ÉLÈVES"        val={euro(calc.depEleves)} note={num(e.nbEleves) > 0 ? euro(calc.depParEleve) + " / élève" + (calc.depElevesIndiv > 0 ? " + " + euro(calc.depElevesIndiv) + " pour un seul élève" : "") : "renseignez le nb d'élèves"} />
             <ResCarte classe="res-orange" lbl="🧑‍🏫 Dépenses ACCOMPAGNATEURS" val={euro(calc.depAccomp)} note="jamais à la charge des familles" />
             <ResCarte classe="res-gris"   lbl="Σ Budget total du projet"   val={euro(calc.budgetTotal)} note="élèves + accompagnateurs" />
           </div>
         </div>
       </div>
 
-      <div className="carte">
+      <div className="carte partie deux-col">
         <TitreEtape n={3}>Le financement (recettes)</TitreEtape>
         <div className="carte-corps">
           <div className="info-box">
@@ -1322,7 +1382,10 @@ function ModuleErasmus({ state, dispatch, calc }) {
           {/* --- Synthèse PAR ÉLÈVE : dépenses ET recettes --- */}
           <h4 style={{ margin: "18px 0 8px", color: "var(--gris-texte)" }}>Par élève</h4>
           <div className="resultats">
-            <ResCarte classe="res-gris" lbl="🎒 Dépense par élève" val={euro(calc.depParEleve)} note={num(e.nbEleves) > 0 ? "coût élèves ÷ " + nf(num(e.nbEleves)) + " élève(s)" : "renseignez le nb d'élèves"} />
+            <ResCarte classe="res-gris" lbl="🎒 Dépense par élève" val={euro(calc.depParEleve)} note={num(e.nbEleves) > 0 ? "dépenses « Groupe » ÷ " + nf(num(e.nbEleves)) + " élève(s)" : "renseignez le nb d'élèves"} />
+            {calc.depElevesIndiv > 0 && (
+              <ResCarte classe="res-bleu" lbl="👤 Dépenses « Un seul élève »" val={euro(calc.depElevesIndiv)} note="propres à un élève, non réparties" />
+            )}
             <ResCarte classe="res-orange" lbl="👤 Recette par élève (famille)" val={euro(calc.partParEleve)} note={num(e.nbEleves) > 0 ? "ce que paie chaque famille" : "renseignez le nb d'élèves"} />
           </div>
 
@@ -1332,43 +1395,31 @@ function ModuleErasmus({ state, dispatch, calc }) {
             </div>
           )}
 
-          <div className="carte" style={{ marginTop: 16 }}>
-            <div className="carte-corps">
-              <CarteGraphique titre="📊 Équilibre Dépenses / Recettes" nomFichier="equilibre_budget_erasmus.png">
-                {calc.budgetTotal > 0 ? (
-                  <ResponsiveContainer width="100%" height={340}>
-                    <BarChart data={calc.barresCumul} margin={{ left: 10, right: 20, top: 24 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="name" fontSize={13} />
-                      <YAxis tickFormatter={(v) => nf(v) + " €"} fontSize={11} />
-                      <Tooltip formatter={(v, n) => [euro(v), n]} />
-                      <Legend wrapperStyle={{ fontSize: 12 }} />
-                      {calc.seriesCumul.map((s, i) => (
-                        <Bar key={s.cle} dataKey={s.cle} name={s.nom} stackId="pile" fill={s.couleur} maxBarSize={120}>
-                          {/* Valeur dans chaque segment (masquée si 0) */}
-                          <LabelList dataKey={s.cle} position="center" fontSize={12} fontWeight={700} fill="#fff"
-                            formatter={(v) => (v > 0 ? euro(v) : "")} />
-                          {/* Total de la colonne au sommet (sur la dernière série de la pile) */}
-                          {i === calc.seriesCumul.length - 1 && (
-                            <LabelList position="top" fontSize={13} fontWeight={800} fill="var(--texte)"
-                              formatter={(v) => ""} content={(props) => {
-                                const { x, y, width, index } = props;
-                                const total = calc.seriesCumul.reduce((t, ss) => t + (calc.barresCumul[index][ss.cle] || 0), 0);
-                                if (!total) return null;
-                                return <text x={x + width / 2} y={y - 8} textAnchor="middle" fontSize={13} fontWeight={800} fill="#1c2b25">{euro(total)}</text>;
-                              }} />
-                          )}
-                        </Bar>
-                      ))}
-                    </BarChart>
-                  </ResponsiveContainer>
-                ) : <p className="aide" style={{ textAlign: "center" }}>Renseignez les devis pour voir le graphique.</p>}
-              </CarteGraphique>
-              <div className="aide" style={{ textAlign: "center", marginTop: 6 }}>
-                Comparez la hauteur des deux colonnes : si les <b>recettes</b> sont plus basses que les <b>dépenses</b>, l'écart correspond au <b>reste à financer</b>.
+          {/* --- Caution par élève : information, HORS budget --- */}
+          <div className="info-box imprimer" style={{ flexDirection: "column", alignItems: "stretch", background: "#F3F4F6", borderLeftColor: "#6B7280", color: "#374151" }}>
+            <div style={{ display: "flex", gap: 10 }}>
+              <span className="ico">🔐</span>
+              <div style={{ flex: 1 }}>
+                <b>Caution demandée par élève</b> <span style={{ fontWeight: 400 }}>(information — non incluse dans le budget)</span>
+                <label className="champ" style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 }}>
+                  <span style={{ whiteSpace: "nowrap" }}>Montant par élève</span>
+                  <input type="number" min="0" step="0.01" style={{ width: 110 }} className="num-input"
+                    value={e.cautionParEleve ?? 0} onChange={(ev) => set("cautionParEleve", ev.target.value)} /> <span>€</span>
+                </label>
+                <div className="aide" style={{ marginTop: 4 }}>
+                  Caution demandée en cas de dégradation dans les hébergements, conformément à la charte des sorties et voyages du lycée.
+                  Elle n'entre ni dans les dépenses ni dans les recettes du projet.
+                </div>
+                {num(e.cautionParEleve) > 0 && (
+                  <div style={{ marginTop: 8, fontWeight: 600 }}>
+                    👉 Chaque famille versera une caution de <b>{euro(num(e.cautionParEleve))}</b> par élève
+                    {num(e.nbEleves) > 0 ? <> (soit {euro(num(e.cautionParEleve) * num(e.nbEleves))} pour {nf(num(e.nbEleves))} élève(s))</> : null}, en plus de sa participation.
+                  </div>
+                )}
               </div>
             </div>
           </div>
+
 
           {/* Bouton export PowerPoint */}
           <div className="ligne-actions no-print" style={{ marginTop: 16, justifyContent: "center" }}>
@@ -1376,6 +1427,45 @@ function ModuleErasmus({ state, dispatch, calc }) {
           </div>
           <div className="aide no-print" style={{ textAlign: "center" }}>
             Génère une présentation .pptx : page de titre, dépenses, recettes, et une slide de vote du budget.
+          </div>
+        </div>
+      </div>
+      {/* ---------- GRAPHIQUE (page à part dans le PDF) ---------- */}
+      <div className="carte partie">
+        <div className="carte-titre">📊 Visualisation</div>
+        <div className="carte-corps">
+          <CarteGraphique titre="📊 Équilibre Dépenses / Recettes" nomFichier="equilibre_budget_erasmus.png">
+            {calc.budgetTotal > 0 ? (
+              <ResponsiveContainer width="100%" height={340}>
+                <BarChart data={calc.barresCumul} margin={{ left: 10, right: 20, top: 24 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="name" fontSize={13} />
+                  <YAxis tickFormatter={(v) => nf(v) + " €"} fontSize={11} />
+                  <Tooltip formatter={(v, n) => [euro(v), n]} />
+                  <Legend wrapperStyle={{ fontSize: 12 }} />
+                  {calc.seriesCumul.map((s, i) => (
+                    <Bar key={s.cle} dataKey={s.cle} name={s.nom} stackId="pile" fill={s.couleur} maxBarSize={120}>
+                      {/* Valeur dans chaque segment (masquée si 0) */}
+                      <LabelList dataKey={s.cle} position="center" fontSize={12} fontWeight={700} fill="#fff"
+                        formatter={(v) => (v > 0 ? euro(v) : "")} />
+                      {/* Total de la colonne au sommet (sur la dernière série de la pile) */}
+                      {i === calc.seriesCumul.length - 1 && (
+                        <LabelList position="top" fontSize={13} fontWeight={800} fill="var(--texte)"
+                          formatter={(v) => ""} content={(props) => {
+                            const { x, y, width, index } = props;
+                            const total = calc.seriesCumul.reduce((t, ss) => t + (calc.barresCumul[index][ss.cle] || 0), 0);
+                            if (!total) return null;
+                            return <text x={x + width / 2} y={y - 8} textAnchor="middle" fontSize={13} fontWeight={800} fill="#1c2b25">{euro(total)}</text>;
+                          }} />
+                      )}
+                    </Bar>
+                  ))}
+                </BarChart>
+              </ResponsiveContainer>
+            ) : <p className="aide" style={{ textAlign: "center" }}>Renseignez les devis pour voir le graphique.</p>}
+          </CarteGraphique>
+          <div className="aide" style={{ textAlign: "center", marginTop: 6 }}>
+            Comparez la hauteur des deux colonnes : si les <b>recettes</b> sont plus basses que les <b>dépenses</b>, l'écart correspond au <b>reste à financer</b>.
           </div>
         </div>
       </div>
@@ -1412,6 +1502,40 @@ function App() {
   const [onglet, setOnglet] = useState("sortie");   // sortie | erasmus
   const [sauveLe, setSauveLe] = useState(null);
   const premierRendu = useRef(true);
+
+  /* ---- Impression / PDF : chaque champ de saisie est recopié en texte
+     juste avant l'impression (les champs coupent les textes longs),
+     puis ces copies sont retirées après l'impression. ---- */
+  useEffect(() => {
+    const fmtNombre = (v) => {
+      if (v === "" || v === null || v === undefined) return "";
+      const n = Number(v);
+      return isNaN(n) ? String(v) : n.toLocaleString("fr-FR", { maximumFractionDigits: 2 });
+    };
+    const fmtDateImpr = (v) => {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || "");
+      return m ? m[3] + "/" + m[2] + "/" + m[1] : (v || "");
+    };
+    const avant = () => {
+      document.querySelectorAll(".val-impr").forEach((n) => n.remove());
+      document.querySelectorAll("main input, main select, main textarea").forEach((el) => {
+        if (el.type === "checkbox" || el.type === "radio" || el.type === "file" || el.type === "hidden") return;
+        let txt;
+        if (el.tagName === "SELECT") txt = el.options[el.selectedIndex] ? el.options[el.selectedIndex].text : "";
+        else if (el.type === "number") txt = fmtNombre(el.value);
+        else if (el.type === "date") txt = fmtDateImpr(el.value);
+        else txt = el.value;
+        const span = document.createElement("span");
+        span.className = "val-impr";
+        span.textContent = txt && String(txt).trim() !== "" ? txt : "—";
+        el.insertAdjacentElement("afterend", span);
+      });
+    };
+    const apres = () => document.querySelectorAll(".val-impr").forEach((n) => n.remove());
+    window.addEventListener("beforeprint", avant);
+    window.addEventListener("afterprint", apres);
+    return () => { window.removeEventListener("beforeprint", avant); window.removeEventListener("afterprint", apres); };
+  }, []);
 
   /* ---- Sauvegarde automatique dans localStorage (anti-rebond) ---- */
   useEffect(() => {
@@ -1531,13 +1655,14 @@ function App() {
 
     /* --- Ventilation des devis : QTE déduite de la cible ---
        groupe = nbEleves, eleves = 1, accomp = nbAccomp ; groupe+eleves => 100 % élèves */
-    let depEleves = 0, depAccomp = 0;
+    let depEleves = 0, depAccomp = 0, depElevesIndiv = 0;
     const parCategorie = {};
     e.devis.forEach((d) => {
       const qte = qteDevisErasmus(d.cible, nbEleves, nbAccomp);
       const total = qte * num(d.prixUnitaire);
       const { el, ac } = repartirErasmus(total, d.cible);
       depEleves += el; depAccomp += ac;
+      if (d.cible === "eleves") depElevesIndiv += el;   // dépense d'un seul élève
       const cat = d.categorie || "Divers";
       if (!parCategorie[cat]) parCategorie[cat] = { el: 0, ac: 0, total: 0 };
       parCategorie[cat].el += el; parCategorie[cat].ac += ac; parCategorie[cat].total += total;
@@ -1568,7 +1693,11 @@ function App() {
     /* Part familles = montant saisi par élève, plafonné au reste à charge élèves */
     const partFamillesTotal = Math.min(num(e.famillesMontantParEleve) * nbEleves, resteEleves);
     const partParEleve = nbEleves > 0 ? partFamillesTotal / nbEleves : 0;
-    const depParEleve = nbEleves > 0 ? depEleves / nbEleves : 0;
+    /* Dépense par élève = dépenses « Groupe » ÷ nb d'élèves.
+       Les lignes « Un seul élève » concernent UN élève : elles ne sont
+       pas réparties sur l'ensemble des participants. */
+    const depElevesGroupe = depEleves - depElevesIndiv;
+    const depParEleve = nbEleves > 0 ? depElevesGroupe / nbEleves : 0;
 
     const couverture = budgetTotal > 0 ? (bourse / budgetTotal) * 100 : 0;
     const resteAFinancer = Math.max(0, budgetTotal - financements - partFamillesTotal);
@@ -1613,7 +1742,7 @@ function App() {
 
     return { depEleves, depAccomp, totalAccomp: Da, budgetTotal, bourse, totalSubventions,
       accompResteEtab, resteEleves, couverture, resteAFinancer,
-      partFamillesTotal, partParEleve, depParEleve,
+      partFamillesTotal, partParEleve, depParEleve, depElevesIndiv, depElevesGroupe,
       boursesEleves, boursesAccomp, boursesTotal,
       depassementEleves, depassementAccomp, depassementTotal,
       totalRecettes, ecart, equilibre, excedent, deficit,
