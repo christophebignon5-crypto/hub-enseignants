@@ -401,14 +401,21 @@ function repartirDevis(total, cible, nbEleves, nbAccomp) {
 /* ---------------------------------------------------------------
    MODULE ERASMUS — QTE déduite automatiquement de la cible :
    - "eleves"  => 1 (dépense pour UN SEUL élève, non répartie entre tous)
-   - "groupe"  => nombre d'élèves
+   - "groupe"  => nombre d'élèves MOINS 1 dès qu'au moins une ligne
+                  « Un seul élève » existe : toutes ces lignes concernent
+                  le MÊME élève, compté une seule fois (ex. 4 élèves → Groupe = 3)
    - "accomp"  => nombre d'accompagnateurs
    Ventilation : "groupe" et "eleves" = 100 % élèves ; "accomp" = 100 % accomp.
    --------------------------------------------------------------- */
-function qteDevisErasmus(cible, nbEleves, nbAccomp) {
+/* Élève compté à part : 1 dès qu'une ligne « Un seul élève » existe,
+   quel que soit le nombre de dépenses qui lui sont liées. */
+function nbLignesUnSeulEleve(devis) {
+  return (devis || []).some((d) => d.cible === "eleves") ? 1 : 0;
+}
+function qteDevisErasmus(cible, nbEleves, nbAccomp, nbIndiv = 0) {
   if (cible === "eleves") return 1;
   if (cible === "accomp") return nbAccomp;
-  return nbEleves;   // groupe
+  return Math.max(0, nbEleves - nbIndiv);   // groupe : élèves non comptés à part
 }
 function repartirErasmus(total, cible) {
   if (cible === "accomp") return { el: 0, ac: total };
@@ -1191,8 +1198,8 @@ function ModuleErasmus({ state, dispatch, calc }) {
           <div className="info-box">
             <span className="ico">💡</span>
             <span>Pour chaque devis, choisissez la <b>catégorie</b> et <b>qui il concerne</b>. La <b>quantité</b> est déduite automatiquement :
-              <b style={{color:"var(--vert-fonce)"}}> Groupe</b> → nombre d'élèves ·
-              <b> Un seul élève</b> → 1 (dépense propre à un élève, non répartie) ·
+              <b style={{color:"var(--vert-fonce)"}}> Groupe</b> → nombre d'élèves, moins 1 si un élève a des dépenses « Un seul élève » ·
+              <b> Un seul élève</b> → 1 (dépenses d'un même élève, non réparties ; plusieurs lignes possibles) ·
               <b style={{color:"var(--orange-fonce)"}}> Accompagnateurs seuls</b> → nombre d'accompagnateurs.
               Saisissez uniquement le <b>prix unitaire</b>.</span>
           </div>
@@ -1213,7 +1220,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
               </thead>
               <tbody>
                 {e.devis.map((d) => {
-                  const qte = qteDevisErasmus(d.cible, num(e.nbEleves), num(e.nbAccompagnateurs));
+                  const qte = qteDevisErasmus(d.cible, num(e.nbEleves), num(e.nbAccompagnateurs), calc.nbIndiv);
                   const total = qte * num(d.prixUnitaire);
                   const { el, ac } = repartirErasmus(total, d.cible);
                   return (
@@ -1231,7 +1238,12 @@ function ModuleErasmus({ state, dispatch, calc }) {
                         </select>
                       </td>
                       {/* QTE déduite automatiquement (non modifiable) */}
-                      <td className="montant" title="Quantité déduite de la cible et des effectifs (partie 1)"><b>{nf(qte)}</b></td>
+                      <td className="montant" title="Quantité déduite de la cible et des effectifs (partie 1)">
+                        <b>{nf(qte)}</b>
+                        {d.cible === "groupe" && calc.nbIndiv > 0 && (
+                          <div style={{ fontSize: 10.5, color: "var(--gris-texte)", whiteSpace: "nowrap" }}>{nf(num(e.nbEleves))} − {nf(calc.nbIndiv)}</div>
+                        )}
+                      </td>
                       <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={d.prixUnitaire}
                         onChange={(ev) => maj(d.id, "prixUnitaire", ev.target.value)} /></td>
                       <td className="montant"><b>{euro(total)}</b></td>
@@ -1257,6 +1269,13 @@ function ModuleErasmus({ state, dispatch, calc }) {
             <button className="btn-vert btn-sm" onClick={() => dispatch({ type: "LISTE_AJOUT", module: "erasmus", cle: "devis", item: ligneDevis() })}>＋ Ajouter un devis</button>
             {num(e.nbEleves) + num(e.nbAccompagnateurs) === 0 && (
               <span className="aide" style={{ color: "var(--rouge)" }}>⚠️ Renseignez les effectifs (étape 1) pour répartir les devis « Groupe ».</span>
+            )}
+            {calc.nbIndiv > 0 && calc.aDesGroupes && (
+              <span className="aide" style={{ color: calc.nbIndiv > num(e.nbEleves) ? "var(--rouge)" : "var(--bleu-info)" }}>
+                {calc.nbIndiv > num(e.nbEleves)
+                  ? "⚠️ Une dépense « Un seul élève » est saisie mais le nombre d'élèves participants est 0 : vérifiez les effectifs."
+                  : "ℹ️ 1 élève a des dépenses « Un seul élève » : les lignes « Groupe » comptent " + nf(calc.qteGroupe) + " élève(s) + 1 = " + nf(num(e.nbEleves)) + " au total."}
+              </span>
             )}
           </div>
           <div className="resultats" style={{ marginTop: 16 }}>
@@ -1382,7 +1401,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
           {/* --- Synthèse PAR ÉLÈVE : dépenses ET recettes --- */}
           <h4 style={{ margin: "18px 0 8px", color: "var(--gris-texte)" }}>Par élève</h4>
           <div className="resultats">
-            <ResCarte classe="res-gris" lbl="🎒 Dépense par élève" val={euro(calc.depParEleve)} note={num(e.nbEleves) > 0 ? "dépenses « Groupe » ÷ " + nf(num(e.nbEleves)) + " élève(s)" : "renseignez le nb d'élèves"} />
+            <ResCarte classe="res-gris" lbl="🎒 Dépense par élève" val={euro(calc.depParEleve)} note={calc.qteGroupe > 0 ? "dépenses « Groupe » ÷ " + nf(calc.qteGroupe) + " élève(s)" : "renseignez le nb d'élèves"} />
             {calc.depElevesIndiv > 0 && (
               <ResCarte classe="res-bleu" lbl="👤 Dépenses « Un seul élève »" val={euro(calc.depElevesIndiv)} note="propres à un élève, non réparties" />
             )}
@@ -1657,8 +1676,12 @@ function App() {
        groupe = nbEleves, eleves = 1, accomp = nbAccomp ; groupe+eleves => 100 % élèves */
     let depEleves = 0, depAccomp = 0, depElevesIndiv = 0;
     const parCategorie = {};
+    /* Élèves comptés à part (lignes « Un seul élève ») : retirés des lignes « Groupe » */
+    const nbIndiv = nbLignesUnSeulEleve(e.devis);
+    const qteGroupe = Math.max(0, nbEleves - nbIndiv);
+    const aDesGroupes = e.devis.some((d) => d.cible === "groupe");
     e.devis.forEach((d) => {
-      const qte = qteDevisErasmus(d.cible, nbEleves, nbAccomp);
+      const qte = qteDevisErasmus(d.cible, nbEleves, nbAccomp, nbIndiv);
       const total = qte * num(d.prixUnitaire);
       const { el, ac } = repartirErasmus(total, d.cible);
       depEleves += el; depAccomp += ac;
@@ -1697,7 +1720,7 @@ function App() {
        Les lignes « Un seul élève » concernent UN élève : elles ne sont
        pas réparties sur l'ensemble des participants. */
     const depElevesGroupe = depEleves - depElevesIndiv;
-    const depParEleve = nbEleves > 0 ? depElevesGroupe / nbEleves : 0;
+    const depParEleve = qteGroupe > 0 ? depElevesGroupe / qteGroupe : 0;
 
     const couverture = budgetTotal > 0 ? (bourse / budgetTotal) * 100 : 0;
     const resteAFinancer = Math.max(0, budgetTotal - financements - partFamillesTotal);
@@ -1743,6 +1766,7 @@ function App() {
     return { depEleves, depAccomp, totalAccomp: Da, budgetTotal, bourse, totalSubventions,
       accompResteEtab, resteEleves, couverture, resteAFinancer,
       partFamillesTotal, partParEleve, depParEleve, depElevesIndiv, depElevesGroupe,
+      nbIndiv, qteGroupe, aDesGroupes,
       boursesEleves, boursesAccomp, boursesTotal,
       depassementEleves, depassementAccomp, depassementTotal,
       totalRecettes, ecart, equilibre, excedent, deficit,
