@@ -384,6 +384,10 @@ const CIBLES = [
 function ligneDevis(categorie = "Transport", designation = "", cible = "groupe") {
   return { id: uid(), categorie, designation, cible, quantite: 1, prixUnitaire: 0 };
 }
+/* Ligne de bourse accompagnateur (bourses différentes) */
+function ligneBourseAccomp(montant = 0, quantite = 1) {
+  return { id: uid(), montant, quantite };
+}
 /* Ligne "nom" (accompagnateurs Erasmus, saisie multiple) */
 function ligneNom(nom = "") {
   return { id: uid(), nom };
@@ -404,7 +408,8 @@ function repartirDevis(total, cible, nbEleves, nbAccomp) {
    - "groupe"  => nombre d'élèves MOINS 1 dès qu'au moins une ligne
                   « Un seul élève » existe : toutes ces lignes concernent
                   le MÊME élève, compté une seule fois (ex. 4 élèves → Groupe = 3)
-   - "accomp"  => nombre d'accompagnateurs
+   - "accomp"  => quantité SAISIE (d.quantiteAccomp) ; tant qu'elle n'est
+                  pas saisie, le nombre d'accompagnateurs est proposé
    Ventilation : "groupe" et "eleves" = 100 % élèves ; "accomp" = 100 % accomp.
    --------------------------------------------------------------- */
 /* Élève compté à part : 1 dès qu'une ligne « Un seul élève » existe,
@@ -412,9 +417,12 @@ function repartirDevis(total, cible, nbEleves, nbAccomp) {
 function nbLignesUnSeulEleve(devis) {
   return (devis || []).some((d) => d.cible === "eleves") ? 1 : 0;
 }
-function qteDevisErasmus(cible, nbEleves, nbAccomp, nbIndiv = 0) {
+function qteAccompSaisie(d) {
+  return !!d && d.quantiteAccomp !== undefined && d.quantiteAccomp !== null && d.quantiteAccomp !== "";
+}
+function qteDevisErasmus(cible, nbEleves, nbAccomp, nbIndiv = 0, d = null) {
   if (cible === "eleves") return 1;
-  if (cible === "accomp") return nbAccomp;
+  if (cible === "accomp") return qteAccompSaisie(d) ? num(d.quantiteAccomp) : nbAccomp;
   return Math.max(0, nbEleves - nbIndiv);   // groupe : élèves non comptés à part
 }
 function repartirErasmus(total, cible) {
@@ -424,7 +432,7 @@ function repartirErasmus(total, cible) {
 const CIBLES_ERASMUS = [
   { id: "groupe", label: "Groupe" },
   { id: "eleves", label: "Un seul élève" },
-  { id: "accomp", label: "Accompagnateurs seuls" },
+  { id: "accomp", label: "Accompagnateur" },
 ];
 
 function etatInitial() {
@@ -462,6 +470,10 @@ function etatInitial() {
       /* Montants de bourse alloués (saisis) — servent au contrôle des dépenses */
       bourseParEleve: 0,
       bourseParAccomp: 0,
+      /* Bourses accompagnateurs différentes ? (false = même bourse pour tous)
+         Si true : lignes { montant, quantite } — ex. 1 × 1 900 € + 1 × 1 500 € */
+      bourseAccompDiff: false,
+      boursesAccompDetail: [ ligneBourseAccomp() ],
       /* Même modèle de devis que la sortie : cible groupe/élèves/accomp. */
       devis: [
         ligneDevis("Transport", "Voyage / mobilité", "groupe"),
@@ -1029,18 +1041,25 @@ function ModuleErasmus({ state, dispatch, calc }) {
     s2.addTable(rowsDep, { x: 0.5, y: 1.2, w: 12.3, colW: [5.3, 2.33, 2.34, 2.33], border: { type: "solid", color: "DDDDDD", pt: 1 }, valign: "middle", rowH: 0.45 });
 
     /* Encadré : bourse élève Erasmus+ et caution (si saisie) */
-    const yInfo = Math.min(1.2 + rowsDep.length * 0.45 + 0.35, 5.6);
+    const yInfo = Math.min(1.2 + rowsDep.length * 0.45 + 0.35, 5.3);
     const lignesInfo = [];
     lignesInfo.push({ text: "Bourse Erasmus+ élève : ", options: { bold: true, color: V } });
     lignesInfo.push({ text: euro(num(e.bourseParEleve)) + " par élève"
       + (num(e.nbEleves) > 0 ? "  ·  soit " + euro(calc.boursesEleves) + " pour " + nf(num(e.nbEleves)) + " élève(s)" : ""),
       options: { color: "333333", breakLine: true } });
+    /* Bourse accompagnateurs (unique ou différentes) */
+    lignesInfo.push({ text: "Bourse Erasmus+ accompagnateurs : ", options: { bold: true, color: "E65100" } });
+    lignesInfo.push({ text: (e.bourseAccompDiff
+        ? calc.libBoursesAccomp.replace(/^\(|\)$/g, "").split(") + (").join("  +  ")
+        : euro(num(e.bourseParAccomp)) + " par accompagnateur")
+      + (calc.boursesAccomp > 0 ? "  ·  soit " + euro(calc.boursesAccomp) + " au total" : ""),
+      options: { color: "333333", breakLine: num(e.cautionParEleve) > 0 } });
     if (num(e.cautionParEleve) > 0) {
       lignesInfo.push({ text: "Caution demandée par élève : ", options: { bold: true, color: GRIS } });
       lignesInfo.push({ text: euro(num(e.cautionParEleve)) + "  (hors budget — en cas de dégradation dans les hébergements, charte des sorties et voyages)",
         options: { italic: true, color: "555555" } });
     }
-    s2.addText(lignesInfo, { x: 0.5, y: yInfo, w: 12.3, h: num(e.cautionParEleve) > 0 ? 0.95 : 0.55, fontSize: 13,
+    s2.addText(lignesInfo, { x: 0.5, y: yInfo, w: 12.3, h: num(e.cautionParEleve) > 0 ? 1.3 : 0.95, fontSize: 13,
       fill: { color: "F5F7F5" }, line: { color: "C8E6C9", width: 1 }, margin: 8, valign: "middle", lineSpacingMultiple: 1.2 });
 
     /* ---- Slide 3 : recettes ---- */
@@ -1107,8 +1126,81 @@ function ModuleErasmus({ state, dispatch, calc }) {
             <Champ label="Nombre d'élèves participants" oblig type="number" min="0" valeur={e.nbEleves} onChange={v => set("nbEleves", v)} aide="Sert de quantité pour les devis « Groupe »" invalide={calc.erreurs.nbEleves} />
             <Champ label="Nombre d'accompagnateurs" oblig type="number" min="0" valeur={e.nbAccompagnateurs} onChange={v => set("nbAccompagnateurs", v)} aide="Sert de quantité pour les devis « Accompagnateurs »" invalide={calc.erreurs.nbAccomp} />
             <Champ label="Montant de la bourse / élève (€)" type="number" min="0" valeur={e.bourseParEleve} onChange={v => set("bourseParEleve", v)} aide="Contrôle des dépenses élèves" />
-            <Champ label="Montant de la bourse / accompagnateur (€)" type="number" min="0" valeur={e.bourseParAccomp} onChange={v => set("bourseParAccomp", v)} aide="Contrôle des dépenses accompagnateurs" />
           </div>
+
+          {/* ---- Bourses des accompagnateurs : identiques ou différentes ---- */}
+          <h4 style={{ margin: "16px 0 8px", color: "var(--gris-texte)" }}>Bourse des accompagnateurs</h4>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 18, alignItems: "center", marginBottom: 10, fontSize: 14 }}>
+            <span style={{ fontWeight: 600 }}>Les accompagnateurs ont-ils des bourses différentes ?</span>
+            {[{ v: false, t: "Non, même bourse pour tous" }, { v: true, t: "Oui, bourses différentes" }].map((o) => (
+              <label key={String(o.v)} style={{ display: "flex", gap: 6, alignItems: "center", cursor: "pointer" }}>
+                <input type="radio" name="bourseAccompDiff" style={{ width: "auto", accentColor: "var(--vert)" }}
+                  checked={!!e.bourseAccompDiff === o.v}
+                  onChange={() => {
+                    if (o.v && !e.bourseAccompDiff) {
+                      /* 1re bascule : pré-remplit une ligne avec la bourse unique et l'effectif */
+                      const det = e.boursesAccompDetail || [];
+                      const vide = det.every((l) => !num(l.montant));
+                      if (vide) set("boursesAccompDetail", [ligneBourseAccomp(num(e.bourseParAccomp), num(e.nbAccompagnateurs) || 1)]);
+                    }
+                    set("bourseAccompDiff", o.v);
+                  }} />
+                <span>{o.t}</span>
+              </label>
+            ))}
+          </div>
+
+          {!e.bourseAccompDiff ? (
+            <div className="grille">
+              <Champ label="Montant de la bourse / accompagnateur (€)" type="number" min="0" valeur={e.bourseParAccomp} onChange={v => set("bourseParAccomp", v)} aide="Même montant pour chaque accompagnateur — contrôle des dépenses accompagnateurs" />
+            </div>
+          ) : (
+            <>
+              <div className="tbl-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th className="montant" style={{ width: 170 }}>Montant de la bourse (€)</th>
+                      <th className="montant" style={{ width: 150 }}>Nb d'accompagnateurs</th>
+                      <th className="montant" style={{ width: 150 }}>Total</th>
+                      <th></th>
+                      <th className="no-print" style={{ width: 40 }}></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(e.boursesAccompDetail || []).map((l) => (
+                      <tr key={l.id}>
+                        <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={l.montant}
+                          onChange={(ev) => dispatch({ type: "LISTE_MAJ", module: "erasmus", cle: "boursesAccompDetail", id: l.id, champ: "montant", valeur: ev.target.value })} /></td>
+                        <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="1" value={l.quantite}
+                          onChange={(ev) => dispatch({ type: "LISTE_MAJ", module: "erasmus", cle: "boursesAccompDetail", id: l.id, champ: "quantite", valeur: ev.target.value })} /></td>
+                        <td className="montant"><b>{euro(num(l.montant) * num(l.quantite))}</b></td>
+                        <td></td>
+                        <td className="no-print"><button className="delete-x" onClick={() => dispatch({ type: "LISTE_SUPPR", module: "erasmus", cle: "boursesAccompDetail", id: l.id })}>×</button></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ fontWeight: 800, background: "#f1f6f3" }}>
+                      <td>TOTAL BOURSES ACCOMPAGNATEURS</td>
+                      <td className="montant" style={{ color: calc.ecartQteBourseAccomp ? "var(--rouge)" : "inherit" }}>{nf(calc.qteBourseAccomp)}</td>
+                      <td className="montant">{euro(calc.boursesAccomp)}</td>
+                      <td></td>
+                      <td className="no-print"></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div className="ligne-actions no-print">
+                <button className="btn-vert btn-sm" onClick={() => dispatch({ type: "LISTE_AJOUT", module: "erasmus", cle: "boursesAccompDetail", item: ligneBourseAccomp() })}>＋ Ajouter un montant de bourse</button>
+                {calc.ecartQteBourseAccomp && (
+                  <span className="aide" style={{ color: "var(--rouge)" }}>
+                    ⚠️ {nf(calc.qteBourseAccomp)} bourse(s) saisie(s) pour {nf(num(e.nbAccompagnateurs))} accompagnateur(s) déclaré(s) : vérifiez les quantités.
+                  </span>
+                )}
+              </div>
+            </>
+          )}
 
           {/* Objectifs du projet en lien avec l'accréditation */}
           <h4 style={{ margin: "16px 0 8px", color: "var(--gris-texte)" }}>Objectifs du projet (en lien avec l'accréditation)</h4>
@@ -1200,7 +1292,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
             <span>Pour chaque devis, choisissez la <b>catégorie</b> et <b>qui il concerne</b>. La <b>quantité</b> est déduite automatiquement :
               <b style={{color:"var(--vert-fonce)"}}> Groupe</b> → nombre d'élèves, moins 1 si un élève a des dépenses « Un seul élève » ·
               <b> Un seul élève</b> → 1 (dépenses d'un même élève, non réparties ; plusieurs lignes possibles) ·
-              <b style={{color:"var(--orange-fonce)"}}> Accompagnateurs seuls</b> → nombre d'accompagnateurs.
+              <b style={{color:"var(--orange-fonce)"}}> Accompagnateur</b> → <b>quantité modifiable</b> (le nombre d'accompagnateurs est proposé en gris tant que vous ne l'avez pas modifiée).
               Saisissez uniquement le <b>prix unitaire</b>.</span>
           </div>
           <div className="tbl-wrap">
@@ -1220,7 +1312,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
               </thead>
               <tbody>
                 {e.devis.map((d) => {
-                  const qte = qteDevisErasmus(d.cible, num(e.nbEleves), num(e.nbAccompagnateurs), calc.nbIndiv);
+                  const qte = qteDevisErasmus(d.cible, num(e.nbEleves), num(e.nbAccompagnateurs), calc.nbIndiv, d);
                   const total = qte * num(d.prixUnitaire);
                   const { el, ac } = repartirErasmus(total, d.cible);
                   return (
@@ -1238,12 +1330,21 @@ function ModuleErasmus({ state, dispatch, calc }) {
                         </select>
                       </td>
                       {/* QTE déduite automatiquement (non modifiable) */}
+                      {d.cible === "accomp" ? (
+                      <td className="montant" title="Quantité modifiable (nombre d'accompagnateurs proposé par défaut)">
+                        <input className="tbl-input num-input" type="number" min="0" step="1"
+                          value={qteAccompSaisie(d) ? d.quantiteAccomp : num(e.nbAccompagnateurs)}
+                          style={qteAccompSaisie(d) ? undefined : { color: "#888", fontStyle: "italic" }}
+                          onChange={(ev) => maj(d.id, "quantiteAccomp", ev.target.value)} />
+                      </td>
+                      ) : (
                       <td className="montant" title="Quantité déduite de la cible et des effectifs (partie 1)">
                         <b>{nf(qte)}</b>
                         {d.cible === "groupe" && calc.nbIndiv > 0 && (
                           <div style={{ fontSize: 10.5, color: "var(--gris-texte)", whiteSpace: "nowrap" }}>{nf(num(e.nbEleves))} − {nf(calc.nbIndiv)}</div>
                         )}
                       </td>
+                      )}
                       <td className="montant"><input className="tbl-input num-input" type="number" min="0" step="0.01" value={d.prixUnitaire}
                         onChange={(ev) => maj(d.id, "prixUnitaire", ev.target.value)} /></td>
                       <td className="montant"><b>{euro(total)}</b></td>
@@ -1299,7 +1400,7 @@ function ModuleErasmus({ state, dispatch, calc }) {
             <input type="text" readOnly value={euro(calc.bourse)} className="num-input"
               style={{ background: "var(--vert-clair)", color: "var(--vert-fonce)", fontWeight: 800, borderColor: "var(--vert)", cursor: "not-allowed" }} />
             <span className="aide">
-              = ({nf(num(e.nbEleves))} élève(s) × {euro(num(e.bourseParEleve))}) + ({nf(num(e.nbAccompagnateurs))} accomp. × {euro(num(e.bourseParAccomp))}).
+              = ({nf(num(e.nbEleves))} élève(s) × {euro(num(e.bourseParEleve))}) + {calc.libBoursesAccomp}.
               Modifiez les montants de bourse en partie 1.
             </span>
           </label>
@@ -1681,7 +1782,7 @@ function App() {
     const qteGroupe = Math.max(0, nbEleves - nbIndiv);
     const aDesGroupes = e.devis.some((d) => d.cible === "groupe");
     e.devis.forEach((d) => {
-      const qte = qteDevisErasmus(d.cible, nbEleves, nbAccomp, nbIndiv);
+      const qte = qteDevisErasmus(d.cible, nbEleves, nbAccomp, nbIndiv, d);
       const total = qte * num(d.prixUnitaire);
       const { el, ac } = repartirErasmus(total, d.cible);
       depEleves += el; depAccomp += ac;
@@ -1695,7 +1796,17 @@ function App() {
 
     /* --- Contrôle bourses allouées (saisies en partie 1) --- */
     const boursesEleves = num(e.bourseParEleve) * nbEleves;
-    const boursesAccomp = num(e.bourseParAccomp) * nbAccomp;
+    /* Bourses accompagnateurs : montant unique × effectif, ou détail
+       (montant × quantité) si les bourses sont différentes */
+    const detBA = (e.boursesAccompDetail || []).filter((l) => num(l.montant) > 0 || num(l.quantite) > 0);
+    const boursesAccomp = e.bourseAccompDiff
+      ? detBA.reduce((a, l) => a + num(l.montant) * num(l.quantite), 0)
+      : num(e.bourseParAccomp) * nbAccomp;
+    const qteBourseAccomp = e.bourseAccompDiff ? detBA.reduce((a, l) => a + num(l.quantite), 0) : nbAccomp;
+    const ecartQteBourseAccomp = !!e.bourseAccompDiff && nbAccomp > 0 && qteBourseAccomp !== nbAccomp;
+    const libBoursesAccomp = e.bourseAccompDiff
+      ? (detBA.length ? detBA.map((l) => "(" + nf(num(l.quantite)) + " accomp. × " + euro(num(l.montant)) + ")").join(" + ") : "(aucune bourse accompagnateur saisie)")
+      : "(" + nf(nbAccomp) + " accomp. × " + euro(num(e.bourseParAccomp)) + ")";
     const boursesTotal  = boursesEleves + boursesAccomp;
     const depassementEleves = boursesEleves > 0 && depEleves > boursesEleves;
     const depassementAccomp = boursesAccomp > 0 && depAccomp > boursesAccomp;
@@ -1768,6 +1879,7 @@ function App() {
       partFamillesTotal, partParEleve, depParEleve, depElevesIndiv, depElevesGroupe,
       nbIndiv, qteGroupe, aDesGroupes,
       boursesEleves, boursesAccomp, boursesTotal,
+      qteBourseAccomp, ecartQteBourseAccomp, libBoursesAccomp,
       depassementEleves, depassementAccomp, depassementTotal,
       totalRecettes, ecart, equilibre, excedent, deficit,
       depParCategorie, detailCategories, barresCumul, seriesCumul, erreurs };
