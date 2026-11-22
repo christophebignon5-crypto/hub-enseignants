@@ -886,12 +886,13 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
 })();
 
 </script>
-<!-- Impression : zones de texte longues jamais tronquées -->
+<!-- Impression : champs texte jamais coupés (copie en texte simple qui passe à la ligne) -->
 <style>
 .pv{display:none;}
 @media print{
   .pf{display:none!important;}
-  .pv{display:block!important;min-height:1.3em;padding:1px 0;font-size:8.5pt;line-height:1.45;color:#1e3a6e;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
+  .pv{display:block!important;flex:1;min-width:0;min-height:1.3em;padding:1px 0;font-size:8.5pt;line-height:1.45;color:#1e3a6e;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
+  .pv.pvi{border-bottom:1px solid #999;}
   .sec,.section{overflow:visible!important;}
   ::placeholder{color:transparent!important;opacity:0!important;}
   .empty-p,input.empty-p,textarea.empty-p{color:transparent!important;-webkit-text-fill-color:transparent!important;}
@@ -905,15 +906,17 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
     document.querySelectorAll('.pf').forEach(function(el){ el.classList.remove('pf'); });
     document.querySelectorAll('.empty-p').forEach(function(el){ el.classList.remove('empty-p'); });
   }
-  // Un textarea garde sa taille écran à l'impression et coupe le texte long : on imprime une copie en texte simple
+  var TXT=['text','email','tel','search','url',''];
   window.addEventListener('beforeprint',function(){
     clearPv();
-    document.querySelectorAll('input,textarea').forEach(function(f){ if(!f.value) f.classList.add('empty-p'); });
-    document.querySelectorAll('textarea').forEach(function(f){
-      if(!f.value||getComputedStyle(f).display==='none') return;
+    document.querySelectorAll('input,textarea').forEach(function(f){
+      if(f.tagName==='INPUT' && TXT.indexOf(f.type||'text')<0) return;
+      if(!f.value){ f.classList.add('empty-p'); return; }
+      if(getComputedStyle(f).display==='none') return;
       var pv=document.createElement('div');
-      pv.className='pv';
+      pv.className='pv'+(f.tagName==='INPUT'?' pvi':'');
       pv.textContent=f.value;
+      if(f.style.textAlign) pv.style.textAlign=f.style.textAlign;
       f.classList.add('pf');
       f.parentNode.insertBefore(pv,f.nextSibling);
     });
