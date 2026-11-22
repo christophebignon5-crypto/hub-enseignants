@@ -1219,6 +1219,10 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
   .pf{display:none!important;}
   .pv{display:block!important;min-height:1.3em;padding:1px 0;font-size:8.5pt;line-height:1.45;color:#1e3a6e;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;}
   .sec,.section{overflow:visible!important;}
+  /* Champs vides : pas de texte d'aide ni de format de date à l'impression */
+  ::placeholder{color:transparent!important;opacity:0!important;}
+  .empty-p,input.empty-p,textarea.empty-p{color:transparent!important;-webkit-text-fill-color:transparent!important;}
+  input[type=date]::-webkit-calendar-picker-indicator,input[type=time]::-webkit-calendar-picker-indicator{display:none!important;}
 }
 </style>
 <script>
@@ -1226,10 +1230,12 @@ fetch('https://raw.githubusercontent.com/christophebignon5-crypto/hub-enseignant
   function clearPv(){
     document.querySelectorAll('.pv').forEach(function(el){ el.remove(); });
     document.querySelectorAll('.pf').forEach(function(el){ el.classList.remove('pf'); });
+    document.querySelectorAll('.empty-p').forEach(function(el){ el.classList.remove('empty-p'); });
   }
   // Un textarea garde sa taille écran à l'impression et coupe le texte long : on imprime une copie en texte simple
   window.addEventListener('beforeprint',function(){
     clearPv();
+    document.querySelectorAll('input,textarea').forEach(function(f){ if(!f.value) f.classList.add('empty-p'); });
     document.querySelectorAll('textarea').forEach(function(f){
       if(!f.value||getComputedStyle(f).display==='none') return;
       var pv=document.createElement('div');
