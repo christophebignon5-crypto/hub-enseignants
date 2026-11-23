@@ -924,7 +924,7 @@ function initTables(){
   ['normal','modif'].forEach(t => {
     const tb = document.getElementById('tbody-'+t);
     tb.innerHTML='';
-    for(let i=0;i<3;i++) rowInto(tb);
+    for(let i=0;i<1;i++) rowInto(tb);
   });
 }
 function addRow(t){ rowInto(document.getElementById('tbody-'+t)); }
@@ -1085,7 +1085,7 @@ function populate(d){
         </td>`;
       tb.appendChild(tr);
     });
-    for(let i=(rows||[]).length;i<3;i++)rowInto(tb);
+    for(let i=(rows||[]).length;i<1;i++)rowInto(tb);
   };
   fill('normal',d.edt_normal);fill('modif',d.edt_modif);
   if(d.decision==='accordee') toggleDecision('accord');
